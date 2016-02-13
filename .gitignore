@@ -1,3 +1,12 @@
+# manually adding
+Debug
+Info.plist
+moc*.cpp
+*.build
+*.pro.user
+*.xcodeproj
+.DS_Store
+
 # Compiled Object files
 *.slo
 *.lo
