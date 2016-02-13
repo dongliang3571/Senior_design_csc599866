@@ -6,6 +6,7 @@ moc*.cpp
 *.pro.user
 *.xcodeproj
 .DS_Store
+*.stash
 
 # Compiled Object files
 *.slo
