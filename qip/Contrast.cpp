@@ -1,0 +1,158 @@
+// ======================================================================
+// IMPROC: Image Processing Software Package
+// Copyright (C) 2016 by George Wolberg
+//
+// Contrast.cpp - Brightness/Contrast widget.
+//
+// Written by: George Wolberg, 2016
+// ======================================================================
+
+#include "MainWindow.h"
+#include "Contrast.h"
+
+extern MainWindow *g_mainWindowP;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Contrast::Contrast:
+//
+// Constructor.
+//
+Contrast::Contrast(QWidget *parent) : ImageFilter(parent)
+{}
+
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Contrast::applyFilter:
+//
+// Run filter on the image, transforming I1 to I2.
+// Overrides ImageFilter::applyFilter().
+// Return 1 for success, 0 for failure.
+//
+bool
+Contrast::applyFilter(ImagePtr I1, ImagePtr I2)
+{
+	// INSERT YOUR CODE HERE
+
+        // apply filter
+	double b, c;	// brightness, contrast parameters
+    contrast(I1, b, c, I2);
+
+	return 1;
+}
+
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Contrast::createGroupBox:
+//
+// Create group box for control panel.
+//
+QGroupBox*
+Contrast::controlPanel()
+{
+    m_ctrlGrp = new QGroupBox("Contrast");
+	// init group box
+    QLabel *label_brightness = new QLabel;
+    label_brightness->setText(QString("Brightness"));
+    
+    //slider for brightness
+    m_sliderB = new QSlider(Qt::Horizontal, m_ctrlGrp);
+    m_sliderB->setTickPosition(QSlider::TicksBelow);
+    m_sliderB->setTickInterval(25);
+    m_sliderB->setMinimum(1);
+    m_sliderB->setMaximum(100);
+    m_sliderB->setValue  (25);
+    
+    //spinbox for brightness
+    m_spinBoxB = new QSpinBox(m_ctrlGrp);
+    m_spinBoxB->setMinimum(1);
+    m_spinBoxB->setMaximum(100);
+    m_spinBoxB->setValue  (25);
+    
+    QLabel *label_contrast = new QLabel;
+    label_contrast->setText(QString("Contrast"));
+    
+    //slider for contrast
+    m_sliderC = new QSlider(Qt::Horizontal, m_ctrlGrp);
+    m_sliderC->setTickPosition(QSlider::TicksBelow);
+    m_sliderC->setTickInterval(25);
+    m_sliderC->setMinimum(1);
+    m_sliderC->setMaximum(100);
+    m_sliderC->setValue  (25);
+
+    
+    // spinbox for contrast
+    m_spinBoxC = new QSpinBox(m_ctrlGrp);
+    m_spinBoxC->setMinimum(1);
+    m_spinBoxC->setMaximum(100);
+    m_spinBoxC->setValue  (25);
+    
+    // init signal/slot connections for Threshold
+    connect(m_sliderB , SIGNAL(valueChanged(int)), this, SLOT(changeBrightness (int)));
+    connect(m_spinBoxB, SIGNAL(valueChanged(int)), this, SLOT(changeBrightness (int)));
+    connect(m_sliderC,  SIGNAL(valueChanged(int)), this, SLOT(changeContrast   (int)));
+    connect(m_spinBoxC, SIGNAL(valueChanged(int)), this, SLOT(changeContrast   (int)));
+
+	// INSERT YOUR CODE HERE
+    
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(label_brightness, 0, 0);
+    layout->addWidget(m_sliderB,        0, 1);
+    layout->addWidget(m_spinBoxB,       0, 2);
+    
+    layout->addWidget(label_contrast,   1, 0);
+    layout->addWidget(m_sliderC,        1, 1);
+    layout->addWidget(m_spinBoxC,       1, 2);
+    
+    m_ctrlGrp->setLayout(layout);
+
+	return(m_ctrlGrp);
+}
+
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// contrast:
+//
+// INSERT YOUR CODE HERE.
+//
+void
+Contrast::contrast(ImagePtr I1, double brightness, double contrast, ImagePtr I2)
+{
+    
+}
+
+
+void Contrast::changeBrightness(int brightness)
+{
+    m_sliderB ->blockSignals(true );
+    m_sliderB ->setValue    (brightness);
+    m_sliderB ->blockSignals(false);
+    m_spinBoxB->blockSignals(true );
+    m_spinBoxB->setValue    (brightness);
+    m_spinBoxB->blockSignals(false);
+    
+
+    
+    
+    
+}
+
+void Contrast::changeContrast(int contrast)
+{
+    m_sliderC ->blockSignals(true );
+    m_sliderC ->setValue    (contrast);
+    m_sliderC ->blockSignals(false);
+    m_spinBoxC->blockSignals(true );
+    m_spinBoxC->setValue    (contrast);
+    m_spinBoxC->blockSignals(false);
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Contrast::reset:
+//
+// Reset parameters.
+//
+void
+Contrast::reset() {}
