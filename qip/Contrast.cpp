@@ -33,10 +33,19 @@ bool
 Contrast::applyFilter(ImagePtr I1, ImagePtr I2)
 {
 	// INSERT YOUR CODE HERE
+    
+    if(I1.isNull()) return 0;
+    // get threshold value
+    double brigt, contr;	// brightness, contrast parameters
+    brigt = (double) m_sliderB->value();
+    contr  = (double) m_sliderC->value();
+    
+    // error checking
+    if(brigt < 0 || brigt > 100 || contr < 0 || contr >100) return 0;
+    
 
         // apply filter
-	double b, c;	// brightness, contrast parameters
-    contrast(I1, b, c, I2);
+    contrast(I1, brigt, contr, I2);
 
 	return 1;
 }
@@ -120,7 +129,7 @@ Contrast::controlPanel()
 void
 Contrast::contrast(ImagePtr I1, double brightness, double contrast, ImagePtr I2)
 {
-    
+    int a = 5;
 }
 
 
@@ -134,7 +143,11 @@ void Contrast::changeBrightness(int brightness)
     m_spinBoxB->blockSignals(false);
     
 
+    // apply filter to source image; save result in destination image
+    applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
     
+    // display output
+    g_mainWindowP->displayOut();
     
     
 }
@@ -147,6 +160,12 @@ void Contrast::changeContrast(int contrast)
     m_spinBoxC->blockSignals(true );
     m_spinBoxC->setValue    (contrast);
     m_spinBoxC->blockSignals(false);
+    
+    // apply filter to source image; save result in destination image
+    applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
+    
+    // display output
+    g_mainWindowP->displayOut();
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

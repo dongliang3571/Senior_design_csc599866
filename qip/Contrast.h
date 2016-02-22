@@ -10,6 +10,8 @@
 #ifndef CONTRAST_H
 #define CONTRAST_H
 
+#define MAX_BRIGHTNESS 100
+#define MAX_CONTRAST 100
 #include "ImageFilter.h"
 
 class Contrast : public ImageFilter {
