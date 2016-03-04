@@ -8,6 +8,12 @@ moc*.cpp
 .DS_Store
 *.stash
 
+project.pbxproj
+project.xcworkspace/
+qt_makeqmake.mak
+qt_preprocess.mak
+xcshareddata/
+
 # Compiled Object files
 *.slo
 *.lo

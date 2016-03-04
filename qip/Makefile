@@ -15,7 +15,7 @@ CXX           = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefau
 DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk -mmacosx-version-min=10.7 -Wall -W -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk -mmacosx-version-min=10.7 -Wall -W -fPIC $(DEFINES)
-INCPATH       = -I. -I../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers -I../../../../Qt/5.5/clang_64/lib/QtGui.framework/Headers -I../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers -Imoc -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/AGL.framework/Headers -I../../../../Qt/5.5/clang_64/mkspecs/macx-clang -F/Users/dongliang/Qt/5.5/clang_64/lib
+INCPATH       = -I. -IIP/mac/header -I../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers -I../../../../Qt/5.5/clang_64/lib/QtGui.framework/Headers -I../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers -Imoc -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/AGL.framework/Headers -I../../../../Qt/5.5/clang_64/mkspecs/macx-clang -F/Users/dongliang/Qt/5.5/clang_64/lib
 QMAKE         = /usr/local/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -740,9 +740,20 @@ moc/moc_MainWindow.cpp: ../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Head
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbox.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbutton.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h \
+		IP/mac/header/IP.h \
+		IP/mac/header/IPdefs.h \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/QtGlobal \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/qglobal.h \
+		IP/mac/header/Channel.h \
+		IP/mac/header/ChannelPtr.h \
+		IP/mac/header/ChannelPtr.tpp \
+		IP/mac/header/Image.h \
+		IP/mac/header/ImagePtr.h \
+		IP/mac/header/IPmmch.tpp \
+		IP/mac/header/IPtoUI.h \
 		ImageFilter.h \
 		MainWindow.h
-	/Users/dongliang/Qt/5.5/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -I/Users/dongliang/Qt/5.5/clang_64/mkspecs/macx-clang -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip -I/Users/dongliang/Qt/5.5/clang_64/lib/QtWidgets.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtGui.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtCore.framework/Headers -F/Users/dongliang/Qt/5.5/clang_64/lib MainWindow.h -o moc/moc_MainWindow.cpp
+	/Users/dongliang/Qt/5.5/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -I/Users/dongliang/Qt/5.5/clang_64/mkspecs/macx-clang -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip/IP/mac/header -I/Users/dongliang/Qt/5.5/clang_64/lib/QtWidgets.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtGui.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtCore.framework/Headers -F/Users/dongliang/Qt/5.5/clang_64/lib MainWindow.h -o moc/moc_MainWindow.cpp
 
 moc/moc_Dummy.cpp: ImageFilter.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/QtWidgets \
@@ -873,8 +884,18 @@ moc/moc_Dummy.cpp: ImageFilter.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbox.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbutton.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h \
+		IP/mac/header/IP.h \
+		IP/mac/header/IPdefs.h \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/QtGlobal \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/qglobal.h \
+		IP/mac/header/Channel.h \
+		IP/mac/header/ChannelPtr.h \
+		IP/mac/header/ChannelPtr.tpp \
+		IP/mac/header/Image.h \
+		IP/mac/header/ImagePtr.h \
+		IP/mac/header/IPmmch.tpp \
 		Dummy.h
-	/Users/dongliang/Qt/5.5/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -I/Users/dongliang/Qt/5.5/clang_64/mkspecs/macx-clang -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip -I/Users/dongliang/Qt/5.5/clang_64/lib/QtWidgets.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtGui.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtCore.framework/Headers -F/Users/dongliang/Qt/5.5/clang_64/lib Dummy.h -o moc/moc_Dummy.cpp
+	/Users/dongliang/Qt/5.5/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -I/Users/dongliang/Qt/5.5/clang_64/mkspecs/macx-clang -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip/IP/mac/header -I/Users/dongliang/Qt/5.5/clang_64/lib/QtWidgets.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtGui.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtCore.framework/Headers -F/Users/dongliang/Qt/5.5/clang_64/lib Dummy.h -o moc/moc_Dummy.cpp
 
 moc/moc_Threshold.cpp: ImageFilter.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/QtWidgets \
@@ -1005,8 +1026,18 @@ moc/moc_Threshold.cpp: ImageFilter.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbox.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbutton.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h \
+		IP/mac/header/IP.h \
+		IP/mac/header/IPdefs.h \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/QtGlobal \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/qglobal.h \
+		IP/mac/header/Channel.h \
+		IP/mac/header/ChannelPtr.h \
+		IP/mac/header/ChannelPtr.tpp \
+		IP/mac/header/Image.h \
+		IP/mac/header/ImagePtr.h \
+		IP/mac/header/IPmmch.tpp \
 		Threshold.h
-	/Users/dongliang/Qt/5.5/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -I/Users/dongliang/Qt/5.5/clang_64/mkspecs/macx-clang -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip -I/Users/dongliang/Qt/5.5/clang_64/lib/QtWidgets.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtGui.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtCore.framework/Headers -F/Users/dongliang/Qt/5.5/clang_64/lib Threshold.h -o moc/moc_Threshold.cpp
+	/Users/dongliang/Qt/5.5/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -I/Users/dongliang/Qt/5.5/clang_64/mkspecs/macx-clang -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip/IP/mac/header -I/Users/dongliang/Qt/5.5/clang_64/lib/QtWidgets.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtGui.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtCore.framework/Headers -F/Users/dongliang/Qt/5.5/clang_64/lib Threshold.h -o moc/moc_Threshold.cpp
 
 moc/moc_Contrast.cpp: ImageFilter.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/QtWidgets \
@@ -1137,8 +1168,18 @@ moc/moc_Contrast.cpp: ImageFilter.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbox.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbutton.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h \
+		IP/mac/header/IP.h \
+		IP/mac/header/IPdefs.h \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/QtGlobal \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/qglobal.h \
+		IP/mac/header/Channel.h \
+		IP/mac/header/ChannelPtr.h \
+		IP/mac/header/ChannelPtr.tpp \
+		IP/mac/header/Image.h \
+		IP/mac/header/ImagePtr.h \
+		IP/mac/header/IPmmch.tpp \
 		Contrast.h
-	/Users/dongliang/Qt/5.5/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -I/Users/dongliang/Qt/5.5/clang_64/mkspecs/macx-clang -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip -I/Users/dongliang/Qt/5.5/clang_64/lib/QtWidgets.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtGui.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtCore.framework/Headers -F/Users/dongliang/Qt/5.5/clang_64/lib Contrast.h -o moc/moc_Contrast.cpp
+	/Users/dongliang/Qt/5.5/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -I/Users/dongliang/Qt/5.5/clang_64/mkspecs/macx-clang -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip -I/Users/dongliang/Documents/city_college/senior_design_csc599866/qip/IP/mac/header -I/Users/dongliang/Qt/5.5/clang_64/lib/QtWidgets.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtGui.framework/Headers -I/Users/dongliang/Qt/5.5/clang_64/lib/QtCore.framework/Headers -F/Users/dongliang/Qt/5.5/clang_64/lib Contrast.h -o moc/moc_Contrast.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -1285,6 +1326,17 @@ obj/main.o: main.cpp MainWindow.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbox.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbutton.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h \
+		IP/mac/header/IP.h \
+		IP/mac/header/IPdefs.h \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/QtGlobal \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/qglobal.h \
+		IP/mac/header/Channel.h \
+		IP/mac/header/ChannelPtr.h \
+		IP/mac/header/ChannelPtr.tpp \
+		IP/mac/header/Image.h \
+		IP/mac/header/ImagePtr.h \
+		IP/mac/header/IPmmch.tpp \
+		IP/mac/header/IPtoUI.h \
 		ImageFilter.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/main.o main.cpp
 
@@ -1417,6 +1469,17 @@ obj/MainWindow.o: MainWindow.cpp MainWindow.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbox.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbutton.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h \
+		IP/mac/header/IP.h \
+		IP/mac/header/IPdefs.h \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/QtGlobal \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/qglobal.h \
+		IP/mac/header/Channel.h \
+		IP/mac/header/ChannelPtr.h \
+		IP/mac/header/ChannelPtr.tpp \
+		IP/mac/header/Image.h \
+		IP/mac/header/ImagePtr.h \
+		IP/mac/header/IPmmch.tpp \
+		IP/mac/header/IPtoUI.h \
 		ImageFilter.h \
 		Dummy.h \
 		Threshold.h \
@@ -1551,7 +1614,17 @@ obj/ImageFilter.o: ImageFilter.cpp ImageFilter.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbar.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbox.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbutton.h \
-		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h
+		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h \
+		IP/mac/header/IP.h \
+		IP/mac/header/IPdefs.h \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/QtGlobal \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/qglobal.h \
+		IP/mac/header/Channel.h \
+		IP/mac/header/ChannelPtr.h \
+		IP/mac/header/ChannelPtr.tpp \
+		IP/mac/header/Image.h \
+		IP/mac/header/ImagePtr.h \
+		IP/mac/header/IPmmch.tpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/ImageFilter.o ImageFilter.cpp
 
 obj/Dummy.o: Dummy.cpp MainWindow.h \
@@ -1683,6 +1756,17 @@ obj/Dummy.o: Dummy.cpp MainWindow.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbox.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbutton.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h \
+		IP/mac/header/IP.h \
+		IP/mac/header/IPdefs.h \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/QtGlobal \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/qglobal.h \
+		IP/mac/header/Channel.h \
+		IP/mac/header/ChannelPtr.h \
+		IP/mac/header/ChannelPtr.tpp \
+		IP/mac/header/Image.h \
+		IP/mac/header/ImagePtr.h \
+		IP/mac/header/IPmmch.tpp \
+		IP/mac/header/IPtoUI.h \
 		ImageFilter.h \
 		Dummy.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/Dummy.o Dummy.cpp
@@ -1816,6 +1900,17 @@ obj/Threshold.o: Threshold.cpp MainWindow.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbox.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbutton.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h \
+		IP/mac/header/IP.h \
+		IP/mac/header/IPdefs.h \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/QtGlobal \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/qglobal.h \
+		IP/mac/header/Channel.h \
+		IP/mac/header/ChannelPtr.h \
+		IP/mac/header/ChannelPtr.tpp \
+		IP/mac/header/Image.h \
+		IP/mac/header/ImagePtr.h \
+		IP/mac/header/IPmmch.tpp \
+		IP/mac/header/IPtoUI.h \
 		ImageFilter.h \
 		Threshold.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/Threshold.o Threshold.cpp
@@ -1949,6 +2044,17 @@ obj/Contrast.o: Contrast.cpp MainWindow.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbox.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtoolbutton.h \
 		../../../../Qt/5.5/clang_64/lib/QtWidgets.framework/Headers/qtwidgetsversion.h \
+		IP/mac/header/IP.h \
+		IP/mac/header/IPdefs.h \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/QtGlobal \
+		../../../../Qt/5.5/clang_64/lib/QtCore.framework/Headers/qglobal.h \
+		IP/mac/header/Channel.h \
+		IP/mac/header/ChannelPtr.h \
+		IP/mac/header/ChannelPtr.tpp \
+		IP/mac/header/Image.h \
+		IP/mac/header/ImagePtr.h \
+		IP/mac/header/IPmmch.tpp \
+		IP/mac/header/IPtoUI.h \
 		ImageFilter.h \
 		Contrast.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/Contrast.o Contrast.cpp

@@ -33,6 +33,7 @@ bool
 Contrast::applyFilter(ImagePtr I1, ImagePtr I2)
 {
 	// INSERT YOUR CODE HERE
+
     
     if(I1.isNull()) return 0;
     // get threshold value
@@ -41,9 +42,9 @@ Contrast::applyFilter(ImagePtr I1, ImagePtr I2)
     contr  = (double) m_sliderC->value();
     
     // error checking
-    if(brigt < 0 || brigt > 100 || contr < 0 || contr >100) return 0;
+    if(brigt < -256 || brigt > 256 || contr < -100 || contr >100) return 0;
     
-
+    qDebug() << "hahahahaha";
         // apply filter
     contrast(I1, brigt, contr, I2);
 
@@ -69,15 +70,15 @@ Contrast::controlPanel()
     m_sliderB = new QSlider(Qt::Horizontal, m_ctrlGrp);
     m_sliderB->setTickPosition(QSlider::TicksBelow);
     m_sliderB->setTickInterval(25);
-    m_sliderB->setMinimum(1);
-    m_sliderB->setMaximum(100);
-    m_sliderB->setValue  (25);
+    m_sliderB->setMinimum(-256);
+    m_sliderB->setMaximum(256);
+    m_sliderB->setValue  (0);
     
     //spinbox for brightness
     m_spinBoxB = new QSpinBox(m_ctrlGrp);
-    m_spinBoxB->setMinimum(1);
-    m_spinBoxB->setMaximum(100);
-    m_spinBoxB->setValue  (25);
+    m_spinBoxB->setMinimum(-256);
+    m_spinBoxB->setMaximum(256);
+    m_spinBoxB->setValue  (0);
     
     QLabel *label_contrast = new QLabel;
     label_contrast->setText(QString("Contrast"));
@@ -86,16 +87,16 @@ Contrast::controlPanel()
     m_sliderC = new QSlider(Qt::Horizontal, m_ctrlGrp);
     m_sliderC->setTickPosition(QSlider::TicksBelow);
     m_sliderC->setTickInterval(25);
-    m_sliderC->setMinimum(1);
+    m_sliderC->setMinimum(-100);
     m_sliderC->setMaximum(100);
-    m_sliderC->setValue  (25);
+    m_sliderC->setValue  (0);
 
     
     // spinbox for contrast
     m_spinBoxC = new QSpinBox(m_ctrlGrp);
-    m_spinBoxC->setMinimum(1);
+    m_spinBoxC->setMinimum(-100);
     m_spinBoxC->setMaximum(100);
-    m_spinBoxC->setValue  (25);
+    m_spinBoxC->setValue  (0);
     
     // init signal/slot connections for Threshold
     connect(m_sliderB , SIGNAL(valueChanged(int)), this, SLOT(changeBrightness (int)));
@@ -129,7 +130,35 @@ Contrast::controlPanel()
 void
 Contrast::contrast(ImagePtr I1, double brightness, double contrast, ImagePtr I2)
 {
-    int a = 5;
+    
+    IP_copyImageHeader(I1, I2);
+    int w = I1->width();
+    int h = I1->height();
+    int total = w * h;
+    double contr;
+    
+    //set contrast range to 0.25 to 5
+    if (contrast >= 0) {
+        contr = contrast / 25.0 + 1.0;
+    }
+    else {
+        contr = contrast / 133.0 + 1.0;
+    }
+    
+    qDebug() << "current contrast: " << contr;
+    // compute lut[]
+    int reference = 128;
+    int i, lut[MXGRAY];
+    for(i=0; i<MXGRAY; ++i)
+        lut[i] = (int)CLIP((i - reference)*contr + 128 + brightness, 0, 255);
+    
+    
+    int type;
+    ChannelPtr<uchar> p1, p2, endd;
+    for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
+        IP_getChannel(I2, ch, p2, type);
+        for(endd = p1 + total; p1<endd;) *p2++ = lut[*p1++];
+    }
 }
 
 
