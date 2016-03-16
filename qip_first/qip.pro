@@ -1,6 +1,6 @@
 TEMPLATE    = app
 TARGET      = qip
-QT 	   += widgets printsupport
+QT 	   += widgets
 OBJECTS_DIR = ./obj
 MOC_DIR     = ./moc
 
@@ -14,7 +14,7 @@ win32-msvc2013 {
 
 
 macx{
-        QMAKE_MAC_SDK = macosx10.11
+  QMAKE_MAC_SDK = macosx10.11
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 	INCLUDEPATH += ./IP/mac/header
 	LIBS        += -L./IP/mac/lib
@@ -32,17 +32,14 @@ unix:!macx {
 # Input
 HEADERS +=	MainWindow.h	\
 		ImageFilter.h	\
-		qcustomplot.h	\
 		Dummy.h		\
 		Threshold.h	\
 		Contrast.h	\
 
-		
-SOURCES +=	main.cpp	\ 
+
+SOURCES +=	main.cpp	\
 		MainWindow.cpp 	\
 		ImageFilter.cpp	\
-		qcustomplot.cpp	\
 		Dummy.cpp	\
 		Threshold.cpp	\
 		Contrast.cpp	\
-

@@ -23,7 +23,7 @@ Dummy::Dummy(QWidget *parent) : ImageFilter(parent)
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Dummy::createPanel:
+// Dummy::createGroupBox:
 //
 // Create group box for control panel.
 //

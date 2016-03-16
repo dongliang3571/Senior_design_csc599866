@@ -28,6 +28,7 @@
 #include "IP.h"
 #include "IPtoUI.h"
 #include "ImageFilter.h"
+#include "qcustomplot.h"
 
 #define MAXFILTERS	50
 
@@ -41,6 +42,7 @@ public:
 	MainWindow	(QWidget *parent = 0);
 	ImagePtr	imageSrc	() const;
 	ImagePtr	imageDst	() const;
+	QCustomPlot*	histogram()	{return m_histogram;}
 
 public slots:
 	void		open		();
@@ -53,6 +55,9 @@ public slots:
 	void		quit		();
 	void		execute		(QAction*);
 
+protected slots:
+	void		setHisto	(int);
+
 protected:
 	void		createActions	();
 	void		createMenus	();
@@ -62,6 +67,7 @@ protected:
 	QGroupBox*	createDisplayButtons();
 	QGroupBox*	createModeButtons();
 	QHBoxLayout*	createExitButtons();
+	void		displayHistogram(ImagePtr);
 	void		display		(int);
 	void		mode		(int);
 
@@ -73,6 +79,7 @@ private:
 	QAction*		m_actionQuit;
 	QAction*		m_actionThreshold;
 	QAction*		m_actionContrast ;
+    QAction*        m_actionQuantize ;
 
 	// homework objects
 	ImageFilter*		m_imageFilterType[MAXFILTERS];
@@ -82,17 +89,33 @@ private:
 	QStackedWidget*		m_stackWidgetPanels;
 
 	// widgets for image display groupbox
-	QRadioButton*		m_radioDisplay[2];
-	QRadioButton*		m_radioMode   [2];
+	QRadioButton*		m_radioDisplay[2];	// radio buttons for input/output
+	QRadioButton*		m_radioMode   [2];	// radio buttons for RGB/Gray modes
+	QCheckBox*          m_checkboxHisto;	// checkbox: histogram display
+	QWidget*            m_extension;		// extension widget for histogram
+	QCustomPlot*		m_histogram;		// histogram plot
+    
+    
+    //groupbox
+    QGroupBox*      m_groupBox_mode;
+    QGroupBox*      m_groupBox_display;
+    
 
-	int			m_width;
-	int			m_height;
-	int			m_code;
+	int             m_width;
+	int             m_height;
+	int             m_code;
 	QString			m_file;
 	QString			m_currentDir;
 	ImagePtr		m_imageIn;
 	ImagePtr		m_imageSrc;
 	ImagePtr		m_imageDst;
+
+	// histogram variables
+	int			m_histoColor;	// histogram color id: 0=RGB, 1=R, 2=G, 3=B, 4=gray
+	double			m_histoXmin[4];	// xmin for all histogram channels
+	double			m_histoXmax[4];	// xmax for all histogram channels
+	double			m_histoYmin[4];	// ymin for all histogram channels
+	double			m_histoYmax[4];	// ymax for all histogram channels
 };
 
 

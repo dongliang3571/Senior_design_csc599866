@@ -50,7 +50,7 @@ Threshold::applyFilter(ImagePtr I1, ImagePtr I2)
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Threshold::controlPanel:
+// Threshold::createGroupBox:
 //
 // Create group box for control panel.
 //

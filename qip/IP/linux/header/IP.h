@@ -103,6 +103,8 @@ extern void	IP_RGBtoHSV1	(int, int, int, int&, int&, int&);
 extern void	IP_HSVtoRGB1	(int, int, int, int&, int&, int&);
 extern void	IP_clipRGB	(int&, int&, int&);
 
+//		IPhisto.cpp	- histogram evaluation
+extern void	IP_histogram	(ImagePtr, int, int*, int, double&, double&);
 
 //		IPinit.cpp	- initialize global IP data structures
 extern void	IP_init		(void);
