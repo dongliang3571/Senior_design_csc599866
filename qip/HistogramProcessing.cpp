@@ -90,8 +90,6 @@ HistogramProcessing::controlPanel()
     connect(m_spinboxMin,    SIGNAL(valueChanged(int)), this, SLOT(changeStretchMin(int)));
     connect(m_checkBoxAutoMin, SIGNAL(stateChanged(int)), this, SLOT(autoStretch(int)));
     
-    
-    
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(label_Max,    0, 0);
     layout->addWidget(m_sliderMax,     0, 1);
@@ -102,9 +100,6 @@ HistogramProcessing::controlPanel()
     layout->addWidget(m_sliderMin,     1, 1);
     layout->addWidget(m_spinboxMin,    1, 2);
     layout->addWidget(m_checkBoxAutoMin, 1, 3);
-    
-    
-    
     
     m_ctrlGrp->setLayout(layout);
     
@@ -198,7 +193,6 @@ void HistogramProcessing::changeStretchMax(int value) {
         settingSliderAndSpinBox(m_sliderMax, m_spinboxMax, m_sliderMin->value() + 1);
     }
     
-    
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
     
     // display output
@@ -216,7 +210,6 @@ void HistogramProcessing::changeStretchMin(int value) {
         settingSliderAndSpinBox(m_sliderMin, m_spinboxMin, m_sliderMax->value() - 1);
     }
     
-    
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
     
     // display output
@@ -224,17 +217,17 @@ void HistogramProcessing::changeStretchMin(int value) {
 }
 
 void HistogramProcessing::autoStretch(int isAuto) {
-    
-    
+
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
     g_mainWindowP->displayOut();
-    
-
 }
 
 
 void HistogramProcessing::reset() {
-    
+    //reset max attribute
+    settingSliderAndSpinBox(m_sliderMax, m_spinboxMax, MaxGray);
+    //reset min attribute
+    settingSliderAndSpinBox(m_sliderMin, m_spinboxMin, 0);
 }
 
 
