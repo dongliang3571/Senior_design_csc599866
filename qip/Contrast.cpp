@@ -207,8 +207,6 @@ void Contrast::changeBrightness(int brightness)
 void Contrast::changeContr_slide(int contrast)
 {
 
-
-        qDebug() <<"int value is "<< contrast;
         m_sliderC ->blockSignals(true );
         m_sliderC ->setValue    (contrast);
         m_sliderC ->blockSignals(false);
@@ -229,7 +227,7 @@ void Contrast::changeContr_slide(int contrast)
 
 void Contrast::changeContr_spinB(double contrast)
 {
-    qDebug() <<"double value is "<< contrast;
+
     double temp = calculateContr_int(contrast);
     m_sliderC ->blockSignals(true );
     m_sliderC ->setValue    (temp);
@@ -255,10 +253,7 @@ void Contrast::changeContr_spinB(double contrast)
 //
 void
 Contrast::reset() {
-
-    qDebug() << "its resetting on contrast";
+    
     m_sliderB -> setValue(0);
     m_sliderC -> setValue(0);
-
-
 }

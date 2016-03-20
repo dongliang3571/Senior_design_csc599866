@@ -59,7 +59,7 @@ Quantize::controlPanel()
     
     connect(m_sliderLevel ,    SIGNAL(valueChanged(int)), this, SLOT(changeLevel(int)));
     connect(m_spinboxLevel,    SIGNAL(valueChanged(int)), this, SLOT(changeLevel(int)));
-    connect(m_checkBox_dither, SIGNAL(stateChanged(int)), this, SLOT(changeDither(int)));
+    connect(m_checkBox_dither, SIGNAL(stateChanged(int)), this, SLOT(changeDither()));
     
     
     
@@ -86,101 +86,48 @@ void Quantize::quantize(ImagePtr I1, int level, bool isChecked, ImagePtr I2) {
     int w = I1->width();
     int h = I1->height();
     int total = w * h;
-    
-    // compute lut[]
     int scale = MXGRAY/level;
     
     
     int i, lut[MXGRAY];
-    for(i=0; i<MXGRAY; ++i)
-        lut[i] = CLIP(scale * (int)(i/scale) + scale/2, 0, 255);
-    
-    
-//    if (isChecked) {
-//        qDebug() <<"inside dithering";
-//        for (i=0; i<MXGRAY; ++i) {
-//            //create noise
-//            int noise = (char)(((rand()/(float)0x7fff)-0.5)*255);
-//
-//            if (i%2 != 0) {
-//                qDebug() <<"I'm before addition"<<lut[i];
-//                lut[i] = CLIP(lut[i] + noise, 0, 255);
-//                qDebug() <<"I'm in after addition"<<lut[i];
-//            }
-//            else {
-//                lut[i] = CLIP(lut[i] + noise, 0, 255);
-//            }
-//        }
-//        
-//    }
+    // compute lut[]
     
     int type;
     ChannelPtr<uchar> p1, p2, endd;
-
-    for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
-        IP_getChannel(I2, ch, p2, type);
-        for(endd = p1 + total; p1<endd;) *p2++ = lut[*p1++];
-    }
     
-    if (isChecked) {
+    for(i=0; i<MXGRAY; ++i)
+        lut[i] = CLIP(scale * (int)(i/scale) + scale/2, 0, 255);
+    
+    if (!isChecked) {
+    
+        
+        for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
+            IP_getChannel(I2, ch, p2, type);
+            for(endd = p1 + total; p1<endd;) *p2++ = lut[*p1++];
+        }
+    } else {
 
         int bias = ((MXGRAY / level) * 0.5);
         
         int point = 0;
         int randomized_bias;
+        int temp;
         for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
             IP_getChannel(I2, ch, p2, type);
-            for(endd = p1 + total; p1<endd;) {
+            for(endd = p1 + total; p1<endd; p1++, point++) {
                 
                 randomized_bias = rand() % bias;
+                if (point%2 == 0)
+                    temp = CLIP(*p1 + randomized_bias, 0, 255);
+                else
+                    temp = CLIP(*p1 - randomized_bias, 0, 255);
                 
-//                qDebug() <<randomized_bias;
-                if (point%2 == 0) {
-                    *p2 = *p1 + randomized_bias;
-                    p2++;
-                    p1++;
-                    point += 1;
-                }
-                else {
-                    *p2 = *p1 - randomized_bias;
-                    p2++;
-                    p1++;
-                    point += 1;
-                }
+                *p2++ = lut[temp];
+                
+                
             }
         }
     }
-    
-    
-    
-    
-    
-
-
-//    if (isChecked) {
-//        int error = 0;
-//        int nextValue = 0;
-//        
-//        for(i=0; i<128 && i<MXGRAY; ++i) lut[i] = 0;
-//        for(   ; i <= MaxGray;      ++i) lut[i] = MaxGray;
-//        
-//        
-//        for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
-//            IP_getChannel(I2, ch, p2, type);
-//            for(endd = p1 + total; p1<endd;) {
-//                
-//                nextValue = CLIP(*p1++ + error, 0, 255);
-//                qDebug() <<"nextblaue is "<<nextValue;
-//                error = nextValue - lut[nextValue];
-//                qDebug() <<"error is "<<error;
-//                *p2++ = lut[nextValue];
-//                qDebug() <<"lut[nextVlue] is "<<nextValue;
-//                
-//                
-//                
-//            }
-//        }
-//    }
 
 }
 
@@ -203,7 +150,7 @@ void Quantize::changeLevel(int level) {
     g_mainWindowP->displayOut();
 }
 
-void Quantize::changeDither(int flag) {
+void Quantize::changeDither() {
     
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
     g_mainWindowP->displayOut();

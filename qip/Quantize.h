@@ -18,7 +18,7 @@ protected:
     
 protected slots:
     void changeLevel (int level);
-    void changeDither(int flag);
+    void changeDither();
 
 private:
     QGroupBox*      m_ctrlGrp;	// groupbox for panel

@@ -35,7 +35,9 @@ HEADERS += Contrast.h \
            MainWindow.h \
            qcustomplot.h \
            Threshold.h \
-           Quantize.h
+           Quantize.h  \
+           HistogramProcessing.h  \
+          
 
 SOURCES += Contrast.cpp \
            Dummy.cpp \
@@ -44,4 +46,8 @@ SOURCES += Contrast.cpp \
            MainWindow.cpp \
            qcustomplot.cpp \
            Threshold.cpp \
-           Quantize.cpp
+           Quantize.cpp  \
+           HistogramProcessing.cpp \
+
+DISTFILES += \
+    IP/mac/lib/libIP_d.a

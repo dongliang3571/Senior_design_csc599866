@@ -12,10 +12,11 @@
 #include "Threshold.h"
 #include "Contrast.h"
 #include "Quantize.h"
+#include "HistogramProcessing.h"
 
 using namespace IP;
 
-enum {DUMMY, THRESHOLD, CONTRAST, QUANTIZE};
+enum {DUMMY, THRESHOLD, CONTRAST, QUANTIZE, HISTOGRAMSTRETCHING};
 enum {RGB, R, G, B, GRAY};
 
 QString GroupBoxStyle = "QGroupBox {				\
@@ -86,6 +87,10 @@ MainWindow::createActions()
     m_actionQuantize->setShortcut(tr("Ctrl+W"));
     m_actionQuantize->setData(QUANTIZE);
 
+    m_actionHistogramStretching = new QAction("&Histogram Stretching", this);
+    m_actionHistogramStretching->setShortcut(tr("Ctrl+S"));
+    m_actionHistogramStretching->setData(HISTOGRAMSTRETCHING);
+
 	// one signal-slot connection for all actions;
 	// execute() will resolve which action was triggered
 	connect(menuBar(), SIGNAL(triggered(QAction*)), this, SLOT(execute(QAction*)));
@@ -111,6 +116,11 @@ MainWindow::createMenus()
 	m_menuPtOps->addAction(m_actionThreshold);
 	m_menuPtOps->addAction(m_actionContrast );
     m_menuPtOps->addAction(m_actionQuantize );
+    
+    m_menuPtOps->addSeparator();
+    m_menuPtOps->addAction(m_actionHistogramStretching );
+    
+    qDebug() << "after insertAction";
     m_menuPtOps->setEnabled(false);
 }
 
@@ -157,6 +167,7 @@ MainWindow::createGroupPanel()
 	m_imageFilterType[THRESHOLD] = new Threshold;
 	m_imageFilterType[CONTRAST ] = new Contrast;
     m_imageFilterType[QUANTIZE ] = new Quantize;
+    m_imageFilterType[HISTOGRAMSTRETCHING] = new HistogramProcessing;
 
 	// create a stacked widget to hold multiple control panels
 	m_stackWidgetPanels = new QStackedWidget;
@@ -166,6 +177,7 @@ MainWindow::createGroupPanel()
 	m_stackWidgetPanels->addWidget(m_imageFilterType[THRESHOLD]->controlPanel());
 	m_stackWidgetPanels->addWidget(m_imageFilterType[CONTRAST ]->controlPanel());
     m_stackWidgetPanels->addWidget(m_imageFilterType[QUANTIZE ]->controlPanel());
+    m_stackWidgetPanels->addWidget(m_imageFilterType[HISTOGRAMSTRETCHING ]->controlPanel());
 
 	// display blank dummmy panel initially
 	m_stackWidgetPanels->setCurrentIndex(0);
