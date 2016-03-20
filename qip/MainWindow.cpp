@@ -391,9 +391,9 @@ void
 MainWindow::reset()
 {
     
-//    int index = m_stackWidgetPanels->currentIndex();
-//	m_imageFilterType[index]->reset();
-    m_stackWidgetImages->setCurrentIndex(0);
+    int index = m_stackWidgetPanels->currentIndex();
+	m_imageFilterType[index]->reset();
+//    m_stackWidgetImages->setCurrentIndex(0);
 }
 
 

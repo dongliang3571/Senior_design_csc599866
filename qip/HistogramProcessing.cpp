@@ -128,7 +128,7 @@ void HistogramProcessing::Stretching(ImagePtr I1, int max, int min, ImagePtr I2)
     
     if (m_checkBoxAutoMax->isChecked() || m_checkBoxAutoMin->isChecked()) {
         // Initialize Histogram array with all 0s
-        for(i = 0; i < MaxGray; i++) Histogram_Array[i] = 0;
+        for(i = 0; i < MXGRAY; i++) Histogram_Array[i] = 0;
         
         //Count frequency for all pixels from tje input image
         for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++)
@@ -138,7 +138,7 @@ void HistogramProcessing::Stretching(ImagePtr I1, int max, int min, ImagePtr I2)
     
     if (m_checkBoxAutoMax->isChecked()) {
         //find max
-        for(i = MaxGray-1; i >= 0; i--) {
+        for(i = MaxGray; i >= 0; i--) {
             if (!Histogram_Array[i]);
             else {
                 tempMax = i;
@@ -150,7 +150,7 @@ void HistogramProcessing::Stretching(ImagePtr I1, int max, int min, ImagePtr I2)
     
     if (m_checkBoxAutoMin->isChecked()) {
         //find min
-        for(i = 0; i < MaxGray; i++) {
+        for(i = 0; i < MXGRAY; i++) {
             if (!Histogram_Array[i]);
             else {
                 tempMin = i;
@@ -224,10 +224,12 @@ void HistogramProcessing::autoStretch(int isAuto) {
 
 
 void HistogramProcessing::reset() {
+    
+    qDebug() <<MaxGray <<"  "<<MXGRAY;
     //reset max attribute
-    settingSliderAndSpinBox(m_sliderMax, m_spinboxMax, MaxGray);
+    m_sliderMax->setValue(MaxGray);
     //reset min attribute
-    settingSliderAndSpinBox(m_sliderMin, m_spinboxMin, 0);
+    m_sliderMin->setValue(0);
 }
 
 
