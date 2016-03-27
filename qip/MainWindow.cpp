@@ -12,11 +12,12 @@
 #include "Threshold.h"
 #include "Contrast.h"
 #include "Quantize.h"
-#include "HistogramProcessing.h"
+#include "HistogramStretching.h"
+#include "HistogramMatching.h"
 
 using namespace IP;
 
-enum {DUMMY, THRESHOLD, CONTRAST, QUANTIZE, HISTOGRAMSTRETCHING};
+enum {DUMMY, THRESHOLD, CONTRAST, QUANTIZE, HISTOGRAMSTRETCHING, HISTOGRAMMATCHING};
 enum {RGB, R, G, B, GRAY};
 
 QString GroupBoxStyle = "QGroupBox {				\
@@ -45,6 +46,11 @@ MainWindow::MainWindow(QWidget *parent)
 	createActions();
 	createMenus  ();
 	createWidgets();
+    
+//    for (int k = 0; k<100; k++) {
+//        printf("value is %d\n", (rand()&0x7fff));
+//        printf("value is %d\n", (rand()&3));
+//    }
 
 }
 
@@ -90,6 +96,10 @@ MainWindow::createActions()
     m_actionHistogramStretching = new QAction("&Histogram Stretching", this);
     m_actionHistogramStretching->setShortcut(tr("Ctrl+S"));
     m_actionHistogramStretching->setData(HISTOGRAMSTRETCHING);
+    
+    m_actionHistogramMatching = new QAction("&Histogram Matching", this);
+    m_actionHistogramMatching->setShortcut(tr("Ctrl+M"));
+    m_actionHistogramMatching->setData(HISTOGRAMMATCHING);
 
 	// one signal-slot connection for all actions;
 	// execute() will resolve which action was triggered
@@ -119,6 +129,7 @@ MainWindow::createMenus()
     
     m_menuPtOps->addSeparator();
     m_menuPtOps->addAction(m_actionHistogramStretching );
+    m_menuPtOps->addAction(m_actionHistogramMatching);
     
     qDebug() << "after insertAction";
     m_menuPtOps->setEnabled(false);
@@ -167,7 +178,8 @@ MainWindow::createGroupPanel()
 	m_imageFilterType[THRESHOLD] = new Threshold;
 	m_imageFilterType[CONTRAST ] = new Contrast;
     m_imageFilterType[QUANTIZE ] = new Quantize;
-    m_imageFilterType[HISTOGRAMSTRETCHING] = new HistogramProcessing;
+    m_imageFilterType[HISTOGRAMSTRETCHING] = new HistogramStretching;
+    m_imageFilterType[HISTOGRAMMATCHING] = new HistogramMatching;
 
 	// create a stacked widget to hold multiple control panels
 	m_stackWidgetPanels = new QStackedWidget;
@@ -178,6 +190,7 @@ MainWindow::createGroupPanel()
 	m_stackWidgetPanels->addWidget(m_imageFilterType[CONTRAST ]->controlPanel());
     m_stackWidgetPanels->addWidget(m_imageFilterType[QUANTIZE ]->controlPanel());
     m_stackWidgetPanels->addWidget(m_imageFilterType[HISTOGRAMSTRETCHING ]->controlPanel());
+    m_stackWidgetPanels->addWidget(m_imageFilterType[HISTOGRAMMATCHING]->controlPanel());
 
 	// display blank dummmy panel initially
 	m_stackWidgetPanels->setCurrentIndex(0);
