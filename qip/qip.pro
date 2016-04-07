@@ -38,6 +38,8 @@ HEADERS += Contrast.h \
            Quantize.h  \
            HistogramStretching.h  \
            HistogramMatching.h    \
+           ErrorDiffusion.h       \
+           BlurSharpen.h          \
           
 
 SOURCES += Contrast.cpp \
@@ -50,6 +52,8 @@ SOURCES += Contrast.cpp \
            Quantize.cpp  \
            HistogramStretching.cpp \
            HistogramMatching.cpp   \
+           ErrorDiffusion.cpp      \
+           BlurSharpen.cpp         \
 
 DISTFILES += \
     IP/mac/lib/libIP_d.a

@@ -73,55 +73,6 @@ HistogramMatching::controlPanel()
 }
 
 
-// gray = .3R +.59G + .11B
-//void HistogramMatching::MatchingEq(ImagePtr I1, ImagePtr I2) {
-//    
-//    IP_copyImageHeader(I1, I2);
-//    int w = I1->width();
-//    int h = I1->height();
-//    int total = w * h;
-//    
-//    int i, R;
-//    int left[MXGRAY], width[MXGRAY];
-//    long Hsum, Havg, histo[MXGRAY];
-//    
-//    int type;
-//    ChannelPtr<uchar> p1, p2, endd;
-//    
-//    for(i=0; i<MXGRAY; i++) histo[i] = 0; /* clear histogram */
-//    
-//    //Count frequency for all pixels from tje input image
-//    for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++)
-//        for(endd = p1 + total; p1<endd; p1++)
-//            histo[*p1] += 1;
-//    R = 0;
-//    Hsum = 0;
-//    Havg = total / MXGRAY;
-//    
-//    
-//    for(i=0; i<MXGRAY; i++) {
-//        left[i] = R; /* left end of interval */
-//        Hsum += histo[i]; /* cum. interval value */
-//        while(Hsum>Havg && R<MXGRAY-1) { /* make interval wider */
-//            Hsum -= Havg;
-//            R++;
-//        }
-//        width[i] = R - left[i] + 1;
-//    }
-//    
-//    for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
-//        IP_getChannel(I2, ch, p2, type);
-//        for(endd = p1 + total; p1<endd; p1++, p2++) {
-//            if(width[*p1] == 1) *p2 = left[*p1];
-//            else {
-//                R = ((rand()&0x7fff)*width[*p1])>>15; /* 0 <= R < width */
-//                printf("R is %d \n", left[*p1]);
-//                *p2 = left[*p1] + R;
-//            }
-//        }
-//    }
-//}
-
 
 void HistogramMatching::Matching(ImagePtr I1, int value, ImagePtr I2) {
     
@@ -142,14 +93,14 @@ void HistogramMatching::Matching(ImagePtr I1, int value, ImagePtr I2) {
         histo[i] = 0; /* clear histogram */
         reserved[i] = 0;
     }
-        
+    
     
     for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++)
         for(endd = p1 + total; p1<endd; p1++)
             histo[*p1] += 1;
     
     for (i = 0; i < MXGRAY; i++) {
-    
+        
         //check slider is positive or negative
         if (value >= 0) {
             Histogram_ref[i] = pow(i/(double)MaxGray, value);
@@ -173,7 +124,7 @@ void HistogramMatching::Matching(ImagePtr I1, int value, ImagePtr I2) {
             Hsum -= Histogram_ref[R];
             R++;
         }
-
+        
         if(left[i] != R) {
             reserved[R] = Hsum;
         }

@@ -14,10 +14,12 @@
 #include "Quantize.h"
 #include "HistogramStretching.h"
 #include "HistogramMatching.h"
+#include "ErrorDiffusion.h"
+#include "BlurSharpen.h"
 
 using namespace IP;
 
-enum {DUMMY, THRESHOLD, CONTRAST, QUANTIZE, HISTOGRAMSTRETCHING, HISTOGRAMMATCHING};
+enum {DUMMY, THRESHOLD, CONTRAST, QUANTIZE, HISTOGRAMSTRETCHING, HISTOGRAMMATCHING, ERRORDIFFUSION, BLURSHARPEN};
 enum {RGB, R, G, B, GRAY};
 
 QString GroupBoxStyle = "QGroupBox {				\
@@ -93,14 +95,21 @@ MainWindow::createActions()
     m_actionQuantize->setShortcut(tr("Ctrl+W"));
     m_actionQuantize->setData(QUANTIZE);
 
-    m_actionHistogramStretching = new QAction("&Histogram Stretching", this);
+    m_actionHistogramStretching = new QAction("Histogram &Stretching", this);
     m_actionHistogramStretching->setShortcut(tr("Ctrl+S"));
     m_actionHistogramStretching->setData(HISTOGRAMSTRETCHING);
     
-    m_actionHistogramMatching = new QAction("&Histogram Matching", this);
+    m_actionHistogramMatching = new QAction("Histogram &Matching", this);
     m_actionHistogramMatching->setShortcut(tr("Ctrl+M"));
     m_actionHistogramMatching->setData(HISTOGRAMMATCHING);
+    
+    m_actionErrorDiffusion = new QAction("&Error Diffusion", this);
+    m_actionErrorDiffusion->setShortcut(tr("Ctrl+E"));
+    m_actionErrorDiffusion->setData(ERRORDIFFUSION);
 
+    m_actionBlurSharpen = new QAction("&Blur and Sharpen", this);
+    m_actionBlurSharpen->setShortcut(tr("Ctrl+B"));
+    m_actionBlurSharpen->setData(BLURSHARPEN);
 	// one signal-slot connection for all actions;
 	// execute() will resolve which action was triggered
 	connect(menuBar(), SIGNAL(triggered(QAction*)), this, SLOT(execute(QAction*)));
@@ -130,8 +139,13 @@ MainWindow::createMenus()
     m_menuPtOps->addSeparator();
     m_menuPtOps->addAction(m_actionHistogramStretching );
     m_menuPtOps->addAction(m_actionHistogramMatching);
+    m_menuPtOps->addSeparator();
     
-    qDebug() << "after insertAction";
+    m_menuNeighborhoodOps = menuBar()->addMenu("&Neighbor Ops");
+    
+    m_menuNeighborhoodOps->addAction(m_actionErrorDiffusion);
+    m_menuNeighborhoodOps->addAction(m_actionBlurSharpen);
+    
     m_menuPtOps->setEnabled(false);
 }
 
@@ -180,6 +194,8 @@ MainWindow::createGroupPanel()
     m_imageFilterType[QUANTIZE ] = new Quantize;
     m_imageFilterType[HISTOGRAMSTRETCHING] = new HistogramStretching;
     m_imageFilterType[HISTOGRAMMATCHING] = new HistogramMatching;
+    m_imageFilterType[ERRORDIFFUSION] = new ErrorDiffusion;
+    m_imageFilterType[BLURSHARPEN] = new BlurSharpen;
 
 	// create a stacked widget to hold multiple control panels
 	m_stackWidgetPanels = new QStackedWidget;
@@ -191,6 +207,8 @@ MainWindow::createGroupPanel()
     m_stackWidgetPanels->addWidget(m_imageFilterType[QUANTIZE ]->controlPanel());
     m_stackWidgetPanels->addWidget(m_imageFilterType[HISTOGRAMSTRETCHING ]->controlPanel());
     m_stackWidgetPanels->addWidget(m_imageFilterType[HISTOGRAMMATCHING]->controlPanel());
+    m_stackWidgetPanels->addWidget(m_imageFilterType[ERRORDIFFUSION]->controlPanel());
+    m_stackWidgetPanels->addWidget(m_imageFilterType[BLURSHARPEN]->controlPanel());
 
 	// display blank dummmy panel initially
 	m_stackWidgetPanels->setCurrentIndex(0);

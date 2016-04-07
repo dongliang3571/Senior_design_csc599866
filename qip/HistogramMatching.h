@@ -10,22 +10,6 @@
 #define HistogramMatching_h
 
 #include <stdio.h>
-
-#endif /* HistogramMatching_h */
-//
-//  HistogramMatching.h
-//  qip
-//
-//  Created by dong liang on 3/19/16.
-//
-//
-
-#ifndef HistogramMatching_H
-#define HistogramMatching_H
-
-#include <stdio.h>
-
-
 #include "ImageFilter.h"
 
 class HistogramMatching: public ImageFilter {
