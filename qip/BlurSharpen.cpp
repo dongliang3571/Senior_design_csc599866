@@ -23,7 +23,7 @@ BlurSharpen::applyFilter(ImagePtr I1, ImagePtr I2)
     
     int isChecked = 0;
     
-    Blur(I1, true, 19, 7, I2);
+    Blur(I1, true, 1, 19, I2);
     
     return 1;
 }
@@ -46,7 +46,7 @@ void BlurSharpen::copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int ke
     
     int i;
     int neighborSize = kernel/2;
-//    printf("kernal us %d\n", kernel);
+
     if (strike == 1) {
         for (i = 0; i < neighborSize; i++ ) {
             buffer[i] = *imagePtr;
@@ -72,9 +72,7 @@ void BlurSharpen::copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int ke
             buffer[i] = *(imagePtr+strike*count);
             count++;
         }
-        imagePtr++;
 
-        
     }
 }
 
@@ -91,7 +89,7 @@ BlurSharpen::Blur(ImagePtr I1, bool isChecked, int xsz, int ysz, ImagePtr I2) {
 
     ChannelPtr<uchar> p1, p2, endd, tempOut;
     
-    if (xsz == 1) {
+    if (xsz == 1 && ysz == 1) {
         for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
             IP_getChannel(I2, ch, p2, type);
             for(endd = p1 + total; p1<endd;) *p2++ = *p1++;
@@ -129,22 +127,25 @@ BlurSharpen::Blur(ImagePtr I1, bool isChecked, int xsz, int ysz, ImagePtr I2) {
     buffer = new short[bufferSize];
     
     for(ch = 0; IP_getChannel(tempImage, ch, tempOut, type); ch++) {
-        IP_getChannel(I1, ch, p1, type);
         IP_getChannel(I2, ch, p2, type);
-//        for(x = 0; x < w; x++) {
+
+        for(x = 0; x < w; x++) {
             sum = 0;
-            copyRowToBuffer(p1, h, ysz, w);
-        copyRowToBuffer(p1, h, ysz, w);
-        printf("heigh is %d\n", h);
-        printf("buffersize is %d\n", bufferSize);
-        for (x = 0; x < bufferSize; x++) {
-            printf("indxe at %d, valye is %d\n", x*w+1, buffer[x]);
-        }
-//        }
-    }
-    for(ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
-        for (x = 0; x < total; x++) {
-            printf("at index %d value is %d\n", x , *p1++);
+            copyRowToBuffer(tempOut, h, ysz, w);
+            in = buffer;
+
+            for (k = 0; k < ysz; k++) {
+                sum += in[k];
+            }
+
+            int count = 0;
+            for (y = YneighborSize; y < h+YneighborSize; y++) {
+                p2[count*w] = sum/ysz;
+                sum += (in[y+YneighborSize+1] - in[y-YneighborSize]);
+                count++;
+            }
+            p2++;
+            tempOut++;
         }
     }
 }
