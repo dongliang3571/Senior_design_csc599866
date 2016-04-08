@@ -24,7 +24,7 @@ public:
     
 protected:
     
-    void Blur(ImagePtr I1, bool isChecked, ImagePtr I2);
+    void Blur(ImagePtr I1, bool isChecked, int kernel, int strike, ImagePtr I2);
     
     protected slots:
 //    void startBlur(int);

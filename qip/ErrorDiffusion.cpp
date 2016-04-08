@@ -117,10 +117,10 @@ void ErrorDiffusion::ErrorDiffuse(ImagePtr I1, bool isChecked, ImagePtr I2) {
                     *p2 = (*in1 < thr)? 0 : 255;
                     error = *in1 - *p2;
                     
-                    *(in1+1)   += (error * 3/16);
-                    *(in2-1)   += (error * 5/16);
-                    *(in2)     += (error * 1/16);
-                    *(in2+1)   += (error * 7/16);
+                    *(in1+1)   += (error * 7/16);
+                    *(in2-1)   += (error * 3/16);
+                    *(in2)     += (error * 5/16);
+                    *(in2+1)   += (error * 1/16);
                     
                     in1++;
                     in2++;
