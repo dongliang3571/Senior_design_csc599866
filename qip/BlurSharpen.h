@@ -24,7 +24,7 @@ public:
     
 protected:
     
-    void Blur(ImagePtr I1, bool isChecked, int kernel, int strike, ImagePtr I2);
+    void Blur(ImagePtr I1, bool isChecked, int xsz, int ysz, ImagePtr I2);
     
     protected slots:
 //    void startBlur(int);
@@ -32,7 +32,7 @@ protected:
     
 private:
     
-    void            copyRowToBuffer(ChannelPtr<uchar> &p1, int width, int kernel, int strike);
+    void            copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int kernel, int strike);
     
     int             bufferSize;
     short*          buffer;
