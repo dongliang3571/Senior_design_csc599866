@@ -24,22 +24,37 @@ public:
     
 protected:
     
-    void Blur(ImagePtr I1, bool isChecked, int xsz, int ysz, ImagePtr I2);
+    void Blur(ImagePtr I1, int xsz, int ysz, ImagePtr I2);
+    void Sharpen(ImagePtr I1, int filterSize, double factor, ImagePtr I2);
     
     protected slots:
-//    void startBlur(int);
+        void startBlurring  (bool clicked);
+        void startSharpening(bool clicked);
+        void changeXrange   (int  value);
+        void changeYrange   (int  value);
+        void changeFactor   (int  value);
+        void lockXY         (int  isChecked);
     
     
 private:
     
     void            copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int kernel, int strike);
     
+    void            settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value);
     int             bufferSize;
     short*          buffer;
-//    short*          bufferDown;
     
     QGroupBox*      m_ctrlGrp;	// groupbox for panel
-    QCheckBox*      m_checkbox;
+    QRadioButton*   m_radioButtons[2];
+    QSlider*        m_sliderXrange;
+    QSlider*        m_sliderYrange;
+    QSpinBox*       m_spinBoxXrange;
+    QSpinBox*       m_spinBoxYrange;
+    
+    QSlider*        m_sliderFactor;
+    QSpinBox*       m_spinBoxFactor;
+    
+    QCheckBox*      m_checkboxLockXY;
     
 };
 
