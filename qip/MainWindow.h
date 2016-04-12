@@ -89,7 +89,7 @@ private:
     //Neighborhood operations
     QAction*        m_actionErrorDiffusion;
     QAction*        m_actionBlurSharpen;
-
+    QAction*        m_actionMedianFilter;
 	// homework objects
 	ImageFilter*		m_imageFilterType[MAXFILTERS];
 

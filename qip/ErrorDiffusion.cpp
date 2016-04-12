@@ -90,15 +90,14 @@ void ErrorDiffusion::ErrorDiffuse(ImagePtr I1, bool isChecked, ImagePtr I2) {
         short* in2;
         int thr = MXGRAY/2;
         int error;
-        
         bufferSize = w+2;
         bufferUp   = new short[bufferSize];
         bufferDown = new short[bufferSize];
         
         for(ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
             IP_getChannel(I2, ch, p2, type);
-
             copyRowToBuffer(p1, w, 0);
+            
             for(y = 1; y < h; y++) {
                 copyRowToBuffer(p1, w, y);
                 if (y%2 == 0) {
@@ -108,7 +107,6 @@ void ErrorDiffusion::ErrorDiffuse(ImagePtr I1, bool isChecked, ImagePtr I2) {
                     in1 = bufferUp   + 1;
                     in2 = bufferDown + 1;
                 }
-                
                 for (x = 0; x < w; x++) {
                     *p2 = (*in1 < thr)? 0 : 255;
                     error = *in1 - *p2;
@@ -116,13 +114,14 @@ void ErrorDiffusion::ErrorDiffuse(ImagePtr I1, bool isChecked, ImagePtr I2) {
                     *(in2-1)   += (error * 3/16);
                     *(in2)     += (error * 5/16);
                     *(in2+1)   += (error * 1/16);
-                    
                     in1++;
                     in2++;
                     p2++;
                 }
             }
         }
+        delete [] bufferUp;
+        delete [] bufferDown;
     } else {
         for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
             IP_getChannel(I2, ch, p2, type);

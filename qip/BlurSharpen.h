@@ -39,7 +39,6 @@ protected:
 private:
     
     void            copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int kernel, int strike);
-    
     void            settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value);
     int             bufferSize;
     short*          buffer;

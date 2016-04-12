@@ -16,10 +16,11 @@
 #include "HistogramMatching.h"
 #include "ErrorDiffusion.h"
 #include "BlurSharpen.h"
+#include "MedianFilter.h"
 
 using namespace IP;
 
-enum {DUMMY, THRESHOLD, CONTRAST, QUANTIZE, HISTOGRAMSTRETCHING, HISTOGRAMMATCHING, ERRORDIFFUSION, BLURSHARPEN};
+enum {DUMMY, THRESHOLD, CONTRAST, QUANTIZE, HISTOGRAMSTRETCHING, HISTOGRAMMATCHING, ERRORDIFFUSION, BLURSHARPEN, MEDIANFILTER};
 enum {RGB, R, G, B, GRAY};
 
 QString GroupBoxStyle = "QGroupBox {				\
@@ -110,6 +111,10 @@ MainWindow::createActions()
     m_actionBlurSharpen = new QAction("&Blur and Sharpen", this);
     m_actionBlurSharpen->setShortcut(tr("Ctrl+B"));
     m_actionBlurSharpen->setData(BLURSHARPEN);
+    
+    m_actionMedianFilter = new QAction("Me&dian Filter", this);
+    m_actionMedianFilter->setShortcut(tr("Ctrl+D"));
+    m_actionMedianFilter->setData(MEDIANFILTER);
 	// one signal-slot connection for all actions;
 	// execute() will resolve which action was triggered
 	connect(menuBar(), SIGNAL(triggered(QAction*)), this, SLOT(execute(QAction*)));
@@ -145,6 +150,7 @@ MainWindow::createMenus()
     
     m_menuNeighborhoodOps->addAction(m_actionErrorDiffusion);
     m_menuNeighborhoodOps->addAction(m_actionBlurSharpen);
+    m_menuNeighborhoodOps->addAction(m_actionMedianFilter);
     
     m_menuPtOps->setEnabled(false);
 }
@@ -196,6 +202,7 @@ MainWindow::createGroupPanel()
     m_imageFilterType[HISTOGRAMMATCHING] = new HistogramMatching;
     m_imageFilterType[ERRORDIFFUSION] = new ErrorDiffusion;
     m_imageFilterType[BLURSHARPEN] = new BlurSharpen;
+    m_imageFilterType[MEDIANFILTER] = new MedianFilter;
 
 	// create a stacked widget to hold multiple control panels
 	m_stackWidgetPanels = new QStackedWidget;
@@ -209,6 +216,7 @@ MainWindow::createGroupPanel()
     m_stackWidgetPanels->addWidget(m_imageFilterType[HISTOGRAMMATCHING]->controlPanel());
     m_stackWidgetPanels->addWidget(m_imageFilterType[ERRORDIFFUSION]->controlPanel());
     m_stackWidgetPanels->addWidget(m_imageFilterType[BLURSHARPEN]->controlPanel());
+    m_stackWidgetPanels->addWidget(m_imageFilterType[MEDIANFILTER]->controlPanel());
 
 	// display blank dummmy panel initially
 	m_stackWidgetPanels->setCurrentIndex(0);

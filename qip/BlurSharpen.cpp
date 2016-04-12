@@ -133,12 +133,12 @@ BlurSharpen::controlPanel()
     return(m_ctrlGrp);
 }
 
-void BlurSharpen::copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int kernel, int strike) {
+void BlurSharpen::copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int kernel, int stride) {
     
     int i;
     int neighborSize = kernel/2;
-
-    if (strike == 1) {
+    
+    if (stride == 1) {
         for (i = 0; i < neighborSize; i++ ) {
             buffer[i] = *imagePtr;
         }
@@ -154,14 +154,15 @@ void BlurSharpen::copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int ke
         for (i = 0; i < neighborSize; i++ ) {
             buffer[i] = *imagePtr;
         }
-        
+        int k = *(imagePtr+(width-1)*stride);
         for (i = neighborSize+width; i < bufferSize; i++) {
-            buffer[i] = *(imagePtr+(width-1)*strike);
+            buffer[i] = k;
         }
-        int count = 0;
+//        int count = 0;
+        ChannelPtr<uchar> p = imagePtr;
         for (i = neighborSize; i < width+neighborSize; i++ ) {
-            buffer[i] = *(imagePtr+strike*count);
-            count++;
+            buffer[i] = *p;
+            p += stride;
         }
 
     }
@@ -216,7 +217,7 @@ BlurSharpen::Blur(ImagePtr I1, int xsz, int ysz, ImagePtr I2) {
     //blurring the columns
     delete[] buffer;
     int YneighborSize = ysz/2;
-    bufferSize = w + YneighborSize*2;
+    bufferSize = h + YneighborSize*2;
     buffer = new short[bufferSize];
     
     for(ch = 0; IP_getChannel(tempImage, ch, tempOut, type); ch++) {
@@ -241,6 +242,7 @@ BlurSharpen::Blur(ImagePtr I1, int xsz, int ysz, ImagePtr I2) {
             tempOut++;
         }
     }
+    delete[] buffer;
 }
 
 
@@ -269,8 +271,8 @@ void BlurSharpen::Sharpen(ImagePtr I1, int filterSize, double factor, ImagePtr I
     for(ch = 0; IP_getChannel(tempImage, ch, tempOut, type); ch++) {
         IP_getChannel(I1, ch, p1, type);
         IP_getChannel(I2, ch, p2, type);
-        for(endd = tempOut + total; tempOut<endd; p2++, p1++, tempOut++) *p2 = CLIP(*p1 + factor*(*p1-*tempOut), 0, 255);
-        
+        for(endd = tempOut + total; tempOut<endd; p2++, p1++, tempOut++)
+            *p2 = CLIP(factor*(*p1-*tempOut), 0, 255);
     }
 }
 
@@ -329,11 +331,18 @@ void BlurSharpen::lockXY(int isChecked) {
         
         applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
         g_mainWindowP->displayOut();
+    } else {
+        m_sliderYrange ->setEnabled(true);
+        m_spinBoxYrange->setEnabled(true);
+        
+        applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
+        g_mainWindowP->displayOut();
     }
     
 }
 
 void BlurSharpen::settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value) {
+    value += !(value%2);
     slider->blockSignals(true );
     slider->setValue    (value);
     slider->blockSignals(false);
