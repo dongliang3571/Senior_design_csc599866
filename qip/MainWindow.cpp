@@ -15,12 +15,14 @@
 #include "HistogramStretching.h"
 #include "HistogramMatching.h"
 #include "ErrorDiffusion.h"
-#include "BlurSharpen.h"
+#include "Blur.h"
+#include "Sharpen.h"
 #include "MedianFilter.h"
+
 
 using namespace IP;
 
-enum {DUMMY, THRESHOLD, CONTRAST, QUANTIZE, HISTOGRAMSTRETCHING, HISTOGRAMMATCHING, ERRORDIFFUSION, BLURSHARPEN, MEDIANFILTER};
+enum {DUMMY, THRESHOLD, CONTRAST, QUANTIZE, HISTOGRAMSTRETCHING, HISTOGRAMMATCHING, ERRORDIFFUSION, BLUR, SHARPEN, MEDIANFILTER};
 enum {RGB, R, G, B, GRAY};
 
 QString GroupBoxStyle = "QGroupBox {				\
@@ -108,9 +110,13 @@ MainWindow::createActions()
     m_actionErrorDiffusion->setShortcut(tr("Ctrl+E"));
     m_actionErrorDiffusion->setData(ERRORDIFFUSION);
 
-    m_actionBlurSharpen = new QAction("&Blur and Sharpen", this);
-    m_actionBlurSharpen->setShortcut(tr("Ctrl+B"));
-    m_actionBlurSharpen->setData(BLURSHARPEN);
+    m_actionBlur = new QAction("&Blur", this);
+    m_actionBlur->setShortcut(tr("Ctrl+B"));
+    m_actionBlur->setData(BLUR);
+    
+    m_actionSharpen = new QAction("&Sharpen", this);
+    m_actionSharpen->setShortcut(tr("Ctrl+s"));
+    m_actionSharpen->setData(SHARPEN);
     
     m_actionMedianFilter = new QAction("Me&dian Filter", this);
     m_actionMedianFilter->setShortcut(tr("Ctrl+D"));
@@ -149,7 +155,8 @@ MainWindow::createMenus()
     m_menuNeighborhoodOps = menuBar()->addMenu("&Neighbor Ops");
     
     m_menuNeighborhoodOps->addAction(m_actionErrorDiffusion);
-    m_menuNeighborhoodOps->addAction(m_actionBlurSharpen);
+    m_menuNeighborhoodOps->addAction(m_actionBlur);
+    m_menuNeighborhoodOps->addAction(m_actionSharpen);
     m_menuNeighborhoodOps->addAction(m_actionMedianFilter);
     
     m_menuPtOps->setEnabled(false);
@@ -201,7 +208,8 @@ MainWindow::createGroupPanel()
     m_imageFilterType[HISTOGRAMSTRETCHING] = new HistogramStretching;
     m_imageFilterType[HISTOGRAMMATCHING] = new HistogramMatching;
     m_imageFilterType[ERRORDIFFUSION] = new ErrorDiffusion;
-    m_imageFilterType[BLURSHARPEN] = new BlurSharpen;
+    m_imageFilterType[BLUR] = new Blur;
+    m_imageFilterType[SHARPEN] = new Sharpen;
     m_imageFilterType[MEDIANFILTER] = new MedianFilter;
 
 	// create a stacked widget to hold multiple control panels
@@ -215,7 +223,8 @@ MainWindow::createGroupPanel()
     m_stackWidgetPanels->addWidget(m_imageFilterType[HISTOGRAMSTRETCHING ]->controlPanel());
     m_stackWidgetPanels->addWidget(m_imageFilterType[HISTOGRAMMATCHING]->controlPanel());
     m_stackWidgetPanels->addWidget(m_imageFilterType[ERRORDIFFUSION]->controlPanel());
-    m_stackWidgetPanels->addWidget(m_imageFilterType[BLURSHARPEN]->controlPanel());
+    m_stackWidgetPanels->addWidget(m_imageFilterType[BLUR]->controlPanel());
+    m_stackWidgetPanels->addWidget(m_imageFilterType[SHARPEN]->controlPanel());
     m_stackWidgetPanels->addWidget(m_imageFilterType[MEDIANFILTER]->controlPanel());
 
 	// display blank dummmy panel initially

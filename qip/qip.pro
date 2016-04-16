@@ -39,8 +39,10 @@ HEADERS += Contrast.h \
            HistogramStretching.h  \
            HistogramMatching.h    \
            ErrorDiffusion.h       \
-           BlurSharpen.h          \
+           Blur.h                 \
+           Sharpen.h              \
            MedianFilter.h         \
+
           
 
 SOURCES += Contrast.cpp \
@@ -54,8 +56,10 @@ SOURCES += Contrast.cpp \
            HistogramStretching.cpp \
            HistogramMatching.cpp   \
            ErrorDiffusion.cpp      \
-           BlurSharpen.cpp         \
+           Blur.cpp                \
+           Sharpen.cpp             \
            MedianFilter.cpp        \
+
 
 DISTFILES += \
     IP/mac/lib/libIP_d.a

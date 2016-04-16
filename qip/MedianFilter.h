@@ -31,9 +31,10 @@ protected:
     protected slots:
     
 private:
-    void            copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int kernel, int strike);
+//    void            copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int kernel, int strike);
+    void            copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, short* lastRow, int row, int width, int height, int kernel);
     int             bufferSize;
-    short*          buffer;
+    short**         buffer;
     
     QGroupBox*      m_ctrlGrp;	// groupbox for panel
     
