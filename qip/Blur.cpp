@@ -229,10 +229,10 @@ Blur::Blurring(ImagePtr I1, int xsz, int ysz, ImagePtr I2) {
 void Blur::changeXrange(int value) {
     bool isChecked = m_checkboxLockXY->isChecked();
     if (isChecked) {
-        settingSliderAndSpinBox(m_sliderXrange, m_spinBoxXrange, value);
-        settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, value);
+        settingSliderAndSpinBox(m_sliderXrange, m_spinBoxXrange, value, true);
+        settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, value, true);
     } else {
-        settingSliderAndSpinBox(m_sliderXrange, m_spinBoxXrange, value);
+        settingSliderAndSpinBox(m_sliderXrange, m_spinBoxXrange, value, true);
     }
         
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
@@ -240,7 +240,7 @@ void Blur::changeXrange(int value) {
 }
 
 void Blur::changeYrange(int value) {
-    settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, value);
+    settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, value, true);
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
     g_mainWindowP->displayOut();
 }
@@ -250,7 +250,7 @@ void Blur::changeYrange(int value) {
 void Blur::lockXY(int isChecked) {
     if (isChecked == Qt::Checked) {
         int xValue = m_sliderXrange->value();
-        settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, xValue);
+        settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, xValue, true);
         m_sliderYrange ->setEnabled(false);
         m_spinBoxYrange->setEnabled(false);
         
@@ -266,8 +266,10 @@ void Blur::lockXY(int isChecked) {
     
 }
 
-void Blur::settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value) {
-    value += !(value%2);
+void Blur::settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool oddOnly) {
+    if (oddOnly) {
+        value += !(value%2);
+    }
     slider->blockSignals(true );
     slider->setValue    (value);
     slider->blockSignals(false);

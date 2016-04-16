@@ -29,14 +29,21 @@ protected:
     void Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2);
     
     protected slots:
+        void changeFilterSize(int value);
+        void changeAvgK(int value);
     
 private:
-//    void            copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int kernel, int strike);
     void            copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, short* lastRow, int row, int width, int height, int kernel);
+    void            settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool oddOnly);
     int             bufferSize;
     short**         buffer;
     
     QGroupBox*      m_ctrlGrp;	// groupbox for panel
+    QSlider*        m_sliderFilterSize;
+    QSlider*        m_sliderAvgK;
+    QSpinBox*       m_spinBoxFilterSize;
+    QSpinBox*       m_spinBoxAvgK;
+    
     
     
 };

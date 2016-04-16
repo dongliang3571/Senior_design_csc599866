@@ -26,7 +26,7 @@ protected:
     
     void            Blurring(ImagePtr I1, int xsz, int ysz, ImagePtr I2);
     void            copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int kernel, int strike);
-    void            settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value);
+    void            settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool oddOnly);
     int             bufferSize;
     short*          buffer;
     QGroupBox*      m_ctrlGrp;	// groupbox for panel

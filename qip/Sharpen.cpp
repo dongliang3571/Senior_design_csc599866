@@ -23,7 +23,6 @@ Sharpen::applyFilter(ImagePtr I1, ImagePtr I2)
     
     
     int xsz    = m_sliderXrange  ->value();
-    int ysz    = m_spinBoxYrange ->value();
     int factor = m_sliderFactor  ->value();
     
     
@@ -161,7 +160,7 @@ void Sharpen::Sharpening(ImagePtr I1, int filterSize, double factor, ImagePtr I2
 }
 
 void Sharpen::changeFactor(int value) {
-    settingSliderAndSpinBox(m_sliderFactor, m_spinBoxFactor, value);
+    settingSliderAndSpinBox(m_sliderFactor, m_spinBoxFactor, value, false);
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
     g_mainWindowP->displayOut();
 }
