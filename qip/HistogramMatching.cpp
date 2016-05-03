@@ -175,8 +175,6 @@ void HistogramMatching::generateHistogram(int value) {
 
 
 void HistogramMatching::reset() {
-    
-    qDebug() <<MaxGray <<"  "<<MXGRAY;
    
 }
 

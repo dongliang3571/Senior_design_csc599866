@@ -120,6 +120,7 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
         extraBottomRow = 0;
     }
     
+    int extraTopIndex = width + neighborSize;
     // create buffer for rows out of boundary
     for (i = 0; i < extraTopRow; i++) {
         for (j = 0; j < neighborSize; j++) {
@@ -129,7 +130,7 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
             buffer[i][k+neighborSize] = firstRow[k];
         }
         for (l = 0; l < neighborSize; l++) {
-            buffer[i][l+width+neighborSize] = firstRow[lastElement];
+            buffer[i][l+extraTopIndex] = firstRow[lastElement];
         }
     }
     
@@ -141,7 +142,7 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
             buffer[i+extraTopRow][k+neighborSize] = *(Ptr-(i+1)*width+k);
         }
         for (l = 0; l < neighborSize; l++) {
-            buffer[i+extraTopRow][l+width+neighborSize] = *(Ptr-(i+1)*width+width-1);
+            buffer[i+extraTopRow][l+extraTopIndex] = *(Ptr-(i+2)*width-1);
         }
     }
     
@@ -153,7 +154,7 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
             buffer[i+neighborSize][k+neighborSize] = *(Ptr+k);
         }
         for (l = 0; l < neighborSize; l++) {
-            buffer[i+neighborSize][l+width+neighborSize] = *(Ptr+width-1);
+            buffer[i+neighborSize][l+extraTopIndex] = *(Ptr+lastElement);
         }
     }
     
@@ -165,19 +166,20 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
             buffer[i+neighborSize+1][k+neighborSize] = *(Ptr+(i+1)*width+k);
         }
         for (l = 0; l < neighborSize; l++) {
-            buffer[i+neighborSize+1][l+width+neighborSize] = *(Ptr+(i+1)*width+width-1);
+            buffer[i+neighborSize+1][l+extraTopIndex] = *(Ptr+(i+2)*width-1);
         }
     }
-
+    
+    int extraBottomIndex = kernel - extraBottomRow;
     for (i = 0; i < extraBottomRow; i++) {
         for (j = 0; j < neighborSize; j++) {
-            buffer[i+kernel-extraBottomRow][j] = lastRow[0];
+            buffer[i+extraBottomIndex][j] = lastRow[0];
         }
         for (k = 0; k < width; k++) {
-            buffer[i+kernel-extraBottomRow][k+neighborSize] = lastRow[k];
+            buffer[i+extraBottomIndex][k+neighborSize] = lastRow[k];
         }
         for (l = 0; l < neighborSize; l++) {
-            buffer[i+kernel-extraBottomRow][l+width+neighborSize] = lastRow[lastElement];
+            buffer[i+extraBottomIndex][l+extraTopIndex] = lastRow[lastElement];
         }
     }
 }
@@ -209,6 +211,8 @@ void MedianFilter::Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2) {
     int neighborSize = size/2;
     int kernel = size;
     int filterSize = kernel*kernel;
+    int halfFilterSize = filterSize/2;
+    int avgKLength = avg_nbrs*2+1;
     bufferSize = w + neighborSize*2;
     buffer = new short*[kernel];
     tempForBuffer = buffer;
@@ -251,13 +255,13 @@ void MedianFilter::Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2) {
                 insertion_sort(tempFornewList, filterSize);
                 if (avg_nbrs > 0) {
                     for (l = 1; l <= avg_nbrs; l++) {
-                        sum += tempFornewList[filterSize/2-l] + tempFornewList[filterSize/2+l];
+                        sum += tempFornewList[halfFilterSize-l] + tempFornewList[halfFilterSize+l];
                     }
-                    sum += tempFornewList[filterSize/2];
-                    *p2 = sum/(avg_nbrs*2+1);
+                    sum += tempFornewList[halfFilterSize];
+                    *p2 = sum/(avgKLength);
                     sum = 0;
                 } else {
-                    *p2 = tempFornewList[filterSize/2];
+                    *p2 = tempFornewList[halfFilterSize];
                 }
                 p2++;
             }
