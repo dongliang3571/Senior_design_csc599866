@@ -10,8 +10,15 @@
 #define MedianFilter_h
 
 #include <stdio.h>
-
+#include <ctime>
 #include "ImageFilter.h"
+#include <vector>
+#include <string>
+#include <sstream>
+#include <math.h>
+#include <algorithm>
+
+using namespace std;
 
 class MedianFilter: public ImageFilter {
     Q_OBJECT
@@ -27,22 +34,28 @@ public:
     
 protected:
     void Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2);
+    void MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2);
     
     protected slots:
         void changeFilterSize(int value);
         void changeAvgK(int value);
+        void applyHistoBased(int state);
     
 private:
     void            copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, short* lastRow, int row, int width, int height, int kernel);
     void            settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool oddOnly);
     int             bufferSize;
     short**         buffer;
+    vector<string>  m_logs;
     
     QGroupBox*      m_ctrlGrp;	// groupbox for panel
     QSlider*        m_sliderFilterSize;
     QSlider*        m_sliderAvgK;
     QSpinBox*       m_spinBoxFilterSize;
     QSpinBox*       m_spinBoxAvgK;
+    QCheckBox*      m_checkBoxHistoBase;
+    QLabel*         m_labelLogging;
+    QScrollArea*    m_scrollArea;
     
     
     
