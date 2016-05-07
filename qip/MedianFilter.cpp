@@ -98,7 +98,6 @@ MedianFilter::controlPanel()
     layout->addWidget(m_sliderAvgK, 1, 1);
     layout->addWidget(m_spinBoxAvgK, 1, 2);
     layout->addWidget(m_checkBoxHistoBase, 2, 0, 1, 2);
-//    layout->addWidget(m_labelLogging, 3, 0);
     layout->addWidget(m_scrollArea, 3, 0, 3, 3);
     
     
@@ -311,7 +310,6 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
     short** tempForBuffer;
     ChannelPtr<uchar> p1, p2, endd, tempOut;
     
-    
     if (size == 1) {
         for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
             IP_getChannel(I2, ch, p2, type);
@@ -328,7 +326,6 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
     int avgKLength = avg_nbrs*2+1;
     int histo[MXGRAY];
     int tempSum = 0;
-    int mediumPixel = 0;
     bufferSize = w + neighborSize*2;
     buffer = new short*[kernel];
     tempForBuffer = buffer;
@@ -360,34 +357,41 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
             copyRowsToBuffer(tempOut, firstRowBuffer, lastRowBuffer, y, w, h, kernel); // copy rows to buffer
             tempOut += w;
             
+            //clear histo array
+            for (k = 0; k < MXGRAY; k++) {
+                histo[k] = 0;
+            }
+            
+            //store all pixels' frequency with the kernel
+            for (i = 0; i < kernel; i++) {
+                for (j = 0; j < kernel; j++) {
+                    histo[tempForBuffer[i][j]]++;
+                }
+            }
             
             for (x = 0; x < w; x++) {
-                for (k = 0; k < MXGRAY; k++) {  //clear histo array
-                    histo[k] = 0;
-                }
-                for (i = 0; i < kernel; i++) {
-                    for (j = 0; j < kernel; j++) {
-                        histo[tempForBuffer[i][j+x]]++;
-                    }
-                }
-                
-                
                 for (k = 0; k < MXGRAY; k++) {
                     tempSum += histo[k];
                     if (tempSum >= halfFilterSizeRound) {
-                        mediumPixel = k;
                         break;
                     };
                 }
-
-                *p2++ = mediumPixel;
+                *p2++ = k;
                 tempSum = 0;
-                mediumPixel = 0;
                 
+                //add incoming pixels and subtract outgoing pixels
+                if (x < w - 1) {
+                    int advancedColumn = x + kernel;
+                    for (i = 0; i < kernel; i++) {
+                        histo[tempForBuffer[i][x]]--;
+                        histo[tempForBuffer[i][advancedColumn]]++;
+                    }
+                }
             }
         }
-        
     }
+    
+    //delete buffer
     delete[] firstRowBuffer;
     delete[] lastRowBuffer;
     for (k = 0; k < kernel; k++) {
