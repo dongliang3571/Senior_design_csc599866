@@ -326,6 +326,7 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
     int avgKLength = avg_nbrs*2+1;
     int histo[MXGRAY];
     int tempSum = 0;
+    int remainder = 0;
     bufferSize = w + neighborSize*2;
     buffer = new short*[kernel];
     tempForBuffer = buffer;
@@ -373,9 +374,15 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
                 for (k = 0; k < MXGRAY; k++) {
                     tempSum += histo[k];
                     if (tempSum >= halfFilterSizeRound) {
+                        remainder = tempSum - halfFilterSizeRound;
                         break;
                     };
                 }
+//                if (avg_nbrs > 0) {
+//                    if (halfFilterSizeRound + avg_nbrs > tempSum) {
+//                        <#statements#>
+//                    }
+//                }
                 *p2++ = k;
                 tempSum = 0;
                 
@@ -423,6 +430,10 @@ void MedianFilter::changeFilterSize(int value) {
 }
 
 void MedianFilter::changeAvgK(int value) {
+    int limit = m_spinBoxFilterSize->value() * m_spinBoxFilterSize->value() / 2;
+    if(value > limit) {
+        value = limit;
+    }
     settingSliderAndSpinBox(m_sliderAvgK, m_spinBoxAvgK, value, false);
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
     g_mainWindowP->displayOut();
