@@ -304,7 +304,7 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
     int w = I1->width();
     int h = I1->height();
     int total = w*h;
-    int type, y, x, ch, k, i, j;
+    int type, y, x, ch, k, i, j, l, sum=0;
     short* firstRowBuffer;
     short* lastRowBuffer;
     short** tempForBuffer;
@@ -326,6 +326,7 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
     int avgKLength = avg_nbrs*2+1;
     int histo[MXGRAY];
     int tempSum = 0;
+    int tempSum2;
     int remainder = 0;
     bufferSize = w + neighborSize*2;
     buffer = new short*[kernel];
@@ -378,13 +379,40 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
                         break;
                     };
                 }
-//                if (avg_nbrs > 0) {
-//                    if (halfFilterSizeRound + avg_nbrs > tempSum) {
-//                        <#statements#>
-//                    }
-//                }
-                *p2++ = k;
-                tempSum = 0;
+                l = k;
+                tempSum2 = tempSum - histo[k];
+                if (avg_nbrs > 0) {
+                    sum += k;
+                    for (i = 1; i <= avg_nbrs; i++) {
+                        if (halfFilterSizeRound + i <= tempSum) {
+                            sum += k;
+                        } else {
+                            k++;
+                            while (histo[k] == 0) {
+                                k++;
+                            }
+                            sum += k;
+                            tempSum += histo[k];
+                        }
+                        
+                        if (halfFilterSizeRound - i > tempSum2) {
+                            sum += l;
+                        } else {
+                            l--;
+                            while (histo[l] == 0) {
+                                l--;
+                            }
+                            sum += l;
+                            tempSum2 -= histo[l];
+                        }
+                    }
+                    *p2++ = sum/(avgKLength);
+                    tempSum = 0;
+                    sum = 0;
+                } else {
+                    *p2++ = k;
+                    tempSum = 0;
+                }
                 
                 //add incoming pixels and subtract outgoing pixels
                 if (x < w - 1) {
