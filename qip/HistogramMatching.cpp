@@ -81,7 +81,7 @@ void HistogramMatching::Matching(ImagePtr I1, int value, ImagePtr I2) {
     int h = I1->height();
     int total = w * h;
     
-    int left[MXGRAY], right[MXGRAY], histo[MXGRAY], reserved[MXGRAY];
+    int left[MXGRAY], right[MXGRAY], histo[MXGRAY], reserved[MXGRAY], target[MXGRAY];
     double Histogram_ref[MXGRAY];
     double Havg = 0, scale;
     int i, p, R = 0, Hsum = 0;
@@ -94,10 +94,9 @@ void HistogramMatching::Matching(ImagePtr I1, int value, ImagePtr I2) {
         reserved[i] = 0;
     }
     
-    
     for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++)
         for(endd = p1 + total; p1<endd; p1++)
-            histo[*p1] += 1;
+            histo[*p1]++;
     
     for (i = 0; i < MXGRAY; i++) {
         
@@ -116,12 +115,16 @@ void HistogramMatching::Matching(ImagePtr I1, int value, ImagePtr I2) {
         for(i=0; i<MXGRAY; i++)
             Histogram_ref[i] *= scale;
     
+    for (i=0; i<MXGRAY; i++) {
+        target[i] = (int)Histogram_ref[i];
+    }
+    
     for(i=0; i<MXGRAY; i++) {
         left[i] = R; /* left end of interval */
         Hsum += histo[i];
         
-        while(Hsum > Histogram_ref[R] && R < MXGRAY - 1) {
-            Hsum -= Histogram_ref[R];
+        while(Hsum > target[R] && R < MXGRAY - 1) {
+            Hsum -= target[R];
             R++;
         }
         
@@ -129,6 +132,10 @@ void HistogramMatching::Matching(ImagePtr I1, int value, ImagePtr I2) {
             reserved[R] = Hsum;
         }
         right[i] = R;
+    }
+    
+    for (i=0; i<MXGRAY; i++) {
+        printf("value at %d is %d \n",i, reserved[i]);
     }
     
     for(i=0; i<MXGRAY; i++) histo[i] = 0;
@@ -139,13 +146,13 @@ void HistogramMatching::Matching(ImagePtr I1, int value, ImagePtr I2) {
         for(endd = p1 + total; p1<endd; p1++, p2++) {
             p = left[*p1];
             if(left[*p1] != right[*p1]) {
-                if(histo[p] < Histogram_ref[p] - reserved[p])
+                if(histo[p] < target[p] - reserved[p])
                     *p2 = p;
                 else
                     *p2 = p = left[*p1] = MIN(p+1, right[*p1]);
                 histo[p]++;
             } else {
-                if(histo[p] < Histogram_ref[p])
+                if(histo[p] < target[p])
                     *p2 = p;
                 else
                     *p2 = p = left[*p1] = MIN(p+1, right[*p1]);
@@ -153,7 +160,6 @@ void HistogramMatching::Matching(ImagePtr I1, int value, ImagePtr I2) {
             }
         }
     }
-    
 }
 
 void HistogramMatching::generateHistogram(int value) {

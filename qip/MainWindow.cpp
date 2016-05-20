@@ -51,11 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
 	createActions();
 	createMenus  ();
 	createWidgets();
-    
-//    for (int k = 0; k<100; k++) {
-//        printf("value is %d\n", (rand()&0x7fff));
-//        printf("value is %d\n", (rand()&3));
-//    }
+
 
 }
 

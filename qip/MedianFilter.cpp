@@ -78,7 +78,7 @@ MedianFilter::controlPanel()
     m_scrollArea->setWidget(m_labelLogging);
     m_scrollArea->setAlignment(Qt::AlignVCenter);
     m_scrollArea->setWidgetResizable(true);
-    m_scrollArea->setFixedSize(350, 200);
+//    m_scrollArea->setFixedSize(350, 200);
     
     
     
@@ -494,6 +494,14 @@ void MedianFilter::settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, i
 }
 
 void MedianFilter::reset() {
+    
+    
+    int p[10];
+    int a = 5, b = 6;
+    for(int i=0; i<10; i++) {
+        p[i] = a + b;
+    }
+    
     
 }
 

@@ -140,8 +140,7 @@ void Blur::copyRowToBuffer(ChannelPtr<uchar> &imagePtr, int width, int kernel, i
     }
 }
 
-void
-Blur::Blurring(ImagePtr I1, int xsz, int ysz, ImagePtr I2) {
+void Blur::Blurring(ImagePtr I1, int xsz, int ysz, ImagePtr I2) {
     //create a temporary image and copy header from input image
     ImagePtr tempImage;
     IP_copyImageHeader(I1, I2);

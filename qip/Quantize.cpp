@@ -123,8 +123,6 @@ void Quantize::quantize(ImagePtr I1, int level, bool isChecked, ImagePtr I2) {
                     temp = CLIP(*p1 - randomized_bias, 0, 255);
                 
                 *p2++ = lut[temp];
-                
-                
             }
         }
     }
