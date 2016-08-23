@@ -10,21 +10,21 @@
 #include "MainWindow.h"
 
 
-extern MainWindow *g_mainWindowP;
+// extern MainWindow *g_mainWindowP;
 
 
 MedianFilter::MedianFilter(QWidget *parent) : ImageFilter(parent)
 {
-    
+
 }
 
 
 
 bool
 MedianFilter::applyFilter(ImagePtr I1, ImagePtr I2) {
-    
+
     if(I1.isNull()) return 0;
-    
+
     int filterSize = m_spinBoxFilterSize->value();
     int AvgK = m_sliderAvgK->value();
     if (m_checkBoxHistoBase->isChecked()) {
@@ -32,7 +32,7 @@ MedianFilter::applyFilter(ImagePtr I1, ImagePtr I2) {
     } else {
         Median(I1, filterSize, AvgK, I2);
     }
-    
+
     return true;
 }
 
@@ -42,69 +42,69 @@ QGroupBox*
 MedianFilter::controlPanel()
 {
     m_ctrlGrp = new QGroupBox("Median Filter");
-    
+
     QLabel* labelFilterSize = new QLabel(QString("Filter Size"));
     QLabel* labelAvgK = new QLabel(QString("Avg K"));
-    
+
     m_sliderFilterSize = new QSlider(Qt::Horizontal, m_ctrlGrp);
     m_sliderFilterSize->setTickPosition(QSlider::TicksBelow);
     m_sliderFilterSize->setTickInterval(5);
     m_sliderFilterSize->setMinimum(1);
     m_sliderFilterSize->setMaximum(99);
     m_sliderFilterSize->setValue  (1);
-    
+
     m_sliderAvgK = new QSlider(Qt::Horizontal, m_ctrlGrp);
     m_sliderAvgK->setTickPosition(QSlider::TicksBelow);
     m_sliderAvgK->setTickInterval(5);
     m_sliderAvgK->setMinimum(0);
     m_sliderAvgK->setMaximum(49);
     m_sliderAvgK->setValue  (0);
-    
+
     m_spinBoxFilterSize = new QSpinBox(m_ctrlGrp);
     m_spinBoxFilterSize->setMinimum   (1);
     m_spinBoxFilterSize->setMaximum   (99);
     m_spinBoxFilterSize->setValue     (1);
     m_spinBoxFilterSize->setSingleStep(2);
-    
+
     m_spinBoxAvgK = new QSpinBox(m_ctrlGrp);
     m_spinBoxAvgK->setMinimum   (0);
     m_spinBoxAvgK->setMaximum   (49);
     m_spinBoxAvgK->setValue     (0);
     m_spinBoxAvgK->setSingleStep(1);
-    
+
     m_checkBoxHistoBase = new QCheckBox(QString("Histogram-Based"));
     m_scrollArea = new QScrollArea;
     m_labelLogging = new QLabel("Waiting for action....");
     m_scrollArea->setWidget(m_labelLogging);
     m_scrollArea->setAlignment(Qt::AlignVCenter);
     m_scrollArea->setWidgetResizable(true);
-//    m_scrollArea->setFixedSize(350, 200);
-    
-    
-    
+    m_scrollArea->setFixedSize(350, 500);
+
+
+
     connect(m_sliderFilterSize,    SIGNAL(valueChanged(int)), this, SLOT(changeFilterSize(int)));
     connect(m_spinBoxFilterSize,   SIGNAL(valueChanged(int)), this, SLOT(changeFilterSize(int)));
     connect(m_sliderAvgK,    SIGNAL(valueChanged(int)), this, SLOT(changeAvgK(int)));
     connect(m_spinBoxAvgK,   SIGNAL(valueChanged(int)), this, SLOT(changeAvgK(int)));
     connect(m_checkBoxHistoBase,   SIGNAL(stateChanged(int)), this, SLOT(applyHistoBased(int)));
-    
+
     QGridLayout *layout = new QGridLayout;
-    
+
     layout->addWidget(labelFilterSize, 0, 0);
     layout->addWidget(m_sliderFilterSize, 0, 1);
     layout->addWidget(m_spinBoxFilterSize, 0, 2);
-    
+
     layout->addWidget(labelAvgK, 1, 0);
     layout->addWidget(m_sliderAvgK, 1, 1);
     layout->addWidget(m_spinBoxAvgK, 1, 2);
     layout->addWidget(m_checkBoxHistoBase, 2, 0, 1, 2);
     layout->addWidget(m_scrollArea, 3, 0, 3, 3);
-    
-    
+
+
     m_ctrlGrp->setLayout(layout);
-    
+
     return m_ctrlGrp;
-    
+
 }
 
 void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, short* lastRow, int row, int width, int height, int kernel) {
@@ -119,7 +119,7 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
     if (extraBottomRow < 0) {
         extraBottomRow = 0;
     }
-    
+
     int extraTopIndex = width + neighborSize;
     // create buffer for rows out of boundary
     for (i = 0; i < extraTopRow; i++) {
@@ -133,7 +133,7 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
             buffer[i][l+extraTopIndex] = firstRow[lastElement];
         }
     }
-    
+
     for (i = 0; i < neighborSize-extraTopRow; i++) {
         for (j = 0; j < neighborSize; j++) {
             buffer[i+extraTopRow][j] = *(Ptr-(i+1)*width);
@@ -145,7 +145,7 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
             buffer[i+extraTopRow][l+extraTopIndex] = *(Ptr-(i+2)*width-1);
         }
     }
-    
+
     for (i = 0; i < 1; i++) {
         for (j = 0; j < neighborSize; j++) {
             buffer[i+neighborSize][j] = *(Ptr);
@@ -157,7 +157,7 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
             buffer[i+neighborSize][l+extraTopIndex] = *(Ptr+lastElement);
         }
     }
-    
+
     for (i = 0; i < neighborSize-extraBottomRow; i++) {
         for (j = 0; j < neighborSize; j++) {
             buffer[i+neighborSize+1][j] = *(Ptr+(i+1)*width);
@@ -169,7 +169,7 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
             buffer[i+neighborSize+1][l+extraTopIndex] = *(Ptr+(i+2)*width-1);
         }
     }
-    
+
     int extraBottomIndex = kernel - extraBottomRow;
     for (i = 0; i < extraBottomRow; i++) {
         for (j = 0; j < neighborSize; j++) {
@@ -186,9 +186,9 @@ void MedianFilter::copyRowsToBuffer(ChannelPtr<uchar> &Ptr, short* firstRow, sho
 
 
 void MedianFilter::Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2) {
-    
+
     clock_t begin = clock(); // start counting time
-    
+
     IP_copyImageHeader(I1, I2);
     int w = I1->width();
     int h = I1->height();
@@ -200,7 +200,7 @@ void MedianFilter::Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2) {
     short* tempFornewList;
     short** tempForBuffer;
     ChannelPtr<uchar> p1, p2, endd, tempOut;
-    
+
 
     if (size == 1) {
         for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
@@ -209,7 +209,7 @@ void MedianFilter::Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2) {
         }
         return;
     }
-    
+
     int neighborSize = size/2;
     int kernel = size;
     int filterSize = kernel*kernel;
@@ -222,7 +222,7 @@ void MedianFilter::Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2) {
     lastRowBuffer = new short[w];
     newList = new short[filterSize];
     tempFornewList = newList;
-    
+
     for(k = 0; k < kernel; k++) {
         buffer[k] = new short[bufferSize];
         tempForBuffer[k] = buffer[k];
@@ -231,23 +231,23 @@ void MedianFilter::Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2) {
     for(ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
         IP_getChannel(I2, ch, p2, type);
         tempOut = p1;
-        
+
         //copy first row to buffer
         for (k = 0; k < w; k++) {
             firstRowBuffer[k] = p1[k];
         }
-        
+
         //copy first row to buffer
         int lastrow = (h-1)*w;
         for (k = 0; k < w; k++) {
             lastRowBuffer[k] = p1[k+lastrow];
         }
-        
+
         //visit one row at a time
         for(y = 0; y < h; y++) {
             copyRowsToBuffer(tempOut, firstRowBuffer, lastRowBuffer, y, w, h, kernel); // copy rows to buffer
             tempOut += w;
-            
+
 
             for (x = 0; x < w; x++) {
                 for (i = 0; i < kernel; i++) {
@@ -270,9 +270,9 @@ void MedianFilter::Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2) {
                 p2++;
             }
         }
-        
+
     }
-    
+
     //take care of memory leakage
     delete[] firstRowBuffer;
     delete[] lastRowBuffer;
@@ -281,7 +281,7 @@ void MedianFilter::Median(ImagePtr I1, int size, int avg_nbrs, ImagePtr I2) {
     }
     delete[] buffer;
     delete[] tempFornewList;
-    
+
     clock_t end = clock(); //finish counting time and output it
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     ostringstream oss;
@@ -309,7 +309,7 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
     short* lastRowBuffer;
     short** tempForBuffer;
     ChannelPtr<uchar> p1, p2, endd, tempOut;
-    
+
     if (size == 1) {
         for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
             IP_getChannel(I2, ch, p2, type);
@@ -317,7 +317,7 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
         }
         return;
     }
-    
+
     int neighborSize = size/2;
     int kernel = size;
     int filterSize = kernel*kernel;
@@ -333,44 +333,44 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
     tempForBuffer = buffer;
     firstRowBuffer = new short[w];
     lastRowBuffer = new short[w];
-    
+
     for(k = 0; k < kernel; k++) {
         buffer[k] = new short[bufferSize];
         tempForBuffer[k] = buffer[k];
     }
-    
+
     for(ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
         IP_getChannel(I2, ch, p2, type);
         tempOut = p1;
-        
+
         //copy first row to buffer
         for (k = 0; k < w; k++) {
             firstRowBuffer[k] = p1[k];
         }
-        
+
         //copy first row to buffer
         int lastrow = (h-1)*w;
         for (k = 0; k < w; k++) {
             lastRowBuffer[k] = p1[k+lastrow];
         }
-        
+
         //visit one row at a time
         for(y = 0; y < h; y++) {
             copyRowsToBuffer(tempOut, firstRowBuffer, lastRowBuffer, y, w, h, kernel); // copy rows to buffer
             tempOut += w;
-            
+
             //clear histo array
             for (k = 0; k < MXGRAY; k++) {
                 histo[k] = 0;
             }
-            
+
             //store all pixels' frequency with the kernel
             for (i = 0; i < kernel; i++) {
                 for (j = 0; j < kernel; j++) {
                     histo[tempForBuffer[i][j]]++;
                 }
             }
-            
+
             for (x = 0; x < w; x++) {
                 for (k = 0; k < MXGRAY; k++) {
                     tempSum += histo[k];
@@ -394,7 +394,7 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
                             sum += k;
                             tempSum += histo[k];
                         }
-                        
+
                         if (halfFilterSizeRound - i > tempSum2) {
                             sum += l;
                         } else {
@@ -413,7 +413,7 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
                     *p2++ = k;
                     tempSum = 0;
                 }
-                
+
                 //add incoming pixels and subtract outgoing pixels
                 if (x < w - 1) {
                     int advancedColumn = x + kernel;
@@ -425,7 +425,7 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
             }
         }
     }
-    
+
     //delete buffer
     delete[] firstRowBuffer;
     delete[] lastRowBuffer;
@@ -433,7 +433,7 @@ void MedianFilter::MedianHistogramBase(ImagePtr I1, int size, int avg_nbrs, Imag
         delete[] buffer[k];
     }
     delete[] buffer;
-    
+
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
     ostringstream oss;
@@ -454,7 +454,7 @@ void MedianFilter::changeFilterSize(int value) {
     settingSliderAndSpinBox(m_sliderFilterSize, m_spinBoxFilterSize, value, true);
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
     g_mainWindowP->displayOut();
-    
+
 }
 
 void MedianFilter::changeAvgK(int value) {
@@ -475,7 +475,7 @@ void MedianFilter::applyHistoBased(int state) {
         m_checkBoxHistoBase->setCheckState(Qt::Unchecked);
     }
     m_checkBoxHistoBase->blockSignals(false);
-    
+
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
     g_mainWindowP->displayOut();
 }
@@ -487,21 +487,20 @@ void MedianFilter::settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, i
     slider->blockSignals(true );
     slider->setValue    (value);
     slider->blockSignals(false);
-    
+
     spinbox->blockSignals(true );
     spinbox->setValue    (value);
     spinbox->blockSignals(false);
 }
 
 void MedianFilter::reset() {
-    
-    
+
+
     int p[10];
     int a = 5, b = 6;
     for(int i=0; i<10; i++) {
         p[i] = a + b;
     }
-    
-    
-}
 
+
+}

@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>vshader0c.glsl</file>
+        <file>fshader0c.glsl</file>
+        <file>vshaderThreshold.glsl</file>
+        <file>fshaderThreshold.glsl</file>
+        <file>vshaderContrast.glsl</file>
+        <file>fshaderContrast.glsl</file>
+        <file>vshaderQuantization.glsl</file>
+        <file>fshaderQuantization.glsl</file>
+        <file>mandrill.jpg</file>
+    </qresource>
+</RCC>
