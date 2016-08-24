@@ -6,6 +6,9 @@
 
 Important Notes
 ===============
+
+### Include lib "QtOpenGL"
+
 - In order to use opengl libray in Qt, we need to add `QT += opengl` to .pro file to link against the module. Add `#include <QtOpenGL>` to include the definitions of the module's classes. *Note:* A **module** is just a bunch of header files reside together in one file, example of `#include <QtOpenGL>`:
   ```
   #ifndef QT_QTOPENGL_MODULE_H
@@ -24,6 +27,8 @@ Important Notes
 
   ```
   After `#include <QtOpenGL>`, you can use `<QGLFunctions>`, `<QGLShaderProgram>` and so on. Alternatively, you can do `#include <QGLShaderProgram>` or `#include <QGLFunctions>`to include each of the class definition in `<QtOpenGL>`, that way you can be aware of what methods come from what classes.
+
+### gl_ModelViewProjectionMatrix
 - `gl_ModelViewProjectionMatrix` in shader file(normally is multiplied by a Position attribute variable, eg. `gl_Position = gl_ModelViewProjectionMatrix * a.Position`) is controlled by glfunctions, eg. `glLoadIdentity()`,
 	`glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar)`, `glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z)` and so on, these are outside shader files, normally they reside in program methods, like
   ```
@@ -53,5 +58,8 @@ Important Notes
 	  glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);   ////////////////Control gl_ModelViewProjectionMatrix//////////// 
   }
   ```
+  
+### Only declaring shader variables
 
 
+- Declaring shader variable(uniform or attribute varibles) but not use it in the `main()` will cause failure to get location of the variable, eg. `int location = glGetUniformLocation(m_program.programId(), "u_Lut");` the location to be returned will be -1, which indicate failed to get location for name `u_Lut`
