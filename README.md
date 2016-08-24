@@ -26,7 +26,7 @@ Important Notes
   #endif
 
   ```
-  After `#include <QtOpenGL>`, you can use `<QGLFunctions>`, `<QGLShaderProgram>` and so on. Alternatively, you can do `#include <QGLShaderProgram>` or `#include <QGLFunctions>`to include each of the class definition in `<QtOpenGL>`, that way you can be aware of what methods come from what classes.
+  After `#include <QtOpenGL>`, you can use `<QGLFunctions>`, `<QGLShaderProgram>`, `<QGLWidgets>` and so on. Alternatively, you can do `#include <QGLShaderProgram>` or `#include <QGLFunctions>`to include each of the class definition in `<QtOpenGL>`, that way you can be aware of what methods come from what classes.
 
 ### gl_ModelViewProjectionMatrix
 - `gl_ModelViewProjectionMatrix` in shader file(normally is multiplied by a Position attribute variable, eg. `gl_Position = gl_ModelViewProjectionMatrix * a.Position`) is controlled by glfunctions, eg. `glLoadIdentity()`,
