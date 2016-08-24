@@ -94,3 +94,10 @@ Important Notes
   * `glUniformMatrix3x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)` send data of type **mat3x4**
   * `glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)` send data of type **mat4**
   * `glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData());`
+
+### Sampler2D and texture2D in fragment shader
+- Sampler indicates texture unit number(`GL_TEXTURE0`). Example: `glUniform1i(m_uniform[SAMPLER], 0);`
+- `vec4 texture2D(sampler2D sampler, vec2 coord)`, `vec4 texture2D(sampler2D sampler, vec2 coord, float bias)`
+The texture2D function returns a texel, i.e. the (color) value of the texture for the given coordinates. The function has one input parameter of the type sampler2D and one input parameter of the type vec2 : sampler, the uniform the texture is bound to, and coord, the 2-dimensional coordinates of the texel to look up.
+  * There is an optional third input parameter of the type float: bias. After calculating the appropriate level of detail for a texture with mipmaps the bias is added before the actual texture lookup operation is executed.
+  * Side note: On iOS devices texture lookup functionality is only available in the fragment shader.
