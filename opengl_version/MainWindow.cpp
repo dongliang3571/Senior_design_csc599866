@@ -180,6 +180,33 @@ QGroupBox* MainWindow::createControlPanelGroupBox()
     QGroupBox *groupBox = new QGroupBox();
     groupBox->setMinimumWidth(300);
     
+    // create a stacked widget to hold multiple control panels
+    m_stackWidgetControlPanel = new QStackedWidget;
+    
+    // add control panels to stacked widget
+    for(int i = 0; i < (int) m_widgetName.size(); i++)
+        m_stackWidgetControlPanel->addWidget(m_glWidgets[m_widgetName[i]]->controlPanel());
+    
+    // A HBOX to hold display radio buttons and mode radio buttons
+    QHBoxLayout *layoutDisplayAndMode = new QHBoxLayout();
+    layoutDisplayAndMode->addWidget(createDisplayButtons());
+    layoutDisplayAndMode->addWidget(createModeButtons());
+    
+    // add stacked widget and buttonlayout to vertical box layout
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addLayout(layoutDisplayAndMode);
+    vbox->addWidget(m_stackWidgetControlPanel);
+    vbox->addStretch(1);
+    vbox->addLayout(createExitButtons());
+    groupBox->setLayout(vbox);
+    
+    return groupBox;
+}
+
+
+
+QHBoxLayout* MainWindow::createExitButtons()
+{
     // create pushbuttons
     QPushButton *buttonReset = new QPushButton("Reset");
     QPushButton *buttonQuit  = new QPushButton("Quit");
@@ -193,21 +220,84 @@ QGroupBox* MainWindow::createControlPanelGroupBox()
     buttonLayout->addWidget(buttonReset);
     buttonLayout->addWidget(buttonQuit );
     
-    // create a stacked widget to hold multiple control panels
-    m_stackWidgetControlPanel = new QStackedWidget;
+    return buttonLayout;
+}
+
+
+
+// MainWindow::createDisplayButtons
+//
+// Create preview window groupbox.
+//
+QGroupBox* MainWindow::createDisplayButtons()
+{
+    // init group box
+    m_groupBox_display = new QGroupBox("Display");
     
-    // add control panels to stacked widget
-    for(int i = 0; i < (int) m_widgetName.size(); i++)
-        m_stackWidgetControlPanel->addWidget(m_glWidgets[m_widgetName[i]]->controlPanel());
+    // create radio buttons
+    m_radioDisplay[0] = new QRadioButton("Input");
+    m_radioDisplay[1] = new QRadioButton("Output");
     
-    // add stacked widget and buttonlayout to vertical box layout
+    // create button group and add radio buttons to it
+    QButtonGroup *bGroup = new QButtonGroup;
+    for(int i = 0; i<2; ++i)
+        bGroup->addButton(m_radioDisplay[i]);
+    
+    // set input radio button to be default
+    m_radioDisplay[0]->setChecked(true);
+    
+    // assemble radio buttons into vertical widget
     QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(m_stackWidgetControlPanel);
-    vbox->addStretch(1);
-    vbox->addLayout(buttonLayout);
-    groupBox->setLayout(vbox);
+    vbox->addWidget(m_radioDisplay[0]);
+    vbox->addWidget(m_radioDisplay[1]);
+    m_groupBox_display->setLayout(vbox);
     
-    return groupBox;
+    // init signal/slot connections
+    connect(m_radioDisplay[0], SIGNAL(clicked()), this, SLOT(displayIn()));
+    connect(m_radioDisplay[1], SIGNAL(clicked()), this, SLOT(displayOut()));
+    
+//    m_groupBox_display->setEnabled(false);
+    
+    return m_groupBox_display;
+}
+
+
+
+// MainWindow::createModeButtons:
+//
+// Create preview window groupbox.
+//
+QGroupBox*
+MainWindow::createModeButtons()
+{
+    // init group box
+    m_groupBox_mode = new QGroupBox("Mode");
+    
+    // create radio buttons
+    m_radioMode[0] = new QRadioButton("RGB");
+    m_radioMode[1] = new QRadioButton("Gray");
+    
+    // create button group and add radio buttons to it
+    QButtonGroup *bGroup = new QButtonGroup;
+    for(int i = 0; i<2; ++i)
+        bGroup->addButton(m_radioMode[i]);
+    
+    // set RGB radio button to be default
+    m_radioMode[0]->setChecked(true);
+    
+    // assemble radio buttons into vertical widget
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(m_radioMode[0]);
+    //	vbox->addWidget(m_radioMode[1]);
+    vbox->addWidget(m_radioMode[1]);	// redundant radiobutton won't display; placeholder
+    m_groupBox_mode->setLayout(vbox);
+    
+    // init signal/slot connections
+    connect(m_radioMode[0], SIGNAL(clicked()), this, SLOT(modeRGB ()));
+    connect(m_radioMode[1], SIGNAL(clicked()), this, SLOT(modeGray()));
+    
+//    m_groupBox_mode->setEnabled(false);
+    return m_groupBox_mode;
 }
 
 
@@ -269,7 +359,58 @@ void MainWindow::open() {
 
 
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// MainWindow::displayIn:
+//
+// Slot functions to display input images.
+//
+void MainWindow::displayIn ()
+{
+    int index = m_tabWidget->currentIndex();	// current OpenGL widget
+    m_glWidgets[ m_widgetName[index] ]->setDisplay(true);
+    m_glWidgets[ m_widgetName[index] ]->reload();
+}
+
+
+
+// MainWindow::displayOut:
+//
+// Slot functions to display output images.
+//
+void MainWindow::displayOut()
+{
+    int index = m_tabWidget->currentIndex();	// current OpenGL widget
+    m_glWidgets[ m_widgetName[index] ]->setDisplay(false);
+    m_glWidgets[ m_widgetName[index] ]->reload();
+}
+
+
+
+// MainWindow::modeRGB:
+//
+// Slot functions to display RGB and grayscale images.
+//
+void MainWindow::modeRGB()
+{
+    int index = m_tabWidget->currentIndex();	// current OpenGL widget
+    m_glWidgets[ m_widgetName[index] ]->setMode(true);
+    m_glWidgets[ m_widgetName[index] ]->reload();
+}
+
+
+
+// MainWindow::modeGray:
+//
+// Slot functions to display RGB and grayscale images.
+//
+void MainWindow::modeGray()
+{
+    int index = m_tabWidget->currentIndex();	// current OpenGL widget
+    m_glWidgets[ m_widgetName[index] ]->setMode(false);
+    m_glWidgets[ m_widgetName[index] ]->reload();
+}
+
+
+
 // MainWindow::reset:
 //
 // Reset application.

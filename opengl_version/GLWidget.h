@@ -7,6 +7,9 @@
 // Written by: George Wolberg, 2015
 // ======================================================================
 
+// gray = .3R +.59G + .11B
+
+
 #ifndef GLWidget_H
 #define GLWidget_H
 
@@ -39,6 +42,13 @@ public:
 	virtual void		reset();		// reset parameters
     virtual void        setImage(QImage image);
     virtual void        reload();
+    
+    void        setDisplay(bool value);
+    void        setMode(bool value);
+    
+protected:
+    bool        m_isInput=true;
+    bool        m_isRGB=true;
 };
 
 #endif // GLWidget_H

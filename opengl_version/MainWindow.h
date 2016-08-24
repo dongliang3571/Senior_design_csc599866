@@ -41,22 +41,27 @@ public slots:
 	void		changeTab	(int);
     void		open		();
 //    void		execute		(QAction*);
+    void		displayIn	();
+    void		displayOut	();
+    void		modeRGB		();
+    void		modeGray	();
     void		reset		();
     void		quit		();
 
 protected:
-	QGroupBox*      createGroupView	  ();
-	QGroupBox*      createGroupInput  ();
-	QHBoxLayout*	createExitButtons ();
-    
     void createGLWidgets();
     void createMainWindow();
     void createMenuActions();
     void createMenus();
-    QGroupBox* createImageViewGroupBox();
-    QGroupBox* createControlPanelGroupBox();
     
+    // Two main conponents on the MainWindow
+    QGroupBox*      createImageViewGroupBox();
+    QGroupBox*      createControlPanelGroupBox();
     
+    // These three methods are called in createControlPanelGroupBox()
+    QGroupBox*      createDisplayButtons();
+    QGroupBox*      createModeButtons();
+    QHBoxLayout*	createExitButtons();
 
 private:
 	// homework objects
@@ -71,7 +76,12 @@ private:
     QString			m_file;
     QString			m_currentDir;
     QImage          m_image;
+    QGroupBox*      m_groupBox_mode;    //groupbox
+    QGroupBox*      m_groupBox_display; //groupbox
     
+    // widgets for image display groupbox
+    QRadioButton*	m_radioDisplay[2];	// radio buttons for input/output
+    QRadioButton*	m_radioMode   [2];	// radio buttons for RGB/Gray modes
     QMenu*			m_menuFile;
     QMenu*			m_menuPtOps;
     QMenu*          m_menuNeighborhoodOps;

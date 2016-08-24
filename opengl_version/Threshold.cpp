@@ -12,7 +12,9 @@
 enum {
     SAMPLER,
     MVP,
-    REFERENCE
+    REFERENCE,
+    ISINPUT,
+    ISRGB
 };
 
 
@@ -50,14 +52,14 @@ QGroupBox* Threshold::controlPanel()
     m_slider->setTickPosition(QSlider::TicksBelow);
     m_slider->setTickInterval(25);
     m_slider->setMinimum(1);
-    m_slider->setMaximum(MXGRAY);
-    m_slider->setValue  (MXGRAY>>1);
+    m_slider->setMaximum(MaxGray);
+    m_slider->setValue  (MaxGray>>1);
     
     // create spinbox
     m_spinBox = new QSpinBox(m_ctrlGrp);
     m_spinBox->setMinimum(1);
-    m_spinBox->setMaximum(MXGRAY);
-    m_spinBox->setValue  (MXGRAY>>1);
+    m_spinBox->setMaximum(MaxGray);
+    m_spinBox->setValue  (MaxGray>>1);
     
     // init signal/slot connections for Threshold
     connect(m_slider , SIGNAL(valueChanged(int)), this, SLOT(changeThr (int)));
@@ -107,11 +109,11 @@ void Threshold::setImage(QImage image)
 
 void Threshold::reload()
 {
-    initializeGL();
-    resizeGL(m_winW, m_winH);
+    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass threshold reference to fragment shader
+    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass threshold reference to fragment shader
     updateGL();
+    qDebug() << this->m_isRGB;
 }
-
 
 
 
@@ -128,6 +130,10 @@ Threshold::changeThr(int thr)
     m_spinBox->blockSignals(true);
     m_spinBox->setValue    (thr);
     m_spinBox->blockSignals(false);
+    
+    m_u_reference = (GLfloat)thr/MaxGray; // Calculate reference
+    glUniform1f(m_uniform[REFERENCE], m_u_reference); // pass threshold reference to fragment shader
+    updateGL();
 }
 
 
@@ -291,7 +297,19 @@ void Threshold::initShaders()
         exit(-1);
     }
     
+    // get location of u_reference in fragment shader
+    m_uniform[ISINPUT] = glGetUniformLocation(m_program.programId(), "u_IsInput");
+    if((int) m_uniform[ISINPUT] < 0) {
+        qDebug() << "Failed to get the storage location of u_IsInput";
+        exit(-1);
+    }
     
+    // get location of u_reference in fragment shader
+    m_uniform[ISRGB] = glGetUniformLocation(m_program.programId(), "u_IsRGB");
+    if((int) m_uniform[ISRGB] < 0) {
+        qDebug() << "Failed to get the storage location of u_IsRGB";
+        exit(-1);
+    }
     
     // bind the glsl progam
     glUseProgram(m_program.programId());
@@ -302,6 +320,9 @@ void Threshold::initShaders()
     glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData()); // Pass MVP matrix to vertex shader
     
     glUniform1f(m_uniform[REFERENCE], m_u_reference); // pass threshold reference to fragment shader
+    
+    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass threshold reference to fragment shader
+    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass threshold reference to fragment shader
 }
 
 

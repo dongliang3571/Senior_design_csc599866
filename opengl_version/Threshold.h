@@ -44,6 +44,7 @@ private:
     int         m_numberVertices;   // number of vertices
     bool        m_isInitialized;    // Bool to save state of initialization
     
+    
     QGLShaderProgram    m_program;  // GLSL program
     QImage		  m_image;          // texture image
     GLuint		  m_texture;        // shader index to texture unit

@@ -57,3 +57,15 @@ void GLWidget::setImage(QImage image)
 void GLWidget::reload()
 {
 }
+
+
+void GLWidget::setDisplay(bool value)
+{
+    m_isInput = value;
+}
+
+
+void GLWidget::setMode(bool value)
+{
+    m_isRGB = value;
+}
