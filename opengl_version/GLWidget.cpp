@@ -2,33 +2,33 @@
 // Computer Graphics Homework Solutions
 // Copyright (C) 2015 by George Wolberg
 //
-// HW.cpp - HW class. Base class of homework solutions.
+// GLWidget.cpp - GLWidget class. Base class of homework solutions.
 //
 // Written by: George Wolberg, 2015
 // ===============================================================
 
-#include "HW.h"
+#include "GLWidget.h"
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// HW::HW:
+// GLWidget::GLWidget:
 //
-// HW constructor.
+// GLWidget constructor.
 // This is base class for homework solutions that will replace
 // the control panel, reset function, and add homework solution. 
 //
-HW::HW(QWidget *parent)
+GLWidget::GLWidget(QWidget *parent)
    : QGLWidget (parent)
 {}
 
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// HW::controlPanel:
+// GLWidget::controlPanel:
 //
 // Create a control panel of widgets for homework solution.
 //
 QGroupBox*
-HW::controlPanel()
+GLWidget::controlPanel()
 {
 	return NULL;
 }
@@ -36,9 +36,9 @@ HW::controlPanel()
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// HW::reset:
+// GLWidget::reset:
 //
 // Reset parameters in control panel.
 //
 void
-HW::reset() {}
+GLWidget::reset() {}

@@ -19,7 +19,7 @@ enum {
 // Contrast constructor.
 //
 Contrast::Contrast(QWidget *parent)
-: HW(parent)
+: GLWidget(parent)
 {
 }
 

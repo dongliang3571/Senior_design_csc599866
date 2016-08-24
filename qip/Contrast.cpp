@@ -253,7 +253,7 @@ void Contrast::changeContr_spinB(double contrast)
 //
 void
 Contrast::reset() {
-    
+
     m_sliderB -> setValue(0);
     m_sliderC -> setValue(0);
 }

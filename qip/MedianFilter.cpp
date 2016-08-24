@@ -10,7 +10,7 @@
 #include "MainWindow.h"
 
 
-// extern MainWindow *g_mainWindowP;
+extern MainWindow *g_mainWindowP;
 
 
 MedianFilter::MedianFilter(QWidget *parent) : ImageFilter(parent)

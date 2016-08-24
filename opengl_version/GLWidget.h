@@ -2,19 +2,22 @@
 // Computer Graphics Homework Solutions
 // Copyright (C) 2015 by George Wolberg
 //
-// HW.h - Header file for HW class. Base class of homework solutions.
+// GLWidget.h - Header file for GLWidget class. Base class of homework solutions.
 //
 // Written by: George Wolberg, 2015
 // ======================================================================
 
-#ifndef HW_H
-#define HW_H
+#ifndef GLWidget_H
+#define GLWidget_H
+
+#define MXGRAY 256
+#define MaxGray 255
 
 #include <QtOpenGL>
 #include <QtWidgets>
-//#include <QGLWidget>
+//#include <QGLWidget>      // This is included in <QtOpenGL>
+//#include <QGLFunctions>   // This is included in <QtOpenGL>
 //#include <GL/glu.h>
-//#include <QGLFunctions>
 
 typedef QVector2D vec2;
 typedef QVector3D vec3;
@@ -28,12 +31,12 @@ enum {
 // ----------------------------------------------------------------------
 // standard include files
 //
-class HW : public QGLWidget, protected QGLFunctions {
+class GLWidget : public QGLWidget, protected QGLFunctions {
 
 public:
-	HW(QWidget *parent = 0);
+	GLWidget(QWidget *parent = 0);
 	virtual QGroupBox*	controlPanel();		// create control panel
 	virtual void		reset();		// reset parameters
 };
 
-#endif // HW_H
+#endif // GLWidget_H

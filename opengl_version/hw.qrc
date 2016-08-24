@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>vshader0c.glsl</file>
-        <file>fshader0c.glsl</file>
         <file>vshaderThreshold.glsl</file>
         <file>fshaderThreshold.glsl</file>
         <file>vshaderContrast.glsl</file>

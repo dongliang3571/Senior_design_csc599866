@@ -23,7 +23,7 @@ enum {
 // Quantization constructor.
 //
 Quantization::Quantization(QWidget *parent)
-: HW(parent)
+: GLWidget(parent)
 {
     // init vars
     m_theta = 0.0f;

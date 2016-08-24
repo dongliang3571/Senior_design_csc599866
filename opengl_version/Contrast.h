@@ -9,13 +9,13 @@
 #ifndef Contrast_h
 #define Contrast_h
 
-#include "HW.h"
+#include "GLWidget.h"
 
     // ----------------------------------------------------------------------
     // standard include files
     //
 
-class Contrast : public HW {
+class Contrast : public GLWidget {
     Q_OBJECT
 public:
     Contrast		(QWidget *parent = 0);		// constructor

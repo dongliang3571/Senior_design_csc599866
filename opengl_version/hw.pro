@@ -21,21 +21,15 @@ unix:!macx {
 }
 
 # Input
-HEADERS +=	MainWindow.h	\
-		HW.h		\ 
-		HW0a.h		\
-		HW0b.h		\
-		HW0c.h      \
-        Threshold.h     \
-        Contrast.h      \
-        Quantization.h  \
+HEADERS +=	MainWindow.h  \
+		GLWidget.h		  \
+        Threshold.h       \
+        Contrast.h        \
+        Quantization.h    \
 		
-SOURCES +=	main.cpp	\ 
-		MainWindow.cpp 	\
-		HW.cpp		\
-		HW0a.cpp	\
-		HW0b.cpp	\
-		HW0c.cpp    \
+SOURCES +=	main.cpp	  \
+		MainWindow.cpp 	  \
+		GLWidget.cpp	  \
         Threshold.cpp     \
         Contrast.cpp      \
         Quantization.cpp  \

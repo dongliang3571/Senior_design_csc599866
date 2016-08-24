@@ -25,11 +25,11 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-#include "HW.h"
+#include "GLWidget.h"
 
-typedef std::map<QString, HW*> hw_type;
+typedef std::map<QString, GLWidget*> glWidget;
 
-class MainWindow : public QWidget {
+class MainWindow : public QMainWindow {
 	Q_OBJECT
 
 public:
@@ -38,24 +38,45 @@ public:
 
 
 public slots:
-	void		createWidgets	();
 	void		changeTab	(int);
-	void		reset		();
-	void		quit		();
+//    void		open		();
+//    void		execute		(QAction*);
+    void		reset		();
+    void		quit		();
 
 protected:
-	QGroupBox*	createGroupView	  ();
-	QGroupBox*	createGroupInput  ();
+	QGroupBox*      createGroupView	  ();
+	QGroupBox*      createGroupInput  ();
 	QHBoxLayout*	createExitButtons ();
+    
+    void createGLWidgets();
+    void createMainWindow();
+    void createMenuActions();
+    void createMenus();
+    QGroupBox* createImageViewGroupBox();
+    QGroupBox* createControlPanelGroupBox();
+    
+    
 
 private:
 	// homework objects
-	QStringList	 m_hwName;
-	hw_type		 m_hw;
+	QStringList	 m_widgetName;
+	glWidget	 m_glWidgets;
 
 	// widgets
 	QTabWidget	*m_tabWidget;
-	QStackedWidget	*m_stackWidget;
+	QStackedWidget	*m_stackWidgetControlPanel;
+    
+    // GUI components
+    QString			m_file;
+    QString			m_currentDir;
+    
+    QMenu*			m_menuFile;
+    QMenu*			m_menuPtOps;
+    QMenu*          m_menuNeighborhoodOps;
+    QAction*		m_actionOpen;
+    QAction*		m_actionQuit;
+    QAction*		m_actionThreshold;
 };
 
 extern MainWindow *MainWindowP;

@@ -11,7 +11,8 @@
 
 enum {
     SAMPLER,
-    MVP
+    MVP,
+    REFERENCE
 };
 
 
@@ -21,8 +22,11 @@ enum {
 // Constructor for class Threshold
 //
 Threshold::Threshold(QWidget *parent)
-: HW (parent)
-{}
+: GLWidget (parent)
+{
+    m_numberVertices = 4;
+    m_u_reference = 0.5;
+}
 
 
 
@@ -32,11 +36,61 @@ Threshold::Threshold(QWidget *parent)
 //
 QGroupBox* Threshold::controlPanel()
 {
-    QGroupBox *groupBox = new QGroupBox("Threshold"); // init group box
-    return(groupBox);
+    // init group box
+    m_ctrlGrp = new QGroupBox("Threshold");
+    
+    // init widgets
+    // create label[i]
+    QLabel *label = new QLabel;
+    label->setText(QString("Thr"));
+    
+    // create slider
+    m_slider = new QSlider(Qt::Horizontal, m_ctrlGrp);
+    m_slider->setTickPosition(QSlider::TicksBelow);
+    m_slider->setTickInterval(25);
+    m_slider->setMinimum(1);
+    m_slider->setMaximum(MXGRAY);
+    m_slider->setValue  (MXGRAY>>1);
+    
+    // create spinbox
+    m_spinBox = new QSpinBox(m_ctrlGrp);
+    m_spinBox->setMinimum(1);
+    m_spinBox->setMaximum(MXGRAY);
+    m_spinBox->setValue  (MXGRAY>>1);
+    
+    // init signal/slot connections for Threshold
+    connect(m_slider , SIGNAL(valueChanged(int)), this, SLOT(changeThr (int)));
+    connect(m_spinBox, SIGNAL(valueChanged(int)), this, SLOT(changeThr (int)));
+    
+    // assemble dialog
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(  label  , 0, 0);
+    layout->addWidget(m_slider , 0, 1);
+    layout->addWidget(m_spinBox, 0, 2);
+    
+    // assign layout to group box
+    m_ctrlGrp->setLayout(layout);
+    
+    return(m_ctrlGrp);
 }
 
 
+
+
+// Threshold::changeThr:
+//
+// Slot to process change in thr caused by moving the slider.
+//
+void
+Threshold::changeThr(int thr)
+{
+    m_slider ->blockSignals(true);
+    m_slider ->setValue    (thr);
+    m_slider ->blockSignals(false);
+    m_spinBox->blockSignals(true);
+    m_spinBox->setValue    (thr);
+    m_spinBox->blockSignals(false);
+}
 
 // Threshold::reset
 //
@@ -98,7 +152,6 @@ void Threshold::resizeGL(int w, int h)
     m_u_mvpMatrix.setToIdentity();
     m_u_mvpMatrix.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
     glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData());
-    
 }
 
 
@@ -110,7 +163,7 @@ void Threshold::resizeGL(int w, int h)
 void Threshold::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);   // clear canvas with background values
-    glDrawArrays(GL_TRIANGLES, 0, 3);   // draw a rectangle
+    glDrawArrays(GL_POLYGON, 0, m_numberVertices);   // draw a rectangle
 }
 
 
@@ -148,7 +201,6 @@ Threshold::initTexture()
         QMessageBox::critical(0, "Error", "Image loading error",QMessageBox::Ok);
         QApplication::quit();
     }
-    
 }
 
 
@@ -170,8 +222,6 @@ void Threshold::initShaders()
         QMessageBox::critical(0, "Error", "Fragment shader error",QMessageBox::Ok);
         QApplication::quit();
     }
-    
-    
     
     // bind the attribute variable in the glsl program with a generic vertex attribute index;
     // values provided via ATTRIB_VERTEX will modify the value of "a_Position")
@@ -196,20 +246,29 @@ void Threshold::initShaders()
     
     // get storage location of u_MvpMatrix in fragment shader
     m_uniform[MVP] = glGetUniformLocation(m_program.programId(), "u_MvpMatrix");
-    if((int) m_uniform[SAMPLER] < 0) {
-        qDebug() << "Failed to get the storage location of u_Sampler";
+    if((int) m_uniform[MVP] < 0) {
+        qDebug() << "Failed to get the storage location of u_MvpMatrix";
         exit(-1);
     }
+    
+    // get location of u_reference in fragment shader
+    m_uniform[REFERENCE] = glGetUniformLocation(m_program.programId(), "u_reference");
+    if((int) m_uniform[REFERENCE] < 0) {
+        qDebug() << "Failed to get the storage location of u_reference";
+        exit(-1);
+    }
+    
+    
     
     // bind the glsl progam
     glUseProgram(m_program.programId());
     
-    glUniform1i(m_uniform[SAMPLER], 0);
+    glUniform1i(m_uniform[SAMPLER], 0); // pass sampler aka. texture unit number(GL_TEXTURE0) to fragment shader
     
     m_u_mvpMatrix.setToIdentity();
-    glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData());
-    glUniform1i(m_uniform[MVP], 0);
-
+    glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData()); // Pass MVP matrix to vertex shader
+    
+    glUniform1f(m_uniform[REFERENCE], m_u_reference); // pass threshold reference to fragment shader
 }
 
 
@@ -235,28 +294,29 @@ void Threshold::initVertexBuffer()
     
     // init geometry data
     const vec2 vertices[] = {
-        vec2( 0.0f,   0.75f ),
-        vec2( 0.65f, -0.375f),
-        vec2(-0.65f, -0.375f)
+        vec2(-0.75f,  0.75f),
+        vec2( 0.75f,  0.75f),
+        vec2( 0.75f, -0.75f),
+        vec2(-0.75f, -0.75f)
     };
     
     // init texture coordinates
     const vec2 textureCoords[] = {
-        vec2((vertices[0][0]+.65)/1.3, (vertices[0][1]+.375)/1.125),
-        vec2((vertices[1][0]+.65)/1.3, (vertices[1][1]+.375)/1.125),
-        vec2((vertices[2][0]+.65)/1.3, (vertices[2][1]+.375)/1.125)
+        vec2(0, 1),
+        vec2(1, 1),
+        vec2(1, 0),
+        vec2(0, 0)
     };
     
     // Bind the vertice buffer and assign data to attribute variables
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer); // bind the buffer to the GPU; all future drawing calls gets data from this buffer
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(vec2), vertices, GL_STATIC_DRAW); // copy the vertices from CPU to GPU
+    glBufferData(GL_ARRAY_BUFFER, m_numberVertices*sizeof(vec2), vertices, GL_STATIC_DRAW); // copy the vertices from CPU to GPU
     glEnableVertexAttribArray(ATTRIB_VERTEX); // enable the assignment of attribute vertex variable
     glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL); // assign the buffer object to the attribute vertex variable
     
-    
     //Create texture coordinates buffer
     glBindBuffer(GL_ARRAY_BUFFER, texCoordBuffer); // Bind the buffer object(textCoordBuffer) to a target(GL_ARRAY_BUFFER)
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(vec2), textureCoords, GL_STATIC_DRAW); // Wrtie data into the buffer object
+    glBufferData(GL_ARRAY_BUFFER, m_numberVertices*sizeof(vec2), textureCoords, GL_STATIC_DRAW); // Wrtie data into the buffer object
     glEnableVertexAttribArray(ATTRIB_TEXTURE_POSITION); // Enable assignment
     glVertexAttribPointer(ATTRIB_TEXTURE_POSITION, 2, GL_FLOAT, false, 0, NULL); // Assign the buffer object to an attribute variable
 }

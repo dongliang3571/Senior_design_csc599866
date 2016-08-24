@@ -10,10 +10,10 @@
 #define Quantization_h
 
 
-#include "HW.h"
+#include "GLWidget.h"
 
 
-class Quantization : public HW {
+class Quantization : public GLWidget {
     Q_OBJECT
 public:
     Quantization		(QWidget *parent = 0);		// constructor
