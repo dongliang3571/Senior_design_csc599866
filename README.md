@@ -1,3 +1,20 @@
+Image filter
+============
+Image filter is something that you can see often in the image processing software, for example PhotoShop, it can enhance contrast, brightness for you images. This project is going to implement some basic image filters using **OpenGL** and **Qt**.
+
+### Filter List
+- Point Operations
+  * Threshold
+  * Contrast
+  * Quantization
+  * Histogram Stretching
+  * Histogram Matching
+
+- Neighborhood Operations
+  * Blur
+  * Sharpen
+  * Median Filter
+
 **Note:This is a Qt project, in order to run this you have to have Qt installed!**
 
 **OpenGL:** Open Graphics Library (OpenGL) is a cross-language, cross-platform application programming interface (API) for rendering 2D and 3D vector graphics. The API is typically used to interact with a graphics processing unit (GPU), to achieve hardware-accelerated rendering.
