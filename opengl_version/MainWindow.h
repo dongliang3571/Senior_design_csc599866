@@ -39,7 +39,7 @@ public:
 
 public slots:
 	void		changeTab	(int);
-//    void		open		();
+    void		open		();
 //    void		execute		(QAction*);
     void		reset		();
     void		quit		();
@@ -70,6 +70,7 @@ private:
     // GUI components
     QString			m_file;
     QString			m_currentDir;
+    QImage          m_image;
     
     QMenu*			m_menuFile;
     QMenu*			m_menuPtOps;

@@ -24,10 +24,12 @@ public:
     
     QGroupBox*  controlPanel();		// create control panel
     void        reset();            // reset parameters
+    void        setImage(QImage image);  // set image
+    void        reload();
     void        initVertexBuffer(); // initialize vertices
     void        initShaders();      // initialize shaders
     void        initTexture();      // initialize texture
-
+    
 public slots:
     void changeThr(int value);      // slot when m_slider changes
     
@@ -39,7 +41,8 @@ protected:
 private:
     int         m_winW;			// window width
     int         m_winH;			// window height
-    int         m_numberVertices;       // number of vertices
+    int         m_numberVertices;   // number of vertices
+    bool        m_isInitialized;    // Bool to save state of initialization
     
     QGLShaderProgram    m_program;  // GLSL program
     QImage		  m_image;          // texture image

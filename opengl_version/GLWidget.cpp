@@ -42,3 +42,18 @@ GLWidget::controlPanel()
 //
 void
 GLWidget::reset() {}
+
+
+
+// Threshold::setImage
+//
+// set image
+//
+void GLWidget::setImage(QImage image)
+{
+}
+
+
+void GLWidget::reload()
+{
+}

@@ -19,6 +19,7 @@ public:
     Quantization		(QWidget *parent = 0);		// constructor
     QGroupBox*	controlPanel	();		// create control panel
     void		reset		();		// reset parameters
+    void        setImage(QImage image);  // set image
     void		initVertexBuffer();		// init vertices
     void		initShaders	();		// init shaders
     void		initTexture	();		// init texture image
@@ -35,6 +36,9 @@ protected:
 private:
     int		  m_winW;			// window width
     int		  m_winH;			// window height
+    int       m_numberVertices;   // number of vertices
+    bool      m_isInitialized;    // Bool to save state of initialization
+    
     QGLShaderProgram  m_program[2];			// GLSL programs
     bool		  m_twist;			// twist flag
     bool		  m_wire;			// wireframe flag

@@ -26,6 +26,7 @@ Threshold::Threshold(QWidget *parent)
 {
     m_numberVertices = 4;
     m_u_reference = 0.5;
+    m_isInitialized = false;
 }
 
 
@@ -76,6 +77,43 @@ QGroupBox* Threshold::controlPanel()
 
 
 
+// Threshold::reset
+//
+// Reset all parameters
+//
+void Threshold::reset()
+{
+    
+}
+
+
+
+// Threshold::setImage
+//
+// set image
+//
+void Threshold::setImage(QImage image)
+{
+    m_image = image;
+    if(!m_isInitialized) {
+        initializeGL();
+        resizeGL(m_winW, m_winH);
+        paintGL();
+        updateGL();
+    }
+}
+
+
+
+void Threshold::reload()
+{
+    initializeGL();
+    resizeGL(m_winW, m_winH);
+    updateGL();
+}
+
+
+
 
 // Threshold::changeThr:
 //
@@ -92,15 +130,6 @@ Threshold::changeThr(int thr)
     m_spinBox->blockSignals(false);
 }
 
-// Threshold::reset
-//
-// Reset all parameters
-//
-void Threshold::reset()
-{
-    
-}
-
 
 
 // Threshold::initializeGL
@@ -111,9 +140,13 @@ void Threshold::reset()
 void Threshold::initializeGL()
 {
     initializeGLFunctions();    // initialize GL function resolution for current context
-    initTexture();  // init texture
-    initShaders();  // init vertex and fragment shaders
-    initVertexBuffer(); // initialize vertex buffer and write positions to vertex shader
+    
+    if(!m_image.isNull()) {
+        initTexture();  // init texture
+        initShaders();  // init vertex and fragment shaders
+        initVertexBuffer(); // initialize vertex buffer and write positions to vertex shader
+        m_isInitialized = true;
+    }
 
     glClearColor(0.0, 0.0, 0.0, 0.0);	// set background color
     glColor3f   (1.0, 1.0, 1.0);		// set foreground color
@@ -176,7 +209,7 @@ void
 Threshold::initTexture()
 {
     // read image from file
-    if(m_image.load(QString(":/mandrill.jpg"))) {
+    if(!m_image.isNull()) {
         // convert jpg to GL formatted image
         QImage qImage = QGLWidget::convertToGLFormat(m_image);
         
@@ -320,4 +353,3 @@ void Threshold::initVertexBuffer()
     glEnableVertexAttribArray(ATTRIB_TEXTURE_POSITION); // Enable assignment
     glVertexAttribPointer(ATTRIB_TEXTURE_POSITION, 2, GL_FLOAT, false, 0, NULL); // Assign the buffer object to an attribute variable
 }
-

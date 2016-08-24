@@ -37,6 +37,8 @@ public:
 	GLWidget(QWidget *parent = 0);
 	virtual QGroupBox*	controlPanel();		// create control panel
 	virtual void		reset();		// reset parameters
+    virtual void        setImage(QImage image);
+    virtual void        reload();
 };
 
 #endif // GLWidget_H

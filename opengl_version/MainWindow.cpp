@@ -103,7 +103,7 @@ void MainWindow::createMenuActions()
     // File Actions
     m_actionOpen = new QAction("&Open", this);
     m_actionOpen->setShortcut(tr("Ctrl+O"));
-//    connect(m_actionOpen, SIGNAL(triggered()), this, SLOT(open()));
+    connect(m_actionOpen, SIGNAL(triggered()), this, SLOT(open()));
     
     m_actionQuit = new QAction("&Quit", this);
     m_actionQuit->setShortcut(tr("Ctrl+Q"));
@@ -219,11 +219,16 @@ QGroupBox* MainWindow::createControlPanelGroupBox()
 //
 void MainWindow::changeTab(int index)
 {
+    if(!m_image.isNull()) {
+        m_glWidgets[m_widgetName[index]]->setImage(m_image);
+    }
+    
 	m_tabWidget->setCurrentIndex(index);	// change OpenGL widget
 	m_stackWidgetControlPanel->setCurrentIndex(index);	// change control panel
 
 	// change keyboard focus to GL widget
 	m_glWidgets[m_widgetName[index]]->setFocusPolicy(Qt::StrongFocus);
+    
 }
 
 
@@ -232,32 +237,35 @@ void MainWindow::changeTab(int index)
 //
 // Open input image.
 //
-//void MainWindow::open() {
-//    QFileDialog dialog(this);
-//    
-//    // open the last known working directory
-//    if(!m_currentDir.isEmpty())
-//        dialog.setDirectory(m_currentDir);
-//    
-//    // display existing files and directories
-//    dialog.setFileMode(QFileDialog::ExistingFile);
-//    
-//    // invoke native file browser to select file
-//    m_file = dialog.getOpenFileName(this,
-//                                    "Open File", m_currentDir,
-//                                    "Images (*.jpg *.png *.ppm *.pgm *.bmp);;All files (*)");
-//    
-//    // verify that file selection was made
-//    if(m_file.isNull()) return;
-//    
-//    // save current directory
-//    QFileInfo f(m_file);
-//    m_currentDir = f.absolutePath();
-//    
-//    
-//    
-//    
-//}
+void MainWindow::open() {
+    QFileDialog dialog(this);
+    
+    // open the last known working directory
+    if(!m_currentDir.isEmpty())
+        dialog.setDirectory(m_currentDir);
+    
+    // display existing files and directories
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    
+    // invoke native file browser to select file
+    m_file = dialog.getOpenFileName(this,
+                                    "Open File", m_currentDir,
+                                    "Images (*.jpg *.png *.ppm *.pgm *.bmp);;All files (*)");
+    
+    // verify that file selection was made
+    if(m_file.isNull()) return;
+    
+    // save current directory
+    QFileInfo f(m_file);
+    m_currentDir = f.absoluteFilePath();
+    
+    qDebug() << m_currentDir;
+    
+    m_image.load(m_currentDir);
+    
+    int index = m_tabWidget->currentIndex();	// current OpenGL widget
+    m_glWidgets[ m_widgetName[index] ]->setImage(m_image);
+}
 
 
 

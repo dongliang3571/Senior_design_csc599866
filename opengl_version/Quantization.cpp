@@ -25,12 +25,8 @@ enum {
 Quantization::Quantization(QWidget *parent)
 : GLWidget(parent)
 {
-    // init vars
-    m_theta = 0.0f;
-    m_subdivisions = 0;
-    m_twist = false;
-    m_wire  = false;
-    
+    m_numberVertices = 4;
+    m_isInitialized = false;
 }
 
 
@@ -52,6 +48,35 @@ Quantization::controlPanel()
 
 
 
+// Quantization::setImage
+//
+// set image
+//
+void Quantization::setImage(QImage image)
+{
+    m_image = image;
+    if(!m_isInitialized) {
+        initializeGL();
+        resizeGL(m_winW, m_winH);
+        updateGL();
+    }
+}
+
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Quantization::reset:
+//
+// Reset parameters.
+//
+void
+Quantization::reset()
+{
+    
+}
+
+
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Quantization::initializeGL:
 //
@@ -61,21 +86,17 @@ Quantization::controlPanel()
 void
 Quantization::initializeGL()
 {
-    // initialize GL function resolution for current context
-    initializeGLFunctions();
+    initializeGLFunctions();    // initialize GL function resolution for current context
     
-    // init texture
-    initTexture();
+    if(!m_image.isNull()) {
+        initTexture();  // init texture
+        initShaders();  // init vertex and fragment shaders
+        initVertexBuffer(); // initialize vertex buffer and write positions to vertex shader
+        m_isInitialized = true;
+    }
     
-    // init vertex and fragment shaders
-    initShaders();
-    
-    // initialize vertex buffer and write positions to vertex shader
-    initVertexBuffer();
-    
-    // init state variables
     glClearColor(0.0, 0.0, 0.0, 0.0);	// set background color
-    glColor3f   (1.0, 1.0, 0.0);		// set foreground color
+    glColor3f   (1.0, 1.0, 1.0);		// set foreground color
 }
 
 
@@ -144,27 +165,32 @@ Quantization::paintGL()
 void
 Quantization::initTexture()
 {
-    // read image from file
-    m_image.load(QString(":/mandrill.jpg"));
-    
-    // convert jpg to GL formatted image
-    QImage qImage = QGLWidget::convertToGLFormat(m_image);
-    
-    // init vars
-    int w = qImage.width ();
-    int h = qImage.height();
-    
-    // generate texture name and bind it
-    glActiveTexture(GL_TEXTURE0);
-    glGenTextures(1, &m_texture);
-    glBindTexture(GL_TEXTURE_2D, m_texture);
-    
-    // set the texture parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, qImage.bits());
+    // read image into buffer
+    if(!m_image.isNull()) {
+        // convert jpg to GL formatted image
+        QImage qImage = QGLWidget::convertToGLFormat(m_image);
+        
+        // init vars
+        int w = qImage.width ();
+        int h = qImage.height();
+        
+        // generate texture object and bind it
+        // GL_TEXTURE0 is texture unit, which is for managing a texture image, each has an associated GL_TEXTURE_2D,
+        // which is the textuture target for specifying the type of texture
+        glActiveTexture(GL_TEXTURE0);
+        glGenTextures(1, &m_texture);
+        glBindTexture(GL_TEXTURE_2D, m_texture);
+        
+        // set the texture parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, qImage.bits());
+    } else {
+        QMessageBox::critical(0, "Error", "Image loading error",QMessageBox::Ok);
+        QApplication::quit();
+    }
 }
 
 
@@ -270,21 +296,3 @@ Quantization::initVertexBuffer()
     
     
 }
-
-
-
-
-
-
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Quantization::reset:
-//
-// Reset parameters.
-//
-void
-Quantization::reset()
-{
-    
-}
-
