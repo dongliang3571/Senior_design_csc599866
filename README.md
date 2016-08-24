@@ -21,6 +21,19 @@ Image filter is something that you can see often in the image processing softwar
 
 **Qt:** Qt is a cross-platform application framework that is widely used for developing application software that can be run on various software and hardware platforms with little or no change in the underlying codebase, while still being a native application with the capabilities and speed thereof
 
+ScreenShots
+===========
+
+### Input:
+![alt text](https://github.com/dongliang3571/Senior_design_csc599866/blob/master/screenshots/input.png?raw=true "Threshold input")
+
+### Output:
+- Threshold
+![alt text](https://github.com/dongliang3571/Senior_design_csc599866/blob/master/screenshots/threshold.png?raw=true "Logo Title Text 1")
+
+- Contrast
+![alt text](https://github.com/dongliang3571/Senior_design_csc599866/blob/master/screenshots/contrast.png?raw=true "Logo Title Text 1")
+
 Important Notes
 ===============
 
