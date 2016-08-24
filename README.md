@@ -63,3 +63,34 @@ Important Notes
 
 
 - Declaring shader variable(uniform or attribute varibles) but not use it in the `main()` will cause failure to get location of the variable, eg. `int location = glGetUniformLocation(m_program.programId(), "u_Lut");` the location to be returned will be -1, which indicate failed to get location for name `u_Lut`
+
+### Array type in shader
+
+- This is how to declare array type in shader: `uniform int u_Lut[256];`
+- To get location of uniform variable of array type: `glGetUniformLocation(m_program.programId(), "u_Lut")`, or `glGetUniformLocation(m_program.programId(), "u_Lut[0]")`
+
+
+### glUniform  
+(note: bool is 1 or 0)
+
+- glUniform{1|2|3|4}{f|i|ui} 
+  * `glUniform1i(GLint location, GLint x)` send data of type **int**
+  * `glUniform2f(GLint location, GLfloat x, GLfloat y)` send data of type **float**
+  * `glUniform2i(GLint location, GLint x, GLint y)` send data of type **ivec2**
+  * `glUniform2f(GLint location, GLfloat x, GLfloat y)` send data of type **vec2**
+  * `glUniform3i(GLint location, GLint x, GLint y, GLint z)` send data of type **ivec3**
+  * `glUniform3f(GLint location, GLfloat x, GLfloat y, GLfloat z)` send data of type **vec3**
+  *  Example: `glUniform1i(m_uniform[SAMPLER], 0);`
+- glUniform{1|2|3|4}{f|i|ui}v 
+  * `glUniform1iv(GLint location, GLsizei count(size of array), const GLint* v(pointer of first element of array))` send data of type int[]
+  * `glUniform1fv` send data of type **float[]**
+  * `glUniform2iv` send data of type **ivec2[]**
+  * `glUniform2fv` send data of type **vec2[]**
+  * `glUniform3iv` send data of type **ivec3[]**
+  * `glUniform3fv` send data of type **vec3[]**
+  * Example: `glUniform1iv(m_uniform[LUT], 256, lut);`
+
+- glUniformMatrix{2|3|4|2x3|3x2|2x4|4x2|3x4|4x3}fv
+  * `glUniformMatrix3x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)` send data of type **mat3x4**
+  * `glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)` send data of type **mat4**
+  * `glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData());`
