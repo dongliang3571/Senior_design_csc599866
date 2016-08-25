@@ -54,16 +54,24 @@ Quantization::controlPanel()
 //
 void Quantization::setImage(QImage image)
 {
-    m_image = image;
+    m_image = QImage(image);
     if(!m_isInitialized) {
         initializeGL();
         resizeGL(m_winW, m_winH);
         updateGL();
     }
+    updateGL();
 }
 
 
 
+void Quantization::reload()
+{
+//    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass threshold reference to fragment shader
+//    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass threshold reference to fragment shader
+    initTexture();
+    updateGL();
+}
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Quantization::reset:
 //

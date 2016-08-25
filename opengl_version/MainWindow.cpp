@@ -315,10 +315,9 @@ void MainWindow::changeTab(int index)
     
 	m_tabWidget->setCurrentIndex(index);	// change OpenGL widget
 	m_stackWidgetControlPanel->setCurrentIndex(index);	// change control panel
-
+    
 	// change keyboard focus to GL widget
 	m_glWidgets[m_widgetName[index]]->setFocusPolicy(Qt::StrongFocus);
-    
 }
 
 
@@ -348,9 +347,6 @@ void MainWindow::open() {
     // save current directory
     QFileInfo f(m_file);
     m_currentDir = f.absoluteFilePath();
-    
-    qDebug() << m_currentDir;
-    
     m_image.load(m_currentDir);
     
     int index = m_tabWidget->currentIndex();	// current OpenGL widget

@@ -8,9 +8,14 @@
 
 #include "Contrast.h"
 
+
 enum {
     SAMPLER,
-    MVP
+    MVP,
+    ISINPUT,
+    ISRGB,
+    CONTRAST,
+    BRIGHTNESS
 };
 
 
@@ -24,6 +29,8 @@ Contrast::Contrast(QWidget *parent)
 {
     m_numberVertices = 4;
     m_isInitialized = false;
+    m_u_contrast = 1.0;
+    m_u_brightness = 0.0;
 }
 
 
@@ -38,6 +45,63 @@ Contrast::controlPanel()
 {
     // init group box
     QGroupBox *groupBox = new QGroupBox("Contrast");
+    
+//    QLabel *label_brightness = new QLabel;
+//    label_brightness->setText(QString("Brightness"));
+//    
+//    //slider for brightness
+//    m_sliderB = new QSlider(Qt::Horizontal, m_ctrlGrp);
+//    m_sliderB->setTickPosition(QSlider::TicksBelow);
+//    m_sliderB->setTickInterval(25);
+//    m_sliderB->setMinimum(-256);
+//    m_sliderB->setMaximum(256);
+//    m_sliderB->setValue  (0);
+//    
+//    //spinbox for brightness
+//    m_spinBoxB = new QSpinBox(m_ctrlGrp);
+//    m_spinBoxB->setMinimum   (-256);
+//    m_spinBoxB->setMaximum   (256);
+//    m_spinBoxB->setValue     (0);
+//    m_spinBoxB->setSingleStep(10);
+//    
+//    QLabel *label_contrast = new QLabel;
+//    label_contrast->setText(QString("Contrast"));
+//    
+//    //slider for contrast
+//    m_sliderC = new QSlider(Qt::Horizontal, m_ctrlGrp);
+//    m_sliderC->setTickPosition(QSlider::TicksBelow);
+//    m_sliderC->setTickInterval(25);
+//    m_sliderC->setRange(-100, 100);
+//    m_sliderC->setValue  (0);
+//    
+//    
+//    // spinbox for contrast
+//    m_spinBoxC = new QDoubleSpinBox(m_ctrlGrp);
+//    m_spinBoxC->setRange     (0.25, 5.0);
+//    m_spinBoxC->setValue     (0.0);
+//    m_spinBoxC->setDecimals  (1);
+//    m_spinBoxC->setSingleStep(0.5);
+//    
+//    
+//    // init signal/slot connections for Threshold
+//    connect(m_sliderB , SIGNAL(valueChanged(int)),    this, SLOT(changeBrightness (int)));
+//    connect(m_spinBoxB, SIGNAL(valueChanged(int)),    this, SLOT(changeBrightness (int)));
+//    connect(m_sliderC,  SIGNAL(valueChanged(int)),    this, SLOT(changeContr_slide(int)));
+//    connect(m_spinBoxC, SIGNAL(valueChanged(double)), this, SLOT(changeContr_spinB(double)));
+//    
+//    // INSERT YOUR CODE HERE
+//    
+//    QGridLayout *layout = new QGridLayout;
+//    layout->addWidget(label_brightness, 0, 0);
+//    layout->addWidget(m_sliderB,        0, 1);
+//    layout->addWidget(m_spinBoxB,       0, 2);
+//    
+//    layout->addWidget(label_contrast,   1, 0);
+//    layout->addWidget(m_sliderC,        1, 1);
+//    layout->addWidget(m_spinBoxC,       1, 2);
+//    
+//    m_ctrlGrp->setLayout(layout);
+
     
     return(groupBox);
 }
@@ -65,18 +129,28 @@ Contrast::reset()
 //
 void Contrast::setImage(QImage image)
 {
-    m_image = image;
-    if(!m_isInitialized) {
-        initializeGL();
-        resizeGL(m_winW, m_winH);
-        paintGL();
-        updateGL();
-    }
+    m_image = QImage(image);
+    initTexture();  // init texture
+//    if(!m_isInitialized) {
+//        initializeGL();
+//        resizeGL(m_winW, m_winH);
+//        paintGL();
+//        updateGL();
+//    }
+    updateGL();
 }
 
 
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void Contrast::reload()
+{
+    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass threshold reference to fragment shader
+    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass threshold reference to fragment shader
+    updateGL();
+}
+
+
+
 // Contrast::initializeGL:
 //
 // Initialization routine before display loop.
@@ -85,16 +159,14 @@ void Contrast::setImage(QImage image)
 void
 Contrast::initializeGL()
 {
-    qDebug() << "initializeGL";
     initializeGLFunctions();    // initialize GL function resolution for current context
     
-    if(!m_image.isNull()) {
-        initTexture();  // init texture
-        initShaders();  // init vertex and fragment shaders
-        initVertexBuffer(); // initialize vertex buffer and write positions to vertex shader
-        m_isInitialized = true;
-    }
-    
+//    if(!m_image.isNull()) {
+//        m_isInitialized = true;
+//    }
+    initTexture();
+    initShaders();  // init vertex and fragment shaders
+    initVertexBuffer(); // initialize vertex buffer and write positions to vertex shader
     glClearColor(0.0, 0.0, 0.0, 0.0);	// set background color
     glColor3f   (1.0, 1.0, 1.0);		// set foreground color
 }
@@ -148,7 +220,7 @@ void
 Contrast::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);   // clear canvas with background values
-    glDrawArrays(GL_POLYGON, 0, m_numberVertices);   // draw a rectangle
+    if(!m_image.isNull()) glDrawArrays(GL_POLYGON, 0, m_numberVertices);   // draw a rectangle
 }
 
 
@@ -160,32 +232,27 @@ Contrast::paintGL()
 void
 Contrast::initTexture()
 {
-    // read image into buffer
-    if(!m_image.isNull()) {
-        // convert jpg to GL formatted image
-        QImage qImage = QGLWidget::convertToGLFormat(m_image);
+    // read image from file
+    if(m_image.isNull()) {
+        m_image.load(QString(":/mandrill.jpg"));
         
-        // init vars
-        int w = qImage.width ();
-        int h = qImage.height();
-        
-        // generate texture object and bind it
-        // GL_TEXTURE0 is texture unit, which is for managing a texture image, each has an associated GL_TEXTURE_2D,
-        // which is the textuture target for specifying the type of texture
-        glActiveTexture(GL_TEXTURE0);
-        glGenTextures(1, &m_texture);
-        glBindTexture(GL_TEXTURE_2D, m_texture);
-        
-        // set the texture parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, qImage.bits());
-    } else {
-        QMessageBox::critical(0, "Error", "Image loading error",QMessageBox::Ok);
-        QApplication::quit();
     }
+    // convert jpg to GL formatted image
+    QImage qImage = QGLWidget::convertToGLFormat(m_image);
+    // init vars
+    int w = qImage.width ();
+    int h = qImage.height();
+    
+    // generate texture object and bind it
+    // GL_TEXTURE0 is texture unit, which is for managing a texture image, each has an associated GL_TEXTURE_2D,
+    // which is the textuture target for specifying the type of texture
+    glActiveTexture(GL_TEXTURE0);
+    glGenTextures(1, &m_texture);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    
+    // set the texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, qImage.bits());
 }
 
 
@@ -237,6 +304,34 @@ void Contrast::initShaders()
         exit(-1);
     }
     
+    // get location of u_reference in fragment shader
+    m_uniform[ISINPUT] = glGetUniformLocation(m_program.programId(), "u_IsInput");
+    if((int) m_uniform[ISINPUT] < 0) {
+        qDebug() << "Failed to get the storage location of u_IsInput";
+        exit(-1);
+    }
+    
+    // get location of u_reference in fragment shader
+    m_uniform[ISRGB] = glGetUniformLocation(m_program.programId(), "u_IsRGB");
+    if((int) m_uniform[ISRGB] < 0) {
+        qDebug() << "Failed to get the storage location of u_IsRGB";
+        exit(-1);
+    }
+    
+    // get location of u_Contrast in fragment shader
+    m_uniform[CONTRAST] = glGetUniformLocation(m_program.programId(), "u_Contrast");
+    if((int) m_uniform[CONTRAST] < 0) {
+        qDebug() << "Failed to get the storage location of u_Contrast";
+        exit(-1);
+    }
+    
+    // get location of u_Brightness in fragment shader
+    m_uniform[BRIGHTNESS] = glGetUniformLocation(m_program.programId(), "u_Brightness");
+    if((int) m_uniform[BRIGHTNESS] < 0) {
+        qDebug() << "Failed to get the storage location of u_Brightness";
+        exit(-1);
+    }
+    
     // bind the glsl progam
     glUseProgram(m_program.programId());
     
@@ -244,6 +339,11 @@ void Contrast::initShaders()
     
     m_u_mvpMatrix.setToIdentity();
     glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData()); // Pass MVP matrix to vertex shader
+    
+    glUniform1i(m_uniform[ISINPUT], m_isInput);
+    glUniform1i(m_uniform[ISRGB], m_isRGB);
+    glUniform1f(m_uniform[CONTRAST], m_u_contrast); // contrast value
+    glUniform1i(m_uniform[BRIGHTNESS], m_u_brightness); // brightness
 }
 
 

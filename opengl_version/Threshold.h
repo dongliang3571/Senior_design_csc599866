@@ -10,18 +10,12 @@
 #define Threshold_h
 
 #include "GLWidget.h"
-#include <QGLShaderProgram>
-#include <QtOpenGL>
-#include <vector>
-    // ----------------------------------------------------------------------
-    // standard include files
-    //
+
 
 class Threshold : public GLWidget {
     Q_OBJECT
 public:
     Threshold  (QWidget *parent = 0);		// constructor
-    
     QGroupBox*  controlPanel();		// create control panel
     void        reset();            // reset parameters
     void        setImage(QImage image);  // set image
@@ -47,6 +41,10 @@ private:
     
     QGLShaderProgram    m_program;  // GLSL program
     QImage		  m_image;          // texture image
+    QImage        m_GLImage;
+    GLsizei       m_width_GLImage;
+    GLsizei       m_height_GLImage;
+    
     GLuint		  m_texture;        // shader index to texture unit
     GLuint		  m_uniform[16];	// uniform var for a shader and <16 vars
     

@@ -1,4 +1,4 @@
-varying vec2      v_TexCoord;
+varying vec2 v_TexCoord;
 uniform sampler2D u_Sampler;
 uniform float u_reference;
 uniform bool u_IsInput;

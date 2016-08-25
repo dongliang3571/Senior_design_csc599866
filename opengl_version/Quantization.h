@@ -20,6 +20,7 @@ public:
     QGroupBox*	controlPanel	();		// create control panel
     void		reset		();		// reset parameters
     void        setImage(QImage image);  // set image
+    void        reload();
     void		initVertexBuffer();		// init vertices
     void		initShaders	();		// init shaders
     void		initTexture	();		// init texture image

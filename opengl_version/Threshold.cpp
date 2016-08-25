@@ -96,13 +96,16 @@ void Threshold::reset()
 //
 void Threshold::setImage(QImage image)
 {
-    m_image = image;
-    if(!m_isInitialized) {
-        initializeGL();
-        resizeGL(m_winW, m_winH);
-        paintGL();
-        updateGL();
-    }
+    m_image = QImage(image);
+    
+    // convert jpg to GL formatted image
+    m_GLImage = QGLWidget::convertToGLFormat(m_image);
+    // init vars
+    m_width_GLImage  = m_GLImage.width ();
+    m_height_GLImage = m_GLImage.height();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width_GLImage, m_height_GLImage, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_GLImage.bits());
+
+    updateGL();
 }
 
 
@@ -111,8 +114,9 @@ void Threshold::reload()
 {
     glUniform1i(m_uniform[ISINPUT], m_isInput); // pass threshold reference to fragment shader
     glUniform1i(m_uniform[ISRGB], m_isRGB); // pass threshold reference to fragment shader
+//    initTexture();
+//    paintGL();
     updateGL();
-    qDebug() << this->m_isRGB;
 }
 
 
@@ -147,13 +151,9 @@ void Threshold::initializeGL()
 {
     initializeGLFunctions();    // initialize GL function resolution for current context
     
-    if(!m_image.isNull()) {
-        initTexture();  // init texture
-        initShaders();  // init vertex and fragment shaders
-        initVertexBuffer(); // initialize vertex buffer and write positions to vertex shader
-        m_isInitialized = true;
-    }
-
+    initTexture();
+    initShaders();  // init vertex and fragment shaders
+    initVertexBuffer(); // initialize vertex buffer and write positions to vertex shader
     glClearColor(0.0, 0.0, 0.0, 0.0);	// set background color
     glColor3f   (1.0, 1.0, 1.0);		// set foreground color
 }
@@ -202,7 +202,7 @@ void Threshold::resizeGL(int w, int h)
 void Threshold::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);   // clear canvas with background values
-    glDrawArrays(GL_POLYGON, 0, m_numberVertices);   // draw a rectangle
+    if(!m_image.isNull()) glDrawArrays(GL_POLYGON, 0, m_numberVertices);   // draw a rectangle
 }
 
 
@@ -215,31 +215,26 @@ void
 Threshold::initTexture()
 {
     // read image from file
-    if(!m_image.isNull()) {
-        // convert jpg to GL formatted image
-        QImage qImage = QGLWidget::convertToGLFormat(m_image);
+    if(m_image.isNull()) {
+        m_image.load(QString(":/mandrill.jpg"));
         
-        // init vars
-        int w = qImage.width ();
-        int h = qImage.height();
-        
-        // generate texture object and bind it
-        // GL_TEXTURE0 is texture unit, which is for managing a texture image, each has an associated GL_TEXTURE_2D,
-        // which is the textuture target for specifying the type of texture
-        glActiveTexture(GL_TEXTURE0);
-        glGenTextures(1, &m_texture);
-        glBindTexture(GL_TEXTURE_2D, m_texture);
-        
-        // set the texture parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, qImage.bits());
-    } else {
-        QMessageBox::critical(0, "Error", "Image loading error",QMessageBox::Ok);
-        QApplication::quit();
     }
+    // convert jpg to GL formatted image
+    m_GLImage = QGLWidget::convertToGLFormat(m_image);
+    // init vars
+    m_width_GLImage  = m_GLImage.width ();
+    m_height_GLImage = m_GLImage.height();
+    
+    // generate texture object and bind it
+    // GL_TEXTURE0 is texture unit, which is for managing a texture image, each has an associated GL_TEXTURE_2D,
+    // which is the textuture target for specifying the type of texture
+    glActiveTexture(GL_TEXTURE0);
+    glGenTextures(1, &m_texture);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    
+    // set the texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width_GLImage, m_height_GLImage, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_GLImage.bits());
 }
 
 
@@ -320,9 +315,8 @@ void Threshold::initShaders()
     glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData()); // Pass MVP matrix to vertex shader
     
     glUniform1f(m_uniform[REFERENCE], m_u_reference); // pass threshold reference to fragment shader
-    
-    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass threshold reference to fragment shader
-    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass threshold reference to fragment shader
+    glUniform1i(m_uniform[ISINPUT], m_isInput);
+    glUniform1i(m_uniform[ISRGB], m_isRGB);
 }
 
 
