@@ -47,7 +47,7 @@ public:
     void        setMode(bool value);
     
 protected:
-    bool        m_isInput=true;
+    bool        m_isInput=false;
     bool        m_isRGB=true;
 };
 

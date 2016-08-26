@@ -44,66 +44,66 @@ QGroupBox*
 Contrast::controlPanel()
 {
     // init group box
-    QGroupBox *groupBox = new QGroupBox("Contrast");
+    QGroupBox *m_ctrlGrp = new QGroupBox("Contrast");
     
-//    QLabel *label_brightness = new QLabel;
-//    label_brightness->setText(QString("Brightness"));
-//    
-//    //slider for brightness
-//    m_sliderB = new QSlider(Qt::Horizontal, m_ctrlGrp);
-//    m_sliderB->setTickPosition(QSlider::TicksBelow);
-//    m_sliderB->setTickInterval(25);
-//    m_sliderB->setMinimum(-256);
-//    m_sliderB->setMaximum(256);
-//    m_sliderB->setValue  (0);
-//    
-//    //spinbox for brightness
-//    m_spinBoxB = new QSpinBox(m_ctrlGrp);
-//    m_spinBoxB->setMinimum   (-256);
-//    m_spinBoxB->setMaximum   (256);
-//    m_spinBoxB->setValue     (0);
-//    m_spinBoxB->setSingleStep(10);
-//    
-//    QLabel *label_contrast = new QLabel;
-//    label_contrast->setText(QString("Contrast"));
-//    
-//    //slider for contrast
-//    m_sliderC = new QSlider(Qt::Horizontal, m_ctrlGrp);
-//    m_sliderC->setTickPosition(QSlider::TicksBelow);
-//    m_sliderC->setTickInterval(25);
-//    m_sliderC->setRange(-100, 100);
-//    m_sliderC->setValue  (0);
-//    
-//    
-//    // spinbox for contrast
-//    m_spinBoxC = new QDoubleSpinBox(m_ctrlGrp);
-//    m_spinBoxC->setRange     (0.25, 5.0);
-//    m_spinBoxC->setValue     (0.0);
-//    m_spinBoxC->setDecimals  (1);
-//    m_spinBoxC->setSingleStep(0.5);
-//    
-//    
-//    // init signal/slot connections for Threshold
-//    connect(m_sliderB , SIGNAL(valueChanged(int)),    this, SLOT(changeBrightness (int)));
-//    connect(m_spinBoxB, SIGNAL(valueChanged(int)),    this, SLOT(changeBrightness (int)));
-//    connect(m_sliderC,  SIGNAL(valueChanged(int)),    this, SLOT(changeContr_slide(int)));
-//    connect(m_spinBoxC, SIGNAL(valueChanged(double)), this, SLOT(changeContr_spinB(double)));
-//    
-//    // INSERT YOUR CODE HERE
-//    
-//    QGridLayout *layout = new QGridLayout;
-//    layout->addWidget(label_brightness, 0, 0);
-//    layout->addWidget(m_sliderB,        0, 1);
-//    layout->addWidget(m_spinBoxB,       0, 2);
-//    
-//    layout->addWidget(label_contrast,   1, 0);
-//    layout->addWidget(m_sliderC,        1, 1);
-//    layout->addWidget(m_spinBoxC,       1, 2);
-//    
-//    m_ctrlGrp->setLayout(layout);
+    QLabel *label_brightness = new QLabel;
+    label_brightness->setText(QString("Brightness"));
+    
+    //slider for brightness
+    m_sliderB = new QSlider(Qt::Horizontal, m_ctrlGrp);
+    m_sliderB->setTickPosition(QSlider::TicksBelow);
+    m_sliderB->setTickInterval(25);
+    m_sliderB->setMinimum(-MaxGray);
+    m_sliderB->setMaximum(MaxGray);
+    m_sliderB->setValue  (0);
+    
+    //spinbox for brightness
+    m_spinBoxB = new QSpinBox(m_ctrlGrp);
+    m_spinBoxB->setMinimum   (-MaxGray);
+    m_spinBoxB->setMaximum   (MaxGray);
+    m_spinBoxB->setValue     (0);
+    m_spinBoxB->setSingleStep(10);
+    
+    QLabel *label_contrast = new QLabel;
+    label_contrast->setText(QString("Contrast"));
+    
+    //slider for contrast
+    m_sliderC = new QSlider(Qt::Horizontal, m_ctrlGrp);
+    m_sliderC->setTickPosition(QSlider::TicksBelow);
+    m_sliderC->setTickInterval(25);
+    m_sliderC->setRange(-100, 100);
+    m_sliderC->setValue  (0);
+    
+    
+    // spinbox for contrast
+    m_spinBoxC = new QDoubleSpinBox(m_ctrlGrp);
+    m_spinBoxC->setRange     (0.25, 5.0);
+    m_spinBoxC->setValue     (0.0);
+    m_spinBoxC->setDecimals  (1);
+    m_spinBoxC->setSingleStep(0.5);
+    
+    
+    // init signal/slot connections for Threshold
+    connect(m_sliderB , SIGNAL(valueChanged(int)),    this, SLOT(changeBrightness (int)));
+    connect(m_spinBoxB, SIGNAL(valueChanged(int)),    this, SLOT(changeBrightness (int)));
+    connect(m_sliderC,  SIGNAL(valueChanged(int)),    this, SLOT(changeContr_slide(int)));
+    connect(m_spinBoxC, SIGNAL(valueChanged(double)), this, SLOT(changeContr_spinB(double)));
+    
+    // INSERT YOUR CODE HERE
+    
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(label_brightness, 0, 0);
+    layout->addWidget(m_sliderB,        0, 1);
+    layout->addWidget(m_spinBoxB,       0, 2);
+    
+    layout->addWidget(label_contrast,   1, 0);
+    layout->addWidget(m_sliderC,        1, 1);
+    layout->addWidget(m_spinBoxC,       1, 2);
+    
+    m_ctrlGrp->setLayout(layout);
 
     
-    return(groupBox);
+    return(m_ctrlGrp);
 }
 
 
@@ -131,12 +131,6 @@ void Contrast::setImage(QImage image)
 {
     m_image = QImage(image);
     initTexture();  // init texture
-//    if(!m_isInitialized) {
-//        initializeGL();
-//        resizeGL(m_winW, m_winH);
-//        paintGL();
-//        updateGL();
-//    }
     updateGL();
 }
 
@@ -151,6 +145,84 @@ void Contrast::reload()
 
 
 
+double calculateContr(double contrast) {
+    double contr;
+    if (contrast >= 0) {
+        contr = contrast / 25.0 + 1.0;
+    } else {
+        contr = contrast / 133.0 + 1.0;
+    }
+    return contr;
+}
+
+
+
+int calculateContr_int(double contrast) {
+    int contr;
+    if (contrast >= 1) {
+        contr = (contrast - 1) * 25;
+    } else {
+        contr = (contrast - 1) * 133;
+    }
+    return contr;
+}
+
+
+
+void Contrast::changeBrightness(int brightness)
+{
+    
+    m_sliderB ->blockSignals(true );
+    m_sliderB ->setValue    (brightness);
+    m_sliderB ->blockSignals(false);
+    m_spinBoxB->blockSignals(true );
+    m_spinBoxB->setValue    (brightness);
+    m_spinBoxB->blockSignals(false);
+    
+    m_u_brightness = (GLfloat)brightness/MaxGray;
+    glUniform1f(m_uniform[BRIGHTNESS], m_u_brightness); // brightness
+    updateGL();
+}
+
+
+
+void Contrast::changeContr_slide(int contrast)
+{
+    m_sliderC ->blockSignals(true );
+    m_sliderC ->setValue    (contrast);
+    m_sliderC ->blockSignals(false);
+    
+    double temp = calculateContr((double)contrast);
+    m_spinBoxC->blockSignals(true );
+    m_spinBoxC->setValue    (temp);
+    m_spinBoxC->blockSignals(false);
+    
+    m_u_contrast = (GLfloat)temp;
+    glUniform1f(m_uniform[CONTRAST], m_u_contrast); // contrast value
+    updateGL();
+}
+
+
+
+void Contrast::changeContr_spinB(double contrast)
+{
+    double temp = calculateContr_int(contrast);
+    m_sliderC ->blockSignals(true );
+    m_sliderC ->setValue    (temp);
+    m_sliderC ->blockSignals(false);
+    
+    m_spinBoxC->blockSignals(true );
+    m_spinBoxC->setValue    (contrast);
+    m_spinBoxC->blockSignals(false);
+    
+    m_u_contrast = (GLfloat)contrast;
+    glUniform1f(m_uniform[CONTRAST], m_u_contrast); // contrast value
+    updateGL();
+}
+
+
+
+
 // Contrast::initializeGL:
 //
 // Initialization routine before display loop.
@@ -160,10 +232,6 @@ void
 Contrast::initializeGL()
 {
     initializeGLFunctions();    // initialize GL function resolution for current context
-    
-//    if(!m_image.isNull()) {
-//        m_isInitialized = true;
-//    }
     initTexture();
     initShaders();  // init vertex and fragment shaders
     initVertexBuffer(); // initialize vertex buffer and write positions to vertex shader
@@ -343,7 +411,7 @@ void Contrast::initShaders()
     glUniform1i(m_uniform[ISINPUT], m_isInput);
     glUniform1i(m_uniform[ISRGB], m_isRGB);
     glUniform1f(m_uniform[CONTRAST], m_u_contrast); // contrast value
-    glUniform1i(m_uniform[BRIGHTNESS], m_u_brightness); // brightness
+    glUniform1f(m_uniform[BRIGHTNESS], m_u_brightness); // brightness
 }
 
 

@@ -23,6 +23,11 @@ public:
     void		initVertexBuffer();		// init vertices
     void		initShaders();		// init shaders
     void		initTexture();		// init texture image
+
+public slots:
+    void        changeBrightness  (int);
+    void        changeContr_slide (int);
+    void        changeContr_spinB (double);
     
 protected:
     void		initializeGL	();		// init GL state

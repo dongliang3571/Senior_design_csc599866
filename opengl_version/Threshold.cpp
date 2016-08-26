@@ -97,7 +97,7 @@ void Threshold::reset()
 void Threshold::setImage(QImage image)
 {
     m_image = QImage(image);
-    
+    updateGL();
     // convert jpg to GL formatted image
     m_GLImage = QGLWidget::convertToGLFormat(m_image);
     // init vars
@@ -114,8 +114,6 @@ void Threshold::reload()
 {
     glUniform1i(m_uniform[ISINPUT], m_isInput); // pass threshold reference to fragment shader
     glUniform1i(m_uniform[ISRGB], m_isRGB); // pass threshold reference to fragment shader
-//    initTexture();
-//    paintGL();
     updateGL();
 }
 

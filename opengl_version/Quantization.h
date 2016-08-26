@@ -25,14 +25,14 @@ public:
     void		initShaders	();		// init shaders
     void		initTexture	();		// init texture image
 
+protected slots:
+    void changeLevel (int level);
+    void changeDither(int checked);
     
 protected:
     void		initializeGL	();		// init GL state
     void		resizeGL	(int, int);	// resize GL widget
     void		paintGL		();		// render GL scene
-    void		divideTriangle(vec2, vec2, vec2, int);	// subdivide triangle
-    void		triangle(vec2, vec2, vec2);	// process single triangle
-    
     
 private:
     int		  m_winW;			// window width
@@ -40,27 +40,22 @@ private:
     int       m_numberVertices;   // number of vertices
     bool      m_isInitialized;    // Bool to save state of initialization
     
-    QGLShaderProgram  m_program[2];			// GLSL programs
-    bool		  m_twist;			// twist flag
-    bool		  m_wire;			// wireframe flag
-    float		  m_theta;			// rotation angle
-    int		  m_subdivisions;		// triangle subdivisions
-    QSlider		 *m_sliderTheta;		// rotation slider
-    QSlider		 *m_sliderSubdiv;		// subdivision slider
-    QSpinBox	 *m_spinBoxTheta;		// rotation spinbox
-    QSpinBox	 *m_spinBoxSubdiv;		// subdivision spinbox
-    QCheckBox	 *m_checkBoxTwist;		// twist checkbox
-    QCheckBox	 *m_checkBoxWire;		// wireframe checkbox
-    std::vector<vec2> m_points;			// vector of 2D points (XY)
-    std::vector<vec2> m_coords;			// vector of 2D coords (UV)
-    int		  m_numPoints;			// number of 2D points
-    QMatrix4x4	  m_ModelMatrix;		// 4x4 transformation matrix
-    
-    QMatrix4x4    m_ViewMatrix;
-    
-    QImage		  m_image;			// texture image
+    QGLShaderProgram  m_program;			// GLSL programs
+    QImage        m_image;			// texture image
     GLuint		  m_texture;			// shader index to texture unit
-    GLuint		  m_uniform[2][16];		// uniform vars for two shaders and <16 vars
+    GLuint		  m_uniform[16];		// uniform vars for two shaders and <16 vars
+    
+    // shader variables
+    QMatrix4x4    m_u_mvpMatrix;	// View Model Porjection matrix
+    GLfloat       m_u_bias;
+    GLboolean     m_u_isDither;
+    GLfloat       m_u_scale;
+    
+    // GUI Components
+    QGroupBox*      m_ctrlGrp;	// groupbox for panel
+    QSlider*        m_sliderLevel;
+    QSpinBox*       m_spinboxLevel;
+    QCheckBox*      m_checkBox_dither;
 };
 
 #endif /* Quantization_h */

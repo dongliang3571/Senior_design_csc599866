@@ -1,8 +1,66 @@
 varying vec2 v_TexCoord;
 uniform sampler2D u_Sampler;
+uniform bool u_IsInput;
+uniform bool u_IsRGB;
+uniform bool u_IsDither;
+uniform float u_Scale;
 
-void main(void){
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
 
-	float gray = texture2D(u_Sampler,v_TexCoord).r*0.30 + texture2D(u_Sampler,v_TexCoord).g*0.59 + texture2D(u_Sampler,v_TexCoord).b*0.11;
-	gl_FragColor = vec4(gray, gray, gray, 1);
+float CLIP(float value, float low, float high) {
+	if(value <= high || value >= low) {
+		return value;
+	} else if(value > high) {
+		return high;
+	} else {
+		return low;
+	}
+}
+
+float quantize(float value, float bias) {
+	if(u_IsDither) {
+		float temp = value + bias;
+		return CLIP(u_Scale * floor(temp/u_Scale) + u_Scale/2.0, 0.0, 1.0);
+	} else {
+		return CLIP(u_Scale * floor(value/u_Scale) + u_Scale/2.0, 0.0, 1.0);
+	}
+}
+
+void main(void) {
+	// Initialize points and new bias
+	float points = 0.0;	// Tracking it's odd or even pixel
+	float newBias = 0.0; // This bias could be positive or negative
+
+	// Check if display input or output image
+	if(u_IsInput) {
+		if(u_IsRGB) {
+			gl_FragColor = texture2D(u_Sampler,v_TexCoord);
+		} else {
+			float gray = texture2D(u_Sampler,v_TexCoord).r*0.30 + texture2D(u_Sampler,v_TexCoord).g*0.59 + texture2D(u_Sampler,v_TexCoord).b*0.11;
+			gl_FragColor = vec4(gray, gray, gray, 1);
+		}
+	} else {
+		if(u_IsDither) {
+			points = points + 1.0;
+			if(mod(points, 2.0) == 0.0) {
+				newBias = rand(vec2(gl_FragCoord.x/1.0, gl_FragCoord.y/1.0)) - 0.4;
+			} else {
+				newBias = - (rand(vec2(gl_FragCoord.x/1.0, gl_FragCoord.y/1.0)) - 0.4);
+			}
+		}
+		if(u_IsRGB) {
+			float x, y, z;
+			x = quantize(texture2D(u_Sampler,v_TexCoord).r, newBias);
+			y = quantize(texture2D(u_Sampler,v_TexCoord).g, newBias);
+			z = quantize(texture2D(u_Sampler,v_TexCoord).b, newBias);
+			gl_FragColor = vec4(x, y, z, 1);
+		} else {
+			float gray = texture2D(u_Sampler,v_TexCoord).r*0.30 + texture2D(u_Sampler,v_TexCoord).g*0.59 + texture2D(u_Sampler,v_TexCoord).b*0.11;
+			float x = quantize(gray, newBias);
+			gl_FragColor = vec4(x, x, x, 1);
+		}
+	}
+
 }

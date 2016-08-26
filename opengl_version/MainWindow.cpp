@@ -244,7 +244,7 @@ QGroupBox* MainWindow::createDisplayButtons()
         bGroup->addButton(m_radioDisplay[i]);
     
     // set input radio button to be default
-    m_radioDisplay[0]->setChecked(true);
+    m_radioDisplay[1]->setChecked(true);
     
     // assemble radio buttons into vertical widget
     QVBoxLayout *vbox = new QVBoxLayout;
