@@ -11,6 +11,9 @@
 #include "Threshold.h"
 #include "Contrast.h"
 #include "Quantization.h"
+#include "HistogramStretching.h"
+#include "HistogramMatching.h"
+#include "Blur.h"
 
 
 enum {
@@ -62,12 +65,16 @@ void MainWindow::createGLWidgets()
 {
     // create list of hw names; m_hwName name will be used for
     // tab name and as key for class in m_hw container
-    m_widgetName << "Threshold" << "Contrast" << "Quantization";
+    m_widgetName << "Threshold" << "Contrast" << "Quantization" << "Histogram Stretching"
+                 << "Histogram Matching" << "Blur";
     
     // instantiate homework solution classes
     m_glWidgets[m_widgetName[0]] = new Threshold();
     m_glWidgets[m_widgetName[1]] = new Contrast();
     m_glWidgets[m_widgetName[2]] = new Quantization();
+    m_glWidgets[m_widgetName[3]] = new HistogramStretching();
+    m_glWidgets[m_widgetName[4]] = new HistogramMatching();
+    m_glWidgets[m_widgetName[5]] = new Blur();
 }
 
 
@@ -178,7 +185,7 @@ QGroupBox* MainWindow::createControlPanelGroupBox()
 {
     // init group box
     QGroupBox *groupBox = new QGroupBox();
-    groupBox->setMinimumWidth(300);
+    groupBox->setMinimumWidth(400);
     
     // create a stacked widget to hold multiple control panels
     m_stackWidgetControlPanel = new QStackedWidget;
@@ -197,6 +204,7 @@ QGroupBox* MainWindow::createControlPanelGroupBox()
     vbox->addLayout(layoutDisplayAndMode);
     vbox->addWidget(m_stackWidgetControlPanel);
     vbox->addStretch(1);
+    vbox->addWidget(createHistogram());
     vbox->addLayout(createExitButtons());
     groupBox->setLayout(vbox);
     
@@ -221,6 +229,33 @@ QHBoxLayout* MainWindow::createExitButtons()
     buttonLayout->addWidget(buttonQuit );
     
     return buttonLayout;
+}
+
+
+
+QCustomPlot* MainWindow::createHistogram()
+{
+    // create histogram plot
+    m_histogram = new QCustomPlot;
+    
+    // set histogram title
+    m_histogram->plotLayout()->insertRow(0);
+    m_histogram->plotLayout()->addElement(0, 0, new QCPPlotTitle(m_histogram,"Histogram"));
+    
+    // assign label axes
+    m_histogram->xAxis->setLabel("Intensity");
+    m_histogram->yAxis->setLabel("Frequency");
+    m_histogram->xAxis->setAutoTickStep(0);
+    m_histogram->xAxis->setTickStep(32.);
+    
+    // set axes ranges, so we see all the data
+    m_histogram->xAxis->setRange(0, MXGRAY);
+    m_histogram->yAxis->setRange(0, MXGRAY);
+    m_histogram->setMinimumHeight(400);
+    m_histogram->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+    
+    return m_histogram;
+
 }
 
 
@@ -381,6 +416,79 @@ void MainWindow::displayOut()
 
 
 
+// MainWindow::displayHistogram:
+//
+// Display image histogram in control panel
+//
+void MainWindow::displayHistogram(QImage image, bool isRGB)
+{
+    int width  = image.width();
+    int height = image.height();
+    QVector<double> x;
+    
+    for (int i = 0; i < MXGRAY; i++) {
+        x.push_back(i);
+    }
+    
+    // clear any previous histogram plots
+    m_histogram->clearGraphs();
+    m_histogram->legend->setVisible(true);
+    
+    if(isRGB) {
+        QVector<double> red(MXGRAY, 0);
+        QVector<double> green(MXGRAY, 0);
+        QVector<double> blue(MXGRAY, 0);
+        
+        
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                QRgb pixel = image.pixel(x, y);
+                int r = qRed(pixel);
+                int g = qGreen(pixel);
+                int b = qBlue(pixel);
+                red[r]++;
+                green[g]++;
+                blue[b]++;
+            }
+        }
+        
+        // add new graph for histogram channel
+        m_histogram->addGraph();
+        m_histogram->graph(0)->setData(x, red);
+        m_histogram->graph(0)->setPen (QPen(Qt::red));
+        m_histogram->graph(0)->setName("R");
+        
+        m_histogram->addGraph();
+        m_histogram->graph(1)->setData(x, green);
+        m_histogram->graph(1)->setPen (QPen(Qt::green));
+        m_histogram->graph(1)->setName("G");
+        
+        m_histogram->addGraph();
+        m_histogram->graph(2)->setData(x, blue);
+        m_histogram->graph(2)->setPen (QPen(Qt::blue));
+        m_histogram->graph(2)->setName("B");
+        
+        
+    } else {
+        QVector<double> gray(MXGRAY, 0);
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                QRgb pixel = image.pixel(x, y);
+                int gr = qGray(pixel);
+                gray[gr]++;
+            }
+        }
+        m_histogram->addGraph();
+        m_histogram->graph(0)->setData(x, gray);
+        m_histogram->graph(0)->setPen (QPen(Qt::gray));
+        m_histogram->graph(0)->setName("G");
+    }
+    m_histogram->rescaleAxes();
+    m_histogram->replot();
+}
+
+
+
 // MainWindow::modeRGB:
 //
 // Slot functions to display RGB and grayscale images.
@@ -390,6 +498,7 @@ void MainWindow::modeRGB()
     int index = m_tabWidget->currentIndex();	// current OpenGL widget
     m_glWidgets[ m_widgetName[index] ]->setMode(true);
     m_glWidgets[ m_widgetName[index] ]->reload();
+    m_glWidgets[ m_widgetName[index] ]->displayHisto();
 }
 
 
@@ -403,6 +512,8 @@ void MainWindow::modeGray()
     int index = m_tabWidget->currentIndex();	// current OpenGL widget
     m_glWidgets[ m_widgetName[index] ]->setMode(false);
     m_glWidgets[ m_widgetName[index] ]->reload();
+    m_glWidgets[ m_widgetName[index] ]->displayHisto();
+    
 }
 
 

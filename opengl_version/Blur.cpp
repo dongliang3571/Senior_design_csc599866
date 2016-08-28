@@ -1,103 +1,125 @@
 //
-//  Threshold.cpp
+//  Blur.cpp
 //  hw
 //
-//  Created by dong liang on 8/16/16.
+//  Created by dong liang on 8/28/16.
 //
 //
 
-#include "MainWindow.h"
-#include "Threshold.h"
-
-
-extern MainWindow *MainWindowP;
+#include "Blur.h"
 
 enum {
     SAMPLER,
     MVP,
-    REFERENCE,
     ISINPUT,
-    ISRGB
+    ISRGB,
+    DISTANCEX,
+    DISTANCEY,
+    FILTERWIDTH,
+    FILTERHEIGHT
 };
 
 
 
-// Threshold::Threshold
+// Blur::Blur
 //
-// Constructor for class Threshold
+// Constructor for class Blur
 //
-Threshold::Threshold(QWidget *parent)
+Blur::Blur(QWidget *parent)
 : GLWidget (parent)
 {
     m_numberVertices = 4;
-    m_u_reference = 0.5;
-    m_isInitialized = false;
+    m_u_filterWidth = 0.0; // This filter width indicate how many units away from the mid pixel
+    m_u_filterHeight = 0.0; // This filter height indicate how many units away from the mid pixel
 }
 
 
 
-// Threshold::controlPanel
+// Blur::controlPanel
 //
 // Create control panel groupbox.
 //
-QGroupBox* Threshold::controlPanel()
+QGroupBox* Blur::controlPanel()
 {
     // init group box
-    m_ctrlGrp = new QGroupBox("Threshold");
+    m_ctrlGrp = new QGroupBox("Blur");
+    QLabel* xrange = new QLabel(QString("Filter Width"));
+    QLabel* yrange = new QLabel(QString("Filter Length"));
     
-    // init widgets
-    // create label[i]
-    QLabel *label = new QLabel;
-    label->setText(QString("Thr"));
+    m_sliderXrange = new QSlider(Qt::Horizontal, m_ctrlGrp);
+    m_sliderXrange->setTickPosition(QSlider::TicksBelow);
+    m_sliderXrange->setTickInterval(5);
+    m_sliderXrange->setMinimum(1);
+    m_sliderXrange->setMaximum(100);
+    m_sliderXrange->setValue  (1);
     
-    // create slider
-    m_slider = new QSlider(Qt::Horizontal, m_ctrlGrp);
-    m_slider->setTickPosition(QSlider::TicksBelow);
-    m_slider->setTickInterval(25);
-    m_slider->setMinimum(1);
-    m_slider->setMaximum(MaxGray);
-    m_slider->setValue  (MaxGray>>1);
+    m_sliderYrange = new QSlider(Qt::Horizontal, m_ctrlGrp);
+    m_sliderYrange->setTickPosition(QSlider::TicksBelow);
+    m_sliderYrange->setTickInterval(5);
+    m_sliderYrange->setMinimum(1);
+    m_sliderYrange->setMaximum(100);
+    m_sliderYrange->setValue  (1);
     
-    // create spinbox
-    m_spinBox = new QSpinBox(m_ctrlGrp);
-    m_spinBox->setMinimum(1);
-    m_spinBox->setMaximum(MaxGray);
-    m_spinBox->setValue  (MaxGray>>1);
+    m_spinBoxXrange = new QSpinBox(m_ctrlGrp);
+    m_spinBoxXrange->setMinimum   (1);
+    m_spinBoxXrange->setMaximum   (100);
+    m_spinBoxXrange->setValue     (1);
+    m_spinBoxXrange->setSingleStep(2);
     
-    // init signal/slot connections for Threshold
-    connect(m_slider , SIGNAL(valueChanged(int)), this, SLOT(changeThr (int)));
-    connect(m_spinBox, SIGNAL(valueChanged(int)), this, SLOT(changeThr (int)));
+    m_spinBoxYrange = new QSpinBox(m_ctrlGrp);
+    m_spinBoxYrange->setMinimum   (1);
+    m_spinBoxYrange->setMaximum   (100);
+    m_spinBoxYrange->setValue     (1);
+    m_spinBoxYrange->setSingleStep(2);
     
-    // assemble dialog
+    m_checkboxLockXY = new QCheckBox(QString("Synchronize X Y"));
+    
+    connect(m_sliderXrange,    SIGNAL(valueChanged(int)), this, SLOT(changeXrange(int)));
+    connect(m_spinBoxXrange,   SIGNAL(valueChanged(int)), this, SLOT(changeXrange(int)));
+    connect(m_sliderYrange,    SIGNAL(valueChanged(int)), this, SLOT(changeYrange(int)));
+    connect(m_spinBoxYrange,   SIGNAL(valueChanged(int)), this, SLOT(changeYrange(int)));
+    connect(m_checkboxLockXY,  SIGNAL(stateChanged(int)), this, SLOT(lockXY(int)));
+    
     QGridLayout *layout = new QGridLayout;
-    layout->addWidget(  label  , 0, 0);
-    layout->addWidget(m_slider , 0, 1);
-    layout->addWidget(m_spinBox, 0, 2);
     
-    // assign layout to group box
+    layout->addWidget(xrange,            0, 0);
+    layout->addWidget(m_sliderXrange,    0, 1);
+    layout->addWidget(m_spinBoxXrange,   0, 2);
+    
+    layout->addWidget(yrange,            1, 0);
+    layout->addWidget(m_sliderYrange,    1, 1);
+    layout->addWidget(m_spinBoxYrange,   1, 2);
+    
+    
+    
+    layout->addWidget(m_checkboxLockXY,  2, 0);
+    
+    
+    
     m_ctrlGrp->setLayout(layout);
     
     return(m_ctrlGrp);
+
 }
 
 
 
-// Threshold::reset
+// Blur::reset
 //
 // Reset all parameters
 //
-void Threshold::reset()
+void Blur::reset()
 {
     
 }
 
 
 
-// Threshold::setImage
+// Blur::setImage
 //
 // set image
 //
-void Threshold::setImage(QImage image)
+void Blur::setImage(QImage image)
 {
     m_image = QImage(image);
     updateGL();
@@ -108,48 +130,104 @@ void Threshold::setImage(QImage image)
     m_width_GLImage  = m_GLImage.width ();
     m_height_GLImage = m_GLImage.height();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width_GLImage, m_height_GLImage, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_GLImage.bits());
-
-    updateGL();
-}
-
-
-
-void Threshold::reload()
-{
-    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass threshold reference to fragment shader
-    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass threshold reference to fragment shader
-    updateGL();
-}
-
-
-
-// Threshold::changeThr:
-//
-// Slot to process change in thr caused by moving the slider.
-//
-void
-Threshold::changeThr(int thr)
-{
-    m_slider ->blockSignals(true);
-    m_slider ->setValue    (thr);
-    m_slider ->blockSignals(false);
-    m_spinBox->blockSignals(true);
-    m_spinBox->setValue    (thr);
-    m_spinBox->blockSignals(false);
     
-    m_u_reference = (GLfloat)thr/MaxGray; // Calculate reference
-    glUniform1f(m_uniform[REFERENCE], m_u_reference); // pass threshold reference to fragment shader
     updateGL();
 }
 
 
 
-// Threshold::initializeGL
+void Blur::reload()
+{
+    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass Blur reference to fragment shader
+    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass Blur reference to fragment shader
+    updateGL();
+}
+
+
+
+void settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool oddOnly) {
+    if (oddOnly) {
+        value += !(value%2);
+    }
+    slider->blockSignals(true );
+    slider->setValue    (value);
+    slider->blockSignals(false);
+    
+    spinbox->blockSignals(true );
+    spinbox->setValue    (value);
+    spinbox->blockSignals(false);
+}
+
+
+
+void Blur::changeXrange(int value) {
+    bool isChecked = m_checkboxLockXY->isChecked();
+    if (isChecked) {
+        settingSliderAndSpinBox(m_sliderXrange, m_spinBoxXrange, value, true);
+        settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, value, true);
+    } else {
+        settingSliderAndSpinBox(m_sliderXrange, m_spinBoxXrange, value, true);
+    }
+    
+    if(value == 1) {
+        m_u_filterWidth = 0.0;
+        m_u_filterHeight = 0.0;
+    } else if(value != 1 && isChecked) {
+        m_u_filterWidth = (GLfloat)(value - 1) / 2;
+        m_u_filterHeight = m_u_filterWidth;
+        glUniform1f(m_uniform[FILTERHEIGHT], m_u_filterHeight);
+    } else {
+        m_u_filterWidth = (GLfloat)(value - 1) / 2;
+    }
+    glUniform1f(m_uniform[FILTERWIDTH], m_u_filterWidth);
+    updateGL();
+}
+
+void Blur::changeYrange(int value) {
+    settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, value, true);
+    if(value == 1) {
+        m_u_filterHeight = 0.0;
+    } else {
+        m_u_filterHeight = (GLfloat)(value - 1) / 2;
+    }
+    glUniform1f(m_uniform[FILTERHEIGHT], m_u_filterHeight);
+    updateGL();
+}
+
+
+
+void Blur::lockXY(int isChecked) {
+    int xValue = m_sliderXrange->value();
+    if (isChecked == Qt::Checked) {
+        settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, xValue, true);
+        m_sliderYrange ->setEnabled(false);
+        m_spinBoxYrange->setEnabled(false);
+    } else {
+        m_sliderYrange ->setEnabled(true);
+        m_spinBoxYrange->setEnabled(true);
+    }
+    if(xValue == 1) {
+        m_u_filterHeight = 0.0;
+        m_u_filterWidth = 0.0;
+    } else {
+        m_u_filterWidth = (GLfloat)(xValue - 1) / 2;
+        m_u_filterHeight = (GLfloat)(xValue - 1) / 2;
+    }
+    glUniform1f(m_uniform[FILTERHEIGHT], m_u_filterHeight);
+    glUniform1f(m_uniform[FILTERWIDTH], m_u_filterWidth);
+    updateGL();
+}
+
+
+
+
+
+// Blur::initializeGL
 //
 // Initialization routine before display loop.
 // Gets called once before the first time resizeGL() or paintGL() is called.
 //
-void Threshold::initializeGL()
+void Blur::initializeGL()
 {
     initializeGLFunctions();    // initialize GL function resolution for current context
     
@@ -162,12 +240,12 @@ void Threshold::initializeGL()
 
 
 
-// Threshold::resizeGL
+// Blur::resizeGL
 //
 // Resize event handler.
 // The input parameters are the window width (w) and height (h).
 //
-void Threshold::resizeGL(int w, int h)
+void Blur::resizeGL(int w, int h)
 {
     // save window dimensions
     m_winW = w;
@@ -197,11 +275,11 @@ void Threshold::resizeGL(int w, int h)
 
 
 
-// Threshold::paintGL
+// Blur::paintGL
 //
 // Update GL scene.
 //
-void Threshold::paintGL()
+void Blur::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);   // clear canvas with background values
     if(!m_image.isNull()) glDrawArrays(GL_POLYGON, 0, m_numberVertices);   // draw a rectangle
@@ -214,7 +292,7 @@ void Threshold::paintGL()
 // Initialize setup for texture
 //
 void
-Threshold::initTexture()
+Blur::initTexture()
 {
     qDebug() <<"init texture";
     // read image from file
@@ -242,20 +320,20 @@ Threshold::initTexture()
 
 
 
-// Threshold::initShaders
+// Blur::initShaders
 //
 // Initialize vertex and fragment shaders.
 //
-void Threshold::initShaders()
+void Blur::initShaders()
 {
     // compile vertex shader
-    if(!m_program.addShaderFromSourceFile(QGLShader::Vertex, ":/vshaderThreshold.glsl")) {
+    if(!m_program.addShaderFromSourceFile(QGLShader::Vertex, ":/vshaderBlur.glsl")) {
         QMessageBox::critical(0, "Error", "Vertex shader error", QMessageBox::Ok);
         QApplication::quit();
     }
     
     // compile fragment shader
-    if(!m_program.addShaderFromSourceFile(QGLShader::Fragment, ":/fshaderThreshold.glsl")) {
+    if(!m_program.addShaderFromSourceFile(QGLShader::Fragment, ":/fshaderBlur.glsl")) {
         QMessageBox::critical(0, "Error", "Fragment shader error",QMessageBox::Ok);
         QApplication::quit();
     }
@@ -289,13 +367,6 @@ void Threshold::initShaders()
     }
     
     // get location of u_reference in fragment shader
-    m_uniform[REFERENCE] = glGetUniformLocation(m_program.programId(), "u_reference");
-    if((int) m_uniform[REFERENCE] < 0) {
-        qDebug() << "Failed to get the storage location of u_reference";
-        exit(-1);
-    }
-    
-    // get location of u_reference in fragment shader
     m_uniform[ISINPUT] = glGetUniformLocation(m_program.programId(), "u_IsInput");
     if((int) m_uniform[ISINPUT] < 0) {
         qDebug() << "Failed to get the storage location of u_IsInput";
@@ -309,6 +380,34 @@ void Threshold::initShaders()
         exit(-1);
     }
     
+    // get location of u_reference in fragment shader
+    m_uniform[DISTANCEX] = glGetUniformLocation(m_program.programId(), "u_DistanceX");
+    if((int) m_uniform[DISTANCEX] < 0) {
+        qDebug() << "Failed to get the storage location of u_DistanceX";
+        exit(-1);
+    }
+    
+    // get location of u_reference in fragment shader
+    m_uniform[DISTANCEY] = glGetUniformLocation(m_program.programId(), "u_DistanceY");
+    if((int) m_uniform[DISTANCEY] < 0) {
+        qDebug() << "Failed to get the storage location of u_DistanceY";
+        exit(-1);
+    }
+    
+    // get location of u_reference in fragment shader
+    m_uniform[FILTERWIDTH] = glGetUniformLocation(m_program.programId(), "u_FilterWidth");
+    if((int) m_uniform[FILTERWIDTH] < 0) {
+        qDebug() << "Failed to get the storage location of u_FilterWidth";
+        exit(-1);
+    }
+    
+    // get location of u_reference in fragment shader
+    m_uniform[FILTERHEIGHT] = glGetUniformLocation(m_program.programId(), "u_FilterHeight");
+    if((int) m_uniform[FILTERHEIGHT] < 0) {
+        qDebug() << "Failed to get the storage location of u_FilterHeight";
+        exit(-1);
+    }
+    
     // bind the glsl progam
     glUseProgram(m_program.programId());
     
@@ -317,18 +416,26 @@ void Threshold::initShaders()
     m_u_mvpMatrix.setToIdentity();
     glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData()); // Pass MVP matrix to vertex shader
     
-    glUniform1f(m_uniform[REFERENCE], m_u_reference); // pass threshold reference to fragment shader
+    glUniform1i(m_uniform[ISINPUT], m_isInput);
     glUniform1i(m_uniform[ISINPUT], m_isInput);
     glUniform1i(m_uniform[ISRGB], m_isRGB);
+    
+    m_u_distanceX = (GLfloat)1.0 / m_width_GLImage;
+    m_u_distanceY = (GLfloat)1.0 / m_height_GLImage;
+    glUniform1f(m_uniform[DISTANCEX], m_u_distanceX);
+    glUniform1f(m_uniform[DISTANCEY], m_u_distanceY);
+    
+    glUniform1f(m_uniform[FILTERWIDTH], m_u_filterWidth);
+    glUniform1f(m_uniform[FILTERHEIGHT], m_u_filterHeight);
 }
 
 
 
-// Threshold::initVertexBuffer:
+// Blur::initVertexBuffer:
 //
 // Initialize vertex buffer.
 //
-void Threshold::initVertexBuffer()
+void Blur::initVertexBuffer()
 {
     // set flag for creating buffers (1st time only)
     static bool flag = 1;
@@ -371,3 +478,4 @@ void Threshold::initVertexBuffer()
     glEnableVertexAttribArray(ATTRIB_TEXTURE_POSITION); // Enable assignment
     glVertexAttribPointer(ATTRIB_TEXTURE_POSITION, 2, GL_FLOAT, false, 0, NULL); // Assign the buffer object to an attribute variable
 }
+

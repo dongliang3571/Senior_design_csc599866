@@ -6,6 +6,13 @@
         <file>fshaderContrast.glsl</file>
         <file>vshaderQuantization.glsl</file>
         <file>fshaderQuantization.glsl</file>
+        <file>vshaderHistogramStretching.glsl</file>
+        <file>fshaderHistogramStretching.glsl</file>
+        <file>vshaderHistogramMatching.glsl</file>
+        <file>fshaderHistogramMatching.glsl</file>
+        <file>vshaderBlur.glsl</file>
+        <file>fshaderBlur.glsl</file>
         <file>mandrill.jpg</file>
+
     </qresource>
 </RCC>

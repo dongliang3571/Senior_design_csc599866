@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = hw
-QT += widgets opengl
+QT += widgets opengl printsupport
 OBJECTS_DIR = ./obj
 MOC_DIR     = ./moc
 RESOURCES   = hw.qrc
@@ -23,13 +23,21 @@ unix:!macx {
 # Input
 HEADERS +=	MainWindow.h  \
 		GLWidget.h		  \
+        qcustomplot.h     \
         Threshold.h       \
         Contrast.h        \
         Quantization.h    \
+        HistogramStretching.h \
+        HistogramMatching.h   \
+        Blur.h            \
 		
 SOURCES +=	main.cpp	  \
 		MainWindow.cpp 	  \
+        qcustomplot.cpp   \
 		GLWidget.cpp	  \
         Threshold.cpp     \
         Contrast.cpp      \
         Quantization.cpp  \
+        HistogramStretching.cpp \
+        HistogramMatching.cpp   \
+        Blur.cpp          \
