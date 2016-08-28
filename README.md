@@ -4,16 +4,16 @@ Image filter is something that you can see often in the image processing softwar
 
 ### Filter List
 - Point Operations
-  * Threshold
-  * Contrast
-  * Quantization
-  * Histogram Stretching
-  * Histogram Matching
+  * [x] Threshold
+  * [x] Contrast
+  * [x] Quantization(Dithering isn't good)
+  * [x] Histogram Stretching
+  * [ ] Histogram Matching
 
 - Neighborhood Operations
-  * Blur
-  * Sharpen
-  * Median Filter
+  * [x] Blur
+  * [ ] Sharpen
+  * [ ] Median Filter
 
 **Note:This is a Qt project, in order to run this you have to have Qt installed!**
 
