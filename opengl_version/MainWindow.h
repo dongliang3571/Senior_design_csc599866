@@ -26,6 +26,7 @@
 #include <map>
 #include <algorithm>
 #include "GLWidget.h"
+#include "qcustomplot.h"
 
 typedef std::map<QString, GLWidget*> glWidget;
 
@@ -35,7 +36,7 @@ class MainWindow : public QMainWindow {
 public:
 	// constructor
 	MainWindow	(QWidget *parent = 0);
-
+    void        displayHistogram(QImage image, bool isRGB);
 
 public slots:
 	void		changeTab	(int);
@@ -62,6 +63,8 @@ protected:
     QGroupBox*      createDisplayButtons();
     QGroupBox*      createModeButtons();
     QHBoxLayout*	createExitButtons();
+    QCustomPlot*    createHistogram();
+    
 
 private:
 	// homework objects
@@ -82,6 +85,7 @@ private:
     // widgets for image display groupbox
     QRadioButton*	m_radioDisplay[2];	// radio buttons for input/output
     QRadioButton*	m_radioMode   [2];	// radio buttons for RGB/Gray modes
+    QCustomPlot*	m_histogram;		// histogram plot
     QMenu*			m_menuFile;
     QMenu*			m_menuPtOps;
     QMenu*          m_menuNeighborhoodOps;

@@ -42,6 +42,7 @@ public:
 	virtual void		reset();		// reset parameters
     virtual void        setImage(QImage image);
     virtual void        reload();
+    virtual void        displayHisto();
     
     void        setDisplay(bool value);
     void        setMode(bool value);

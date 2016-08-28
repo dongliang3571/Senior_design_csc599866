@@ -58,6 +58,9 @@ void GLWidget::reload()
 {
 }
 
+void GLWidget::displayHisto()
+{
+}
 
 void GLWidget::setDisplay(bool value)
 {

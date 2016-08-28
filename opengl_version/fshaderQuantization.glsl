@@ -28,11 +28,10 @@ float quantize(float value, float bias) {
 	}
 }
 
-void main(void) {
-	// Initialize points and new bias
-	float points = 0.0;	// Tracking it's odd or even pixel
-	float newBias = 0.0; // This bias could be positive or negative
 
+void main(void) {
+
+    float newBias;
 	// Check if display input or output image
 	if(u_IsInput) {
 		if(u_IsRGB) {
@@ -43,11 +42,10 @@ void main(void) {
 		}
 	} else {
 		if(u_IsDither) {
-			points = points + 1.0;
-			if(mod(points, 2.0) == 0.0) {
-				newBias = rand(vec2(gl_FragCoord.x/1.0, gl_FragCoord.y/1.0)) - 0.4;
+			if(mod(gl_FragCoord.x, 2.0) == 0.0) {
+				newBias = mod(rand(vec2(gl_FragCoord.x/1.0, gl_FragCoord.y/1.0)), u_Scale);
 			} else {
-				newBias = - (rand(vec2(gl_FragCoord.x/1.0, gl_FragCoord.y/1.0)) - 0.4);
+				newBias = - mod(rand(vec2(gl_FragCoord.x/1.0, gl_FragCoord.y/1.0)) / 3.0, u_Scale);
 			}
 		}
 		if(u_IsRGB) {

@@ -1,13 +1,13 @@
 //
-//  Threshold.cpp
+//  HistogramMatching.cpp
 //  hw
 //
-//  Created by dong liang on 8/16/16.
+//  Created by dong liang on 8/27/16.
 //
 //
 
 #include "MainWindow.h"
-#include "Threshold.h"
+#include "HistogramMatching.h"
 
 
 extern MainWindow *MainWindowP;
@@ -22,11 +22,11 @@ enum {
 
 
 
-// Threshold::Threshold
+// HistogramMatching::HistogramMatching
 //
-// Constructor for class Threshold
+// Constructor for class HistogramMatching
 //
-Threshold::Threshold(QWidget *parent)
+HistogramMatching::HistogramMatching(QWidget *parent)
 : GLWidget (parent)
 {
     m_numberVertices = 4;
@@ -36,14 +36,14 @@ Threshold::Threshold(QWidget *parent)
 
 
 
-// Threshold::controlPanel
+// HistogramMatching::controlPanel
 //
 // Create control panel groupbox.
 //
-QGroupBox* Threshold::controlPanel()
+QGroupBox* HistogramMatching::controlPanel()
 {
     // init group box
-    m_ctrlGrp = new QGroupBox("Threshold");
+    m_ctrlGrp = new QGroupBox("HistogramMatching");
     
     // init widgets
     // create label[i]
@@ -64,7 +64,7 @@ QGroupBox* Threshold::controlPanel()
     m_spinBox->setMaximum(MaxGray);
     m_spinBox->setValue  (MaxGray>>1);
     
-    // init signal/slot connections for Threshold
+    // init signal/slot connections for HistogramMatching
     connect(m_slider , SIGNAL(valueChanged(int)), this, SLOT(changeThr (int)));
     connect(m_spinBox, SIGNAL(valueChanged(int)), this, SLOT(changeThr (int)));
     
@@ -82,22 +82,22 @@ QGroupBox* Threshold::controlPanel()
 
 
 
-// Threshold::reset
+// HistogramMatching::reset
 //
 // Reset all parameters
 //
-void Threshold::reset()
+void HistogramMatching::reset()
 {
     
 }
 
 
 
-// Threshold::setImage
+// HistogramMatching::setImage
 //
 // set image
 //
-void Threshold::setImage(QImage image)
+void HistogramMatching::setImage(QImage image)
 {
     m_image = QImage(image);
     updateGL();
@@ -107,28 +107,34 @@ void Threshold::setImage(QImage image)
     // init vars
     m_width_GLImage  = m_GLImage.width ();
     m_height_GLImage = m_GLImage.height();
+    
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width_GLImage, m_height_GLImage, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_GLImage.bits());
-
+    
     updateGL();
 }
 
 
 
-void Threshold::reload()
+void HistogramMatching::reload()
 {
-    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass threshold reference to fragment shader
-    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass threshold reference to fragment shader
+    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass HistogramMatching reference to fragment shader
+    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass HistogramMatching reference to fragment shader
     updateGL();
 }
 
 
+void HistogramMatching::displayHisto()
+{
+    MainWindowP->displayHistogram(m_GLImage, m_isRGB);
+}
 
-// Threshold::changeThr:
+
+// HistogramMatching::changeThr:
 //
 // Slot to process change in thr caused by moving the slider.
 //
 void
-Threshold::changeThr(int thr)
+HistogramMatching::changeThr(int thr)
 {
     m_slider ->blockSignals(true);
     m_slider ->setValue    (thr);
@@ -138,18 +144,18 @@ Threshold::changeThr(int thr)
     m_spinBox->blockSignals(false);
     
     m_u_reference = (GLfloat)thr/MaxGray; // Calculate reference
-    glUniform1f(m_uniform[REFERENCE], m_u_reference); // pass threshold reference to fragment shader
+    glUniform1f(m_uniform[REFERENCE], m_u_reference); // pass HistogramMatching reference to fragment shader
     updateGL();
 }
 
 
 
-// Threshold::initializeGL
+// HistogramMatching::initializeGL
 //
 // Initialization routine before display loop.
 // Gets called once before the first time resizeGL() or paintGL() is called.
 //
-void Threshold::initializeGL()
+void HistogramMatching::initializeGL()
 {
     initializeGLFunctions();    // initialize GL function resolution for current context
     
@@ -162,12 +168,12 @@ void Threshold::initializeGL()
 
 
 
-// Threshold::resizeGL
+// HistogramMatching::resizeGL
 //
 // Resize event handler.
 // The input parameters are the window width (w) and height (h).
 //
-void Threshold::resizeGL(int w, int h)
+void HistogramMatching::resizeGL(int w, int h)
 {
     // save window dimensions
     m_winW = w;
@@ -197,11 +203,11 @@ void Threshold::resizeGL(int w, int h)
 
 
 
-// Threshold::paintGL
+// HistogramMatching::paintGL
 //
 // Update GL scene.
 //
-void Threshold::paintGL()
+void HistogramMatching::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);   // clear canvas with background values
     if(!m_image.isNull()) glDrawArrays(GL_POLYGON, 0, m_numberVertices);   // draw a rectangle
@@ -214,9 +220,8 @@ void Threshold::paintGL()
 // Initialize setup for texture
 //
 void
-Threshold::initTexture()
+HistogramMatching::initTexture()
 {
-    qDebug() <<"init texture";
     // read image from file
     if(m_image.isNull()) {
         m_image.load(QString(":/mandrill.jpg"));
@@ -224,10 +229,12 @@ Threshold::initTexture()
     }
     // convert jpg to GL formatted image
     m_GLImage = QGLWidget::convertToGLFormat(m_image);
+    
     // init vars
     m_width_GLImage  = m_GLImage.width ();
     m_height_GLImage = m_GLImage.height();
     
+    displayHisto();
     // generate texture object and bind it
     // GL_TEXTURE0 is texture unit, which is for managing a texture image, each has an associated GL_TEXTURE_2D,
     // which is the textuture target for specifying the type of texture
@@ -238,24 +245,25 @@ Threshold::initTexture()
     // set the texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width_GLImage, m_height_GLImage, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_GLImage.bits());
+    
 }
 
 
 
-// Threshold::initShaders
+// HistogramMatching::initShaders
 //
 // Initialize vertex and fragment shaders.
 //
-void Threshold::initShaders()
+void HistogramMatching::initShaders()
 {
     // compile vertex shader
-    if(!m_program.addShaderFromSourceFile(QGLShader::Vertex, ":/vshaderThreshold.glsl")) {
+    if(!m_program.addShaderFromSourceFile(QGLShader::Vertex, ":/vshaderHistogramMatching.glsl")) {
         QMessageBox::critical(0, "Error", "Vertex shader error", QMessageBox::Ok);
         QApplication::quit();
     }
     
     // compile fragment shader
-    if(!m_program.addShaderFromSourceFile(QGLShader::Fragment, ":/fshaderThreshold.glsl")) {
+    if(!m_program.addShaderFromSourceFile(QGLShader::Fragment, ":/fshaderHistogramMatching.glsl")) {
         QMessageBox::critical(0, "Error", "Fragment shader error",QMessageBox::Ok);
         QApplication::quit();
     }
@@ -317,18 +325,18 @@ void Threshold::initShaders()
     m_u_mvpMatrix.setToIdentity();
     glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData()); // Pass MVP matrix to vertex shader
     
-    glUniform1f(m_uniform[REFERENCE], m_u_reference); // pass threshold reference to fragment shader
+    glUniform1f(m_uniform[REFERENCE], m_u_reference); // pass HistogramMatching reference to fragment shader
     glUniform1i(m_uniform[ISINPUT], m_isInput);
     glUniform1i(m_uniform[ISRGB], m_isRGB);
 }
 
 
 
-// Threshold::initVertexBuffer:
+// HistogramMatching::initVertexBuffer:
 //
 // Initialize vertex buffer.
 //
-void Threshold::initVertexBuffer()
+void HistogramMatching::initVertexBuffer()
 {
     // set flag for creating buffers (1st time only)
     static bool flag = 1;

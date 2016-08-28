@@ -300,6 +300,7 @@ Contrast::paintGL()
 void
 Contrast::initTexture()
 {
+    qDebug() <<"init texture";
     // read image from file
     if(m_image.isNull()) {
         m_image.load(QString(":/mandrill.jpg"));
