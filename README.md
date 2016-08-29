@@ -4,16 +4,16 @@ Image filter is something that you can see often in the image processing softwar
 
 ### Filter List
 - Point Operations
-  * Threshold
-  * Contrast
-  * Quantization
-  * Histogram Stretching
-  * Histogram Matching
+  * [x] Threshold
+  * [x] Contrast
+  * [x] Quantization(Dithering isn't good)
+  * [x] Histogram Stretching
+  * [ ] Histogram Matching
 
 - Neighborhood Operations
-  * Blur
-  * Sharpen
-  * Median Filter
+  * [x] Blur
+  * [ ] Sharpen
+  * [ ] Median Filter
 
 **Note:This is a Qt project, in order to run this you have to have Qt installed!**
 
@@ -131,3 +131,54 @@ Important Notes
 The texture2D function returns a texel, i.e. the (color) value of the texture for the given coordinates. The function has one input parameter of the type sampler2D and one input parameter of the type vec2 : sampler, the uniform the texture is bound to, and coord, the 2-dimensional coordinates of the texel to look up.
   * There is an optional third input parameter of the type float: bias. After calculating the appropriate level of detail for a texture with mipmaps the bias is added before the actual texture lookup operation is executed.
   * Side note: On iOS devices texture lookup functionality is only available in the fragment shader.
+
+### Array type in shader
+- An array type can be formed by specifying a type followed by square brackets ([ ]) and including a size
+
+  ```c++
+  float[5]
+  ```
+- This type can be used anywhere any other type can be used, including as the return value from a function
+
+  ```c++
+  float[5] foo() { }
+  ```
+- as a constructor of an array
+
+  ```c++
+  float[5](3.4, 4.2, 5.0, 5.2, 1.1)
+  ```
+- as an unnamed parameter
+
+  ```c++
+  void foo(float[5])
+  ```
+- and as an alternate way of declaring a variable or function parameter
+
+  ```c++
+  float[5] a;
+  ```
+- Arrays can have initializers formed from array constructors
+
+  ```c++
+  float a[5] = float[5](3.4, 4.2, 5.0, 5.2, 1.1);
+  float a[5] = float[](3.4, 4.2, 5.0, 5.2, 1.1); // same thing
+  ```
+- An array of arrays can be declared as
+
+  ```c++
+  vec4 a[3][2]; // size-3 array of size-2 array of vec4
+  ```
+- which declares a one-dimensional array of size 3 of one-dimensional arrays of size 2 of vec4s. These
+  following declarations do the same thing
+
+  ```c++
+  vec4[2] a[3]; // size-3 array of size-2 array of vec4
+  vec4[3][2] a; // size-3 array of size-2 array of vec4
+  ```
+- Arrays know the number of elements they contain. This can be obtained by using the `.length()` method
+
+  ```c++
+  float a[5];
+  a.length(); // returns 5 
+  ```
