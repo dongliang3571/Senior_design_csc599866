@@ -31,7 +31,6 @@ Threshold::Threshold(QWidget *parent)
 {
     m_numberVertices = 4;
     m_u_reference = 0.5;
-    m_isInitialized = false;
 }
 
 
@@ -216,7 +215,6 @@ void Threshold::paintGL()
 void
 Threshold::initTexture()
 {
-    qDebug() <<"init texture";
     // read image from file
     if(m_image.isNull()) {
         m_image.load(QString(":/mandrill.jpg"));

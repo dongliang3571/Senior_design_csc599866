@@ -17,7 +17,9 @@ float CLIP(float value, float low, float high) {
 
 float histogramStretch(float value) {
 	const float MaxGray = 1.0;
-	return CLIP(MaxGray * (value - u_Min_Value) / (u_Max_Value - u_Min_Value), 0.0, MaxGray);
+	return CLIP(MaxGray * (value - u_Min_Value) / (u_Max_Value - u_Min_Value),
+				0.0,
+				MaxGray);
 }
 
 void main(void) {
@@ -25,7 +27,9 @@ void main(void) {
 		if(u_IsRGB) {
 			gl_FragColor = texture2D(u_Sampler,v_TexCoord);
 		} else {
-			float gray = texture2D(u_Sampler,v_TexCoord).r*0.30 + texture2D(u_Sampler,v_TexCoord).g*0.59 + texture2D(u_Sampler,v_TexCoord).b*0.11;
+			float gray = texture2D(u_Sampler,v_TexCoord).r*0.30 +
+			             texture2D(u_Sampler,v_TexCoord).g*0.59 +
+						 texture2D(u_Sampler,v_TexCoord).b*0.11;
 			gl_FragColor = vec4(gray, gray, gray, 1);
 		}
 	} else {
@@ -36,7 +40,9 @@ void main(void) {
 			z = histogramStretch(texture2D(u_Sampler,v_TexCoord).b);
 			gl_FragColor = vec4(x, y, z, 1);
 		} else {
-			float gray = texture2D(u_Sampler,v_TexCoord).r*0.30 + texture2D(u_Sampler,v_TexCoord).g*0.59 + texture2D(u_Sampler,v_TexCoord).b*0.11;
+			float gray = texture2D(u_Sampler,v_TexCoord).r*0.30 +
+						 texture2D(u_Sampler,v_TexCoord).g*0.59 +
+						 texture2D(u_Sampler,v_TexCoord).b*0.11;
 			float x = histogramStretch(gray);
 			gl_FragColor = vec4(x, x, x, 1);
 		}

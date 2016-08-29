@@ -14,6 +14,8 @@
 #include "HistogramStretching.h"
 #include "HistogramMatching.h"
 #include "Blur.h"
+#include "Sharpen.h"
+#include "MedianFilter.h"
 
 
 enum {
@@ -66,7 +68,7 @@ void MainWindow::createGLWidgets()
     // create list of hw names; m_hwName name will be used for
     // tab name and as key for class in m_hw container
     m_widgetName << "Threshold" << "Contrast" << "Quantization" << "Histogram Stretching"
-                 << "Histogram Matching" << "Blur";
+                 << "Histogram Matching" << "Blur" << "Sharpen" << "Median Filter";
     
     // instantiate homework solution classes
     m_glWidgets[m_widgetName[0]] = new Threshold();
@@ -75,6 +77,8 @@ void MainWindow::createGLWidgets()
     m_glWidgets[m_widgetName[3]] = new HistogramStretching();
     m_glWidgets[m_widgetName[4]] = new HistogramMatching();
     m_glWidgets[m_widgetName[5]] = new Blur();
+    m_glWidgets[m_widgetName[6]] = new Sharpen();
+    m_glWidgets[m_widgetName[7]] = new MedianFilter();
 }
 
 

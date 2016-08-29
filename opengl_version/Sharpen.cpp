@@ -1,12 +1,12 @@
 //
-//  Blur.cpp
+//  Sharpen.cpp
 //  hw
 //
 //  Created by dong liang on 8/28/16.
 //
 //
 
-#include "Blur.h"
+#include "Sharpen.h"
 
 enum {
     SAMPLER,
@@ -16,35 +16,45 @@ enum {
     DISTANCEX,
     DISTANCEY,
     FILTERWIDTH,
-    FILTERHEIGHT
+    FILTERHEIGHT,
+    ISEDGE,
+    FACTOR
 };
 
 
 
-// Blur::Blur
+// Sharpen::Sharpen
 //
-// Constructor for class Blur
+// Constructor for class Sharpen
 //
-Blur::Blur(QWidget *parent)
+Sharpen::Sharpen(QWidget *parent)
 : GLWidget (parent)
 {
     m_numberVertices = 4;
     m_u_filterWidth = 0.0; // This filter width indicate how many units away from the mid pixel
     m_u_filterHeight = 0.0; // This filter height indicate how many units away from the mid pixel
+    m_u_isEdge = false;
+    m_u_factor = 1.0;
 }
 
 
 
-// Blur::controlPanel
+// Sharpen::controlPanel
 //
 // Create control panel groupbox.
 //
-QGroupBox* Blur::controlPanel()
+QGroupBox* Sharpen::controlPanel()
 {
     // init group box
-    m_ctrlGrp = new QGroupBox("Blur");
+    m_ctrlGrp = new QGroupBox("Sharpen");
     QLabel* xrange = new QLabel(QString("Filter Width"));
-    QLabel* yrange = new QLabel(QString("Filter Length"));
+    QLabel* yrange = new QLabel(QString("Filter Height"));
+    QLabel* factor = new QLabel(QString("Factor"));
+    
+    m_radioButtons[0] = new QRadioButton("Edging", m_ctrlGrp);
+    m_radioButtons[0]->setChecked(true);
+    m_radioButtons[1] = new QRadioButton("Sharpen", m_ctrlGrp);
+    m_radioButtons[1]->setChecked(false);
     
     m_sliderXrange = new QSlider(Qt::Horizontal, m_ctrlGrp);
     m_sliderXrange->setTickPosition(QSlider::TicksBelow);
@@ -59,6 +69,14 @@ QGroupBox* Blur::controlPanel()
     m_sliderYrange->setMinimum(1);
     m_sliderYrange->setMaximum(100);
     m_sliderYrange->setValue  (1);
+    m_sliderYrange->setDisabled(true);
+    
+    m_sliderFactor = new QSlider(Qt::Horizontal, m_ctrlGrp);
+    m_sliderFactor->setTickPosition(QSlider::TicksBelow);
+    m_sliderFactor->setTickInterval(5);
+    m_sliderFactor->setMinimum(1);
+    m_sliderFactor->setMaximum(50);
+    m_sliderFactor->setValue  (1);
     
     m_spinBoxXrange = new QSpinBox(m_ctrlGrp);
     m_spinBoxXrange->setMinimum   (1);
@@ -71,13 +89,25 @@ QGroupBox* Blur::controlPanel()
     m_spinBoxYrange->setMaximum   (100);
     m_spinBoxYrange->setValue     (1);
     m_spinBoxYrange->setSingleStep(2);
+    m_sliderYrange->setDisabled(true);
+    
+    m_spinBoxFactor = new QSpinBox(m_ctrlGrp);
+    m_spinBoxFactor->setMinimum   (1);
+    m_spinBoxFactor->setMaximum   (100);
+    m_spinBoxFactor->setValue     (1);
+    m_spinBoxFactor->setSingleStep(1);
     
     m_checkboxLockXY = new QCheckBox(QString("Synchronize X Y"));
+    m_checkboxLockXY->setCheckState(Qt::Checked);
     
+    connect(m_radioButtons[0], SIGNAL(clicked(bool)),     this, SLOT(startEdging(bool)));
+    connect(m_radioButtons[1], SIGNAL(clicked(bool)),     this, SLOT(startSharpening(bool)));
     connect(m_sliderXrange,    SIGNAL(valueChanged(int)), this, SLOT(changeXrange(int)));
     connect(m_spinBoxXrange,   SIGNAL(valueChanged(int)), this, SLOT(changeXrange(int)));
     connect(m_sliderYrange,    SIGNAL(valueChanged(int)), this, SLOT(changeYrange(int)));
     connect(m_spinBoxYrange,   SIGNAL(valueChanged(int)), this, SLOT(changeYrange(int)));
+    connect(m_sliderFactor,    SIGNAL(valueChanged(int)), this, SLOT(changeFactor(int)));
+    connect(m_spinBoxFactor,   SIGNAL(valueChanged(int)), this, SLOT(changeFactor(int)));
     connect(m_checkboxLockXY,  SIGNAL(stateChanged(int)), this, SLOT(lockXY(int)));
     
     QGridLayout *layout = new QGridLayout;
@@ -85,35 +115,42 @@ QGroupBox* Blur::controlPanel()
     layout->addWidget(xrange,            0, 0);
     layout->addWidget(m_sliderXrange,    0, 1);
     layout->addWidget(m_spinBoxXrange,   0, 2);
+    
     layout->addWidget(yrange,            1, 0);
     layout->addWidget(m_sliderYrange,    1, 1);
     layout->addWidget(m_spinBoxYrange,   1, 2);
-    layout->addWidget(m_checkboxLockXY,  2, 0);
-
+    
+    layout->addWidget(factor,            2, 0);
+    layout->addWidget(m_sliderFactor,    2, 1);
+    layout->addWidget(m_spinBoxFactor,   2, 2);
+    
+    layout->addWidget(m_radioButtons[0], 4, 0);
+    layout->addWidget(m_checkboxLockXY);
+    layout->addWidget(m_radioButtons[1], 5, 0);
+    
     m_ctrlGrp->setLayout(layout);
     
     return(m_ctrlGrp);
-
 }
 
 
 
-// Blur::reset
+// Sharpen::reset
 //
 // Reset all parameters
 //
-void Blur::reset()
+void Sharpen::reset()
 {
     
 }
 
 
 
-// Blur::setImage
+// Sharpen::setImage
 //
 // set image
 //
-void Blur::setImage(QImage image)
+void Sharpen::setImage(QImage image)
 {
     m_image = QImage(image);
     updateGL();
@@ -130,16 +167,16 @@ void Blur::setImage(QImage image)
 
 
 
-void Blur::reload()
+void Sharpen::reload()
 {
-    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass Blur reference to fragment shader
-    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass Blur reference to fragment shader
+    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass Sharpen reference to fragment shader
+    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass Sharpen reference to fragment shader
     updateGL();
 }
 
 
 
-void settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool oddOnly) {
+void Sharpen::settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool oddOnly) {
     if (oddOnly) {
         value += !(value%2);
     }
@@ -153,8 +190,7 @@ void settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool
 }
 
 
-
-void Blur::changeXrange(int value) {
+void Sharpen::changeXrange(int value) {
     bool isChecked = m_checkboxLockXY->isChecked();
     if (isChecked) {
         settingSliderAndSpinBox(m_sliderXrange, m_spinBoxXrange, value, true);
@@ -178,7 +214,7 @@ void Blur::changeXrange(int value) {
     updateGL();
 }
 
-void Blur::changeYrange(int value) {
+void Sharpen::changeYrange(int value) {
     settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, value, true);
     if(value == 1) {
         m_u_filterHeight = 0.0;
@@ -191,7 +227,7 @@ void Blur::changeYrange(int value) {
 
 
 
-void Blur::lockXY(int isChecked) {
+void Sharpen::lockXY(int isChecked) {
     int xValue = m_sliderXrange->value();
     if (isChecked == Qt::Checked) {
         settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, xValue, true);
@@ -215,12 +251,37 @@ void Blur::lockXY(int isChecked) {
 
 
 
-// Blur::initializeGL
+void Sharpen::changeFactor(int value) {
+    settingSliderAndSpinBox(m_sliderFactor, m_spinBoxFactor, value, false);
+    m_u_factor = (GLfloat)value;
+    glUniform1f(m_uniform[FACTOR], m_u_factor);
+    updateGL();
+}
+
+void Sharpen::startEdging(bool isClicked) {
+    if(isClicked) {
+        m_u_isEdge = true;
+        glUniform1i(m_uniform[ISEDGE], m_u_isEdge);
+        updateGL();
+    }
+}
+
+void Sharpen::startSharpening(bool isClicked) {
+    if(isClicked) {
+        m_u_isEdge = false;
+        glUniform1i(m_uniform[ISEDGE], m_u_isEdge);
+        updateGL();        
+    }
+}
+
+
+
+// Sharpen::initializeGL
 //
 // Initialization routine before display loop.
 // Gets called once before the first time resizeGL() or paintGL() is called.
 //
-void Blur::initializeGL()
+void Sharpen::initializeGL()
 {
     initializeGLFunctions();    // initialize GL function resolution for current context
     
@@ -233,12 +294,12 @@ void Blur::initializeGL()
 
 
 
-// Blur::resizeGL
+// Sharpen::resizeGL
 //
 // Resize event handler.
 // The input parameters are the window width (w) and height (h).
 //
-void Blur::resizeGL(int w, int h)
+void Sharpen::resizeGL(int w, int h)
 {
     // save window dimensions
     m_winW = w;
@@ -268,11 +329,11 @@ void Blur::resizeGL(int w, int h)
 
 
 
-// Blur::paintGL
+// Sharpen::paintGL
 //
 // Update GL scene.
 //
-void Blur::paintGL()
+void Sharpen::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);   // clear canvas with background values
     if(!m_image.isNull()) glDrawArrays(GL_POLYGON, 0, m_numberVertices);   // draw a rectangle
@@ -285,7 +346,7 @@ void Blur::paintGL()
 // Initialize setup for texture
 //
 void
-Blur::initTexture()
+Sharpen::initTexture()
 {
     // read image from file
     if(m_image.isNull()) {
@@ -312,20 +373,20 @@ Blur::initTexture()
 
 
 
-// Blur::initShaders
+// Sharpen::initShaders
 //
 // Initialize vertex and fragment shaders.
 //
-void Blur::initShaders()
+void Sharpen::initShaders()
 {
     // compile vertex shader
-    if(!m_program.addShaderFromSourceFile(QGLShader::Vertex, ":/vshaderBlur.glsl")) {
+    if(!m_program.addShaderFromSourceFile(QGLShader::Vertex, ":/vshaderSharpen.glsl")) {
         QMessageBox::critical(0, "Error", "Vertex shader error", QMessageBox::Ok);
         QApplication::quit();
     }
     
     // compile fragment shader
-    if(!m_program.addShaderFromSourceFile(QGLShader::Fragment, ":/fshaderBlur.glsl")) {
+    if(!m_program.addShaderFromSourceFile(QGLShader::Fragment, ":/fshaderSharpen.glsl")) {
         QMessageBox::critical(0, "Error", "Fragment shader error",QMessageBox::Ok);
         QApplication::quit();
     }
@@ -400,6 +461,20 @@ void Blur::initShaders()
         exit(-1);
     }
     
+    // get location of u_reference in fragment shader
+    m_uniform[ISEDGE] = glGetUniformLocation(m_program.programId(), "u_IsEdge");
+    if((int) m_uniform[ISEDGE] < 0) {
+        qDebug() << "Failed to get the storage location of u_IsEdge";
+        exit(-1);
+    }
+    
+    // get location of u_reference in fragment shader
+    m_uniform[FACTOR] = glGetUniformLocation(m_program.programId(), "u_Factor");
+    if((int) m_uniform[FACTOR] < 0) {
+        qDebug() << "Failed to get the storage location of u_Factor";
+        exit(-1);
+    }
+    
     // bind the glsl progam
     glUseProgram(m_program.programId());
     
@@ -408,7 +483,6 @@ void Blur::initShaders()
     m_u_mvpMatrix.setToIdentity();
     glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData()); // Pass MVP matrix to vertex shader
     
-    glUniform1i(m_uniform[ISINPUT], m_isInput);
     glUniform1i(m_uniform[ISINPUT], m_isInput);
     glUniform1i(m_uniform[ISRGB], m_isRGB);
     
@@ -419,15 +493,18 @@ void Blur::initShaders()
     
     glUniform1f(m_uniform[FILTERWIDTH], m_u_filterWidth);
     glUniform1f(m_uniform[FILTERHEIGHT], m_u_filterHeight);
+    
+    glUniform1i(m_uniform[ISEDGE], m_u_isEdge);
+    glUniform1f(m_uniform[FACTOR], m_u_factor);
 }
 
 
 
-// Blur::initVertexBuffer:
+// Sharpen::initVertexBuffer:
 //
 // Initialize vertex buffer.
 //
-void Blur::initVertexBuffer()
+void Sharpen::initVertexBuffer()
 {
     // set flag for creating buffers (1st time only)
     static bool flag = 1;
@@ -470,4 +547,3 @@ void Blur::initVertexBuffer()
     glEnableVertexAttribArray(ATTRIB_TEXTURE_POSITION); // Enable assignment
     glVertexAttribPointer(ATTRIB_TEXTURE_POSITION, 2, GL_FLOAT, false, 0, NULL); // Assign the buffer object to an attribute variable
 }
-

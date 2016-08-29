@@ -1,12 +1,12 @@
 //
-//  Blur.cpp
+//  MedianFilter.cpp
 //  hw
 //
 //  Created by dong liang on 8/28/16.
 //
 //
 
-#include "Blur.h"
+#include "MedianFilter.h"
 
 enum {
     SAMPLER,
@@ -15,105 +15,99 @@ enum {
     ISRGB,
     DISTANCEX,
     DISTANCEY,
-    FILTERWIDTH,
-    FILTERHEIGHT
+    NEIGHBORSIZE
 };
 
 
 
-// Blur::Blur
+// MedianFilter::MedianFilter
 //
-// Constructor for class Blur
+// Constructor for class MedianFilter
 //
-Blur::Blur(QWidget *parent)
+MedianFilter::MedianFilter(QWidget *parent)
 : GLWidget (parent)
 {
     m_numberVertices = 4;
-    m_u_filterWidth = 0.0; // This filter width indicate how many units away from the mid pixel
-    m_u_filterHeight = 0.0; // This filter height indicate how many units away from the mid pixel
+    m_u_neighborSize = 1.0;
 }
 
 
 
-// Blur::controlPanel
+// MedianFilter::controlPanel
 //
 // Create control panel groupbox.
 //
-QGroupBox* Blur::controlPanel()
+QGroupBox* MedianFilter::controlPanel()
 {
-    // init group box
-    m_ctrlGrp = new QGroupBox("Blur");
-    QLabel* xrange = new QLabel(QString("Filter Width"));
-    QLabel* yrange = new QLabel(QString("Filter Length"));
+    m_ctrlGrp = new QGroupBox("Median Filter");
     
-    m_sliderXrange = new QSlider(Qt::Horizontal, m_ctrlGrp);
-    m_sliderXrange->setTickPosition(QSlider::TicksBelow);
-    m_sliderXrange->setTickInterval(5);
-    m_sliderXrange->setMinimum(1);
-    m_sliderXrange->setMaximum(100);
-    m_sliderXrange->setValue  (1);
+    QLabel* labelFilterSize = new QLabel(QString("Filter Size"));
+    QLabel* labelAvgK = new QLabel(QString("Avg K"));
     
-    m_sliderYrange = new QSlider(Qt::Horizontal, m_ctrlGrp);
-    m_sliderYrange->setTickPosition(QSlider::TicksBelow);
-    m_sliderYrange->setTickInterval(5);
-    m_sliderYrange->setMinimum(1);
-    m_sliderYrange->setMaximum(100);
-    m_sliderYrange->setValue  (1);
+    m_sliderFilterSize = new QSlider(Qt::Horizontal, m_ctrlGrp);
+    m_sliderFilterSize->setTickPosition(QSlider::TicksBelow);
+    m_sliderFilterSize->setTickInterval(5);
+    m_sliderFilterSize->setMinimum(1);
+    m_sliderFilterSize->setMaximum(99);
+    m_sliderFilterSize->setValue  (1);
     
-    m_spinBoxXrange = new QSpinBox(m_ctrlGrp);
-    m_spinBoxXrange->setMinimum   (1);
-    m_spinBoxXrange->setMaximum   (100);
-    m_spinBoxXrange->setValue     (1);
-    m_spinBoxXrange->setSingleStep(2);
+    m_sliderAvgK = new QSlider(Qt::Horizontal, m_ctrlGrp);
+    m_sliderAvgK->setTickPosition(QSlider::TicksBelow);
+    m_sliderAvgK->setTickInterval(5);
+    m_sliderAvgK->setMinimum(0);
+    m_sliderAvgK->setMaximum(49);
+    m_sliderAvgK->setValue  (0);
     
-    m_spinBoxYrange = new QSpinBox(m_ctrlGrp);
-    m_spinBoxYrange->setMinimum   (1);
-    m_spinBoxYrange->setMaximum   (100);
-    m_spinBoxYrange->setValue     (1);
-    m_spinBoxYrange->setSingleStep(2);
+    m_spinBoxFilterSize = new QSpinBox(m_ctrlGrp);
+    m_spinBoxFilterSize->setMinimum   (1);
+    m_spinBoxFilterSize->setMaximum   (99);
+    m_spinBoxFilterSize->setValue     (1);
+    m_spinBoxFilterSize->setSingleStep(2);
     
-    m_checkboxLockXY = new QCheckBox(QString("Synchronize X Y"));
+    m_spinBoxAvgK = new QSpinBox(m_ctrlGrp);
+    m_spinBoxAvgK->setMinimum   (0);
+    m_spinBoxAvgK->setMaximum   (49);
+    m_spinBoxAvgK->setValue     (0);
+    m_spinBoxAvgK->setSingleStep(1);
     
-    connect(m_sliderXrange,    SIGNAL(valueChanged(int)), this, SLOT(changeXrange(int)));
-    connect(m_spinBoxXrange,   SIGNAL(valueChanged(int)), this, SLOT(changeXrange(int)));
-    connect(m_sliderYrange,    SIGNAL(valueChanged(int)), this, SLOT(changeYrange(int)));
-    connect(m_spinBoxYrange,   SIGNAL(valueChanged(int)), this, SLOT(changeYrange(int)));
-    connect(m_checkboxLockXY,  SIGNAL(stateChanged(int)), this, SLOT(lockXY(int)));
+    connect(m_sliderFilterSize,    SIGNAL(valueChanged(int)), this, SLOT(changeFilterSize(int)));
+    connect(m_spinBoxFilterSize,   SIGNAL(valueChanged(int)), this, SLOT(changeFilterSize(int)));
+    connect(m_sliderAvgK,    SIGNAL(valueChanged(int)), this, SLOT(changeAvgK(int)));
+    connect(m_spinBoxAvgK,   SIGNAL(valueChanged(int)), this, SLOT(changeAvgK(int)));
     
     QGridLayout *layout = new QGridLayout;
     
-    layout->addWidget(xrange,            0, 0);
-    layout->addWidget(m_sliderXrange,    0, 1);
-    layout->addWidget(m_spinBoxXrange,   0, 2);
-    layout->addWidget(yrange,            1, 0);
-    layout->addWidget(m_sliderYrange,    1, 1);
-    layout->addWidget(m_spinBoxYrange,   1, 2);
-    layout->addWidget(m_checkboxLockXY,  2, 0);
-
+    layout->addWidget(labelFilterSize, 0, 0);
+    layout->addWidget(m_sliderFilterSize, 0, 1);
+    layout->addWidget(m_spinBoxFilterSize, 0, 2);
+    
+    layout->addWidget(labelAvgK, 1, 0);
+    layout->addWidget(m_sliderAvgK, 1, 1);
+    layout->addWidget(m_spinBoxAvgK, 1, 2);
+    
     m_ctrlGrp->setLayout(layout);
     
-    return(m_ctrlGrp);
-
+    return m_ctrlGrp;
 }
 
 
 
-// Blur::reset
+// MedianFilter::reset
 //
 // Reset all parameters
 //
-void Blur::reset()
+void MedianFilter::reset()
 {
     
 }
 
 
 
-// Blur::setImage
+// MedianFilter::setImage
 //
 // set image
 //
-void Blur::setImage(QImage image)
+void MedianFilter::setImage(QImage image)
 {
     m_image = QImage(image);
     updateGL();
@@ -130,16 +124,16 @@ void Blur::setImage(QImage image)
 
 
 
-void Blur::reload()
+void MedianFilter::reload()
 {
-    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass Blur reference to fragment shader
-    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass Blur reference to fragment shader
+    glUniform1i(m_uniform[ISINPUT], m_isInput); // pass MedianFilter reference to fragment shader
+    glUniform1i(m_uniform[ISRGB], m_isRGB); // pass MedianFilter reference to fragment shader
     updateGL();
 }
 
 
 
-void settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool oddOnly) {
+void MedianFilter::settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool oddOnly) {
     if (oddOnly) {
         value += !(value%2);
     }
@@ -154,73 +148,28 @@ void settingSliderAndSpinBox(QSlider* slider, QSpinBox* spinbox, int value, bool
 
 
 
-void Blur::changeXrange(int value) {
-    bool isChecked = m_checkboxLockXY->isChecked();
-    if (isChecked) {
-        settingSliderAndSpinBox(m_sliderXrange, m_spinBoxXrange, value, true);
-        settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, value, true);
-    } else {
-        settingSliderAndSpinBox(m_sliderXrange, m_spinBoxXrange, value, true);
-    }
-    
-    if(value == 1) {
-        m_u_filterWidth = 0.0;
-        m_u_filterHeight = 0.0;
-        glUniform1f(m_uniform[FILTERHEIGHT], m_u_filterHeight);
-    } else if(value != 1 && isChecked) {
-        m_u_filterWidth = (GLfloat)(value - 1) / 2;
-        m_u_filterHeight = m_u_filterWidth;
-        glUniform1f(m_uniform[FILTERHEIGHT], m_u_filterHeight);
-    } else {
-        m_u_filterWidth = (GLfloat)(value - 1) / 2;
-    }
-    glUniform1f(m_uniform[FILTERWIDTH], m_u_filterWidth);
-    updateGL();
-}
-
-void Blur::changeYrange(int value) {
-    settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, value, true);
-    if(value == 1) {
-        m_u_filterHeight = 0.0;
-    } else {
-        m_u_filterHeight = (GLfloat)(value - 1) / 2;
-    }
-    glUniform1f(m_uniform[FILTERHEIGHT], m_u_filterHeight);
-    updateGL();
+void MedianFilter::changeFilterSize(int value) {
+    value += !(value%2);
+    settingSliderAndSpinBox(m_sliderFilterSize, m_spinBoxFilterSize, value, true);
 }
 
 
 
-void Blur::lockXY(int isChecked) {
-    int xValue = m_sliderXrange->value();
-    if (isChecked == Qt::Checked) {
-        settingSliderAndSpinBox(m_sliderYrange, m_spinBoxYrange, xValue, true);
-        m_sliderYrange ->setEnabled(false);
-        m_spinBoxYrange->setEnabled(false);
-    } else {
-        m_sliderYrange ->setEnabled(true);
-        m_spinBoxYrange->setEnabled(true);
+void MedianFilter::changeAvgK(int value) {
+    int limit = m_spinBoxFilterSize->value() * m_spinBoxFilterSize->value() / 2;
+    if(value > limit) {
+        value = limit;
     }
-    if(xValue == 1) {
-        m_u_filterHeight = 0.0;
-        m_u_filterWidth = 0.0;
-    } else {
-        m_u_filterWidth = (GLfloat)(xValue - 1) / 2;
-        m_u_filterHeight = (GLfloat)(xValue - 1) / 2;
-    }
-    glUniform1f(m_uniform[FILTERHEIGHT], m_u_filterHeight);
-    glUniform1f(m_uniform[FILTERWIDTH], m_u_filterWidth);
-    updateGL();
+    settingSliderAndSpinBox(m_sliderAvgK, m_spinBoxAvgK, value, false);
 }
 
 
-
-// Blur::initializeGL
+// MedianFilter::initializeGL
 //
 // Initialization routine before display loop.
 // Gets called once before the first time resizeGL() or paintGL() is called.
 //
-void Blur::initializeGL()
+void MedianFilter::initializeGL()
 {
     initializeGLFunctions();    // initialize GL function resolution for current context
     
@@ -233,12 +182,12 @@ void Blur::initializeGL()
 
 
 
-// Blur::resizeGL
+// MedianFilter::resizeGL
 //
 // Resize event handler.
 // The input parameters are the window width (w) and height (h).
 //
-void Blur::resizeGL(int w, int h)
+void MedianFilter::resizeGL(int w, int h)
 {
     // save window dimensions
     m_winW = w;
@@ -268,11 +217,11 @@ void Blur::resizeGL(int w, int h)
 
 
 
-// Blur::paintGL
+// MedianFilter::paintGL
 //
 // Update GL scene.
 //
-void Blur::paintGL()
+void MedianFilter::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);   // clear canvas with background values
     if(!m_image.isNull()) glDrawArrays(GL_POLYGON, 0, m_numberVertices);   // draw a rectangle
@@ -285,7 +234,7 @@ void Blur::paintGL()
 // Initialize setup for texture
 //
 void
-Blur::initTexture()
+MedianFilter::initTexture()
 {
     // read image from file
     if(m_image.isNull()) {
@@ -312,20 +261,20 @@ Blur::initTexture()
 
 
 
-// Blur::initShaders
+// MedianFilter::initShaders
 //
 // Initialize vertex and fragment shaders.
 //
-void Blur::initShaders()
+void MedianFilter::initShaders()
 {
     // compile vertex shader
-    if(!m_program.addShaderFromSourceFile(QGLShader::Vertex, ":/vshaderBlur.glsl")) {
+    if(!m_program.addShaderFromSourceFile(QGLShader::Vertex, ":/vshaderMedianFilter.glsl")) {
         QMessageBox::critical(0, "Error", "Vertex shader error", QMessageBox::Ok);
         QApplication::quit();
     }
     
     // compile fragment shader
-    if(!m_program.addShaderFromSourceFile(QGLShader::Fragment, ":/fshaderBlur.glsl")) {
+    if(!m_program.addShaderFromSourceFile(QGLShader::Fragment, ":/fshaderMedianFilter.glsl")) {
         QMessageBox::critical(0, "Error", "Fragment shader error",QMessageBox::Ok);
         QApplication::quit();
     }
@@ -387,16 +336,9 @@ void Blur::initShaders()
     }
     
     // get location of u_reference in fragment shader
-    m_uniform[FILTERWIDTH] = glGetUniformLocation(m_program.programId(), "u_FilterWidth");
-    if((int) m_uniform[FILTERWIDTH] < 0) {
-        qDebug() << "Failed to get the storage location of u_FilterWidth";
-        exit(-1);
-    }
-    
-    // get location of u_reference in fragment shader
-    m_uniform[FILTERHEIGHT] = glGetUniformLocation(m_program.programId(), "u_FilterHeight");
-    if((int) m_uniform[FILTERHEIGHT] < 0) {
-        qDebug() << "Failed to get the storage location of u_FilterHeight";
+    m_uniform[NEIGHBORSIZE] = glGetUniformLocation(m_program.programId(), "u_NeighborSize");
+    if((int) m_uniform[NEIGHBORSIZE] < 0) {
+        qDebug() << "Failed to get the storage location of u_NeighborSize";
         exit(-1);
     }
     
@@ -409,7 +351,6 @@ void Blur::initShaders()
     glUniformMatrix4fv(m_uniform[MVP], 1, GL_FALSE, m_u_mvpMatrix.constData()); // Pass MVP matrix to vertex shader
     
     glUniform1i(m_uniform[ISINPUT], m_isInput);
-    glUniform1i(m_uniform[ISINPUT], m_isInput);
     glUniform1i(m_uniform[ISRGB], m_isRGB);
     
     m_u_distanceX = (GLfloat)1.0 / m_width_GLImage;
@@ -417,17 +358,17 @@ void Blur::initShaders()
     glUniform1f(m_uniform[DISTANCEX], m_u_distanceX);
     glUniform1f(m_uniform[DISTANCEY], m_u_distanceY);
     
-    glUniform1f(m_uniform[FILTERWIDTH], m_u_filterWidth);
-    glUniform1f(m_uniform[FILTERHEIGHT], m_u_filterHeight);
+    glUniform1f(m_uniform[NEIGHBORSIZE], m_u_neighborSize);
+    qDebug() << m_u_neighborSize;
 }
 
 
 
-// Blur::initVertexBuffer:
+// MedianFilter::initVertexBuffer:
 //
 // Initialize vertex buffer.
 //
-void Blur::initVertexBuffer()
+void MedianFilter::initVertexBuffer()
 {
     // set flag for creating buffers (1st time only)
     static bool flag = 1;
@@ -470,4 +411,3 @@ void Blur::initVertexBuffer()
     glEnableVertexAttribArray(ATTRIB_TEXTURE_POSITION); // Enable assignment
     glVertexAttribPointer(ATTRIB_TEXTURE_POSITION, 2, GL_FLOAT, false, 0, NULL); // Assign the buffer object to an attribute variable
 }
-

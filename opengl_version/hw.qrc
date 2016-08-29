@@ -12,7 +12,10 @@
         <file>fshaderHistogramMatching.glsl</file>
         <file>vshaderBlur.glsl</file>
         <file>fshaderBlur.glsl</file>
+        <file>vshaderSharpen.glsl</file>
+        <file>fshaderSharpen.glsl</file>
+        <file>vshaderMedianFilter.glsl</file>
+        <file>fshaderMedianFilter.glsl</file>
         <file>mandrill.jpg</file>
-
     </qresource>
 </RCC>
