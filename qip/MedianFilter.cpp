@@ -98,7 +98,7 @@ MedianFilter::controlPanel()
     layout->addWidget(m_sliderAvgK, 1, 1);
     layout->addWidget(m_spinBoxAvgK, 1, 2);
     layout->addWidget(m_checkBoxHistoBase, 2, 0, 1, 2);
-    layout->addWidget(m_scrollArea, 3, 0, 3, 3);
+    // layout->addWidget(m_scrollArea, 3, 0, 3, 3);
 
 
     m_ctrlGrp->setLayout(layout);

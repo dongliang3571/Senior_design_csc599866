@@ -14,7 +14,7 @@ win32-msvc2013 {
 
 
 macx{
-        QMAKE_MAC_SDK = macosx10.11
+        QMAKE_MAC_SDK = macosx10.12
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 	INCLUDEPATH += ./IP/mac/header
 	LIBS        += -L./IP/mac/lib
