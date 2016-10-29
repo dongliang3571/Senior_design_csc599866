@@ -42,6 +42,10 @@ private:
     
     QGLShaderProgram  m_program;			// GLSL programs
     QImage        m_image;			// texture image
+    QImage        m_GLImage;
+    GLsizei       m_width_GLImage;
+    GLsizei       m_height_GLImage;
+    
     GLuint		  m_texture;			// shader index to texture unit
     GLuint		  m_uniform[16];		// uniform vars for two shaders and <16 vars
     
@@ -50,6 +54,8 @@ private:
     GLfloat       m_u_bias;
     GLboolean     m_u_isDither;
     GLfloat       m_u_scale;
+    GLfloat       m_u_distanceX;    // Blur reference value
+    GLfloat       m_u_distanceY;    // Blur reference value
     
     // GUI Components
     QGroupBox*      m_ctrlGrp;	// groupbox for panel

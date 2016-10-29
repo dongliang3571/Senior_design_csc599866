@@ -324,21 +324,18 @@ void MedianFilter::initShaders()
         exit(-1);
     }
     
-    // get location of u_reference in fragment shader
     m_uniform[DISTANCEX] = glGetUniformLocation(m_program.programId(), "u_DistanceX");
     if((int) m_uniform[DISTANCEX] < 0) {
         qDebug() << "Failed to get the storage location of u_DistanceX";
         exit(-1);
     }
     
-    // get location of u_reference in fragment shader
     m_uniform[DISTANCEY] = glGetUniformLocation(m_program.programId(), "u_DistanceY");
     if((int) m_uniform[DISTANCEY] < 0) {
         qDebug() << "Failed to get the storage location of u_DistanceY";
         exit(-1);
     }
     
-    // get location of u_reference in fragment shader
     m_uniform[NEIGHBORSIZE] = glGetUniformLocation(m_program.programId(), "u_NeighborSize");
     if((int) m_uniform[NEIGHBORSIZE] < 0) {
         qDebug() << "Failed to get the storage location of u_NeighborSize";

@@ -36,7 +36,7 @@ vec3 blur() {
 		avg += texture2D(u_Sampler,vec2(v_TexCoord.x+k*u_DistanceX, v_TexCoord.y)).rgb;
 	}
 
-	// add up all pixels within neighborhood
+	// add up rest of pixels within neighborhood
 	for(float i = 1.0; i <= u_FilterHeight; i += 1.0) {
 		for(float j = 1.0; j <= u_FilterWidth; j +=1.0) {
 			avg += texture2D(u_Sampler,vec2(v_TexCoord.x-j*u_DistanceX,

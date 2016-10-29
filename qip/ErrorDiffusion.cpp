@@ -15,20 +15,20 @@ extern MainWindow *g_mainWindowP;
 
 ErrorDiffusion::ErrorDiffusion(QWidget *parent) : ImageFilter(parent)
 {
-    
+
 }
 
 
 
 bool
 ErrorDiffusion::applyFilter(ImagePtr I1, ImagePtr I2) {
-    
+
     if(I1.isNull()) return 0;
-    
+
     bool isChecked = m_checkbox->isChecked();
-    
+
     ErrorDiffuse(I1, isChecked, I2);
-    
+
     return true;
 }
 
@@ -38,24 +38,24 @@ QGroupBox*
 ErrorDiffusion::controlPanel()
 {
     m_ctrlGrp = new QGroupBox("ErrorDiffusion");
-    
+
     m_checkbox = new QCheckBox("Error Diffusion");
-    
+
     connect(m_checkbox , SIGNAL(stateChanged(int)), this, SLOT(startDiffuse(int)));
-    
+
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(m_checkbox, 0, 0);
-    
+
     m_ctrlGrp->setLayout(layout);
-    
+
     return m_ctrlGrp;
-    
+
 }
 
 void ErrorDiffusion::copyRowToBuffer(ChannelPtr<uchar> &p1, int width, int row) {
-    
+
     int i;
-    
+
     if (row%2 == 0) {
         bufferUp[0] = *p1;
         bufferUp[bufferSize-1] = *(p1+width-1);
@@ -77,14 +77,14 @@ void ErrorDiffusion::copyRowToBuffer(ChannelPtr<uchar> &p1, int width, int row) 
 
 
 void ErrorDiffusion::ErrorDiffuse(ImagePtr I1, bool isChecked, ImagePtr I2) {
-    
+
     IP_copyImageHeader(I1, I2);
     int w = I1->width();
     int h = I1->height();
     int total = w * h;
     int type, y, x, ch;
     ChannelPtr<uchar> p1, p2, endd;
-    
+
     if(isChecked) {
         short* in1;
         short* in2;
@@ -93,11 +93,11 @@ void ErrorDiffusion::ErrorDiffuse(ImagePtr I1, bool isChecked, ImagePtr I2) {
         bufferSize = w+2;
         bufferUp   = new short[bufferSize];
         bufferDown = new short[bufferSize];
-        
+
         for(ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
             IP_getChannel(I2, ch, p2, type);
             copyRowToBuffer(p1, w, 0);
-            
+
             for(y = 1; y < h; y++) {
                 copyRowToBuffer(p1, w, y);
                 if (y%2 == 0) {
@@ -131,7 +131,7 @@ void ErrorDiffusion::ErrorDiffuse(ImagePtr I1, bool isChecked, ImagePtr I2) {
 }
 
 void ErrorDiffusion::startDiffuse(int value) {
-    
+
     if (value != 0) {
         m_checkbox->blockSignals(true);
         m_checkbox->setCheckState(Qt::Checked);
@@ -141,19 +141,19 @@ void ErrorDiffusion::startDiffuse(int value) {
         m_checkbox->setCheckState(Qt::Unchecked);
         m_checkbox->blockSignals(false);
     }
-    
-    
-    
-    
+
+
+
+
     applyFilter(g_mainWindowP->imageSrc(), g_mainWindowP->imageDst());
-    
+
     // display output
     g_mainWindowP->displayOut();
 }
 
 
 void ErrorDiffusion::reset() {
-    
+
     qDebug() <<MaxGray <<"  "<<MXGRAY;
-    
+
 }

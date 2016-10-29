@@ -4,6 +4,8 @@ uniform bool u_IsInput;
 uniform bool u_IsRGB;
 uniform bool u_IsDither;
 uniform float u_Scale;
+uniform float u_DistanceX;
+// uniform float u_DistanceY;
 
 float rand(vec2 co){
     return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
@@ -31,7 +33,7 @@ float quantize(float value, float bias) {
 
 void main(void) {
 
-    float newBias;
+    float newBias = 0.0;
 	// Check if display input or output image
 	if(u_IsInput) {
 		if(u_IsRGB) {
@@ -44,10 +46,10 @@ void main(void) {
 		}
 	} else {
 		if(u_IsDither) {
-			if(mod(gl_FragCoord.x, 2.0) == 0.0) {
-				newBias = mod(rand(vec2(gl_FragCoord.x/1.0, gl_FragCoord.y/1.0)), u_Scale);
+			if(mod(v_TexCoord.x, u_DistanceX*2.0) == 0.0) {
+				newBias = mod(rand(vec2(gl_FragCoord.x/1.0, gl_FragCoord.y/1.0)), u_Scale/2.0);
 			} else {
-				newBias = - mod(rand(vec2(gl_FragCoord.x/1.0, gl_FragCoord.y/1.0)) / 3.0, u_Scale);
+				newBias = - mod(rand(vec2(gl_FragCoord.x/1.0, gl_FragCoord.y/1.0)), u_Scale/2.0);
 			}
 		}
 		if(u_IsRGB) {
