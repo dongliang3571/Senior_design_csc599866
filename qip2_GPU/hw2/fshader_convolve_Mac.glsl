@@ -1,6 +1,6 @@
-#version 130
+#version 120
 
-in	vec2	  v_TexCoord;	// varying variable for passing texture coordinate from vertex shader
+varying	vec2	  v_TexCoord;	// varying variable for passing texture coordinate from vertex shader
 
 uniform int       u_Size;	// blur width value
 uniform float	  u_StepX;
