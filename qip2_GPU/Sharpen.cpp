@@ -9,7 +9,7 @@
 
 #include "MainWindow.h"
 #include "Sharpen.h"
-//#include "hw2/HW_sharpen.cpp"
+#include "hw2/HW_sharpen.cpp"
 
 extern MainWindow *g_mainWindowP;
 enum { WSIZE, FACTOR, STEPX, STEPY, SAMPLER };
@@ -127,7 +127,7 @@ Sharpen::applyFilter(ImagePtr I1, bool gpuFlag, ImagePtr I2)
 void
 Sharpen::sharpen(ImagePtr I1, int size, double factor, ImagePtr I2)
 {
-//	HW_sharpen(I1, size, factor, I2);
+	HW_sharpen(I1, size, factor, I2);
 }
 
 
@@ -211,13 +211,20 @@ Sharpen::initShader()
 	uniforms["u_StepY"  ] = STEPY;
 	uniforms["u_Sampler"] = SAMPLER;
 
+        QString v_name = ":/vshader_passthrough";
+        QString f_name = ":/hw2/fshader_sharpen";
+        
+#ifdef __APPLE__
+        v_name += "_Mac";
+        f_name += "_Mac"; 
+#endif    
+
 	// compile shader, bind attribute vars, link shader, and initialize uniform var table
-	g_mainWindowP->glw()->initShader(m_program[PASS1],
-					 QString(":/hw2/vshader_sharpen.glsl"),
-					 QString(":/hw2/fshader_sharpen.glsl"),
+	g_mainWindowP->glw()->initShader(m_program[PASS1], 
+	                                 v_name + ".glsl", 
+	                                 f_name + ".glsl",
 					 uniforms,
 					 m_uniform[PASS1]);
-
 
 	m_shaderFlag = true;
 }

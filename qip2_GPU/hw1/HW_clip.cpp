@@ -6,21 +6,21 @@
 // If t1<input<t2: output = input;
 // If      val>t2: output = t2;
 //
+// Written by: Dong Liang, 2016
+//
 void
 HW_clip(ImagePtr I1, int t1, int t2, ImagePtr I2)
 {
-	IP_copyImageHeader(I1, I2);
+    IP_copyImageHeader(I1, I2);
 	int w = I1->width ();
 	int h = I1->height();
 	int total = w * h;
 
 	// init lookup table
-	int lut[MXGRAY];
-	for(int i=0; i<MXGRAY; i++) {
-		if(i < t1)	lut[i] = t1;
-		else if(i > t2)	lut[i] = t2;
-		else		lut[i] = i;
-	}
+	int i, lut[MXGRAY];
+	for(i = 0; i < t1 && i < MXGRAY; ++i) lut[i] = t1;
+    for(     ; i < t2 && i < MXGRAY; ++i) lut[i] = i;
+	for(i = t2; i<MXGRAY; ++i) lut[i] = t2;
 
 	// evaluate output: each input pixel indexes into lut[] to eval output
 	int type;
@@ -29,4 +29,5 @@ HW_clip(ImagePtr I1, int t1, int t2, ImagePtr I2)
 		IP_getChannel(I2, ch, p2, type);
 		for(endd = p1 + total; p1<endd;) *p2++ = lut[*p1++];
 	}
+
 }

@@ -3,21 +3,21 @@
 //
 // Gamma correct image I1. Output is in I2.
 //
-void
-HW_gammaCorrect(ImagePtr I1, double gamma, ImagePtr I2)
+// Written by: Dong Liang, 2016
+//
+
+void HW_gammaCorrect(ImagePtr I1, double gamma, ImagePtr I2)
 {
-	IP_copyImageHeader(I1, I2);
+    IP_copyImageHeader(I1, I2);
 	int w = I1->width ();
 	int h = I1->height();
 	int total = w * h;
 
-	// init gamma
-	gamma = 1.0 / gamma;
-
 	// init lookup table
-	uchar lut[MXGRAY];
-	for(int i=0; i<MXGRAY; i++)
-		lut[i] = (int) (MaxGray * pow((double) i/MaxGray, gamma));
+	int i, lut[MXGRAY];
+	for(i=0; i<MXGRAY; ++i) {
+        lut[i] = CLIP(pow((double)i/MaxGray, 1/gamma) * MaxGray, 0, MaxGray);
+    }
 
 	// evaluate output: each input pixel indexes into lut[] to eval output
 	int type;

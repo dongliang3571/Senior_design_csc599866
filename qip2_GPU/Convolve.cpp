@@ -9,7 +9,7 @@
 
 #include "MainWindow.h"
 #include "Convolve.h"
-//#include "hw2/HW_convolve.cpp"
+#include "hw2/HW_convolve.cpp"
 
 extern MainWindow *g_mainWindowP;
 enum { WSIZE, HSIZE, STEPX, STEPY, KERNEL, SAMPLER };
@@ -93,7 +93,7 @@ Convolve::applyFilter(ImagePtr I1, bool gpuFlag, ImagePtr I2)
 void
 Convolve::convolve(ImagePtr I1, ImagePtr kernel, ImagePtr I2)
 {
-//	HW_convolve(I1, kernel, I2);
+	HW_convolve(I1, kernel, I2);
 }
 
 
@@ -170,10 +170,32 @@ Convolve::load()
 void
 Convolve::initShader() 
 {
-
-
-
-	m_shaderFlag = false;
+//    m_nPasses = 1;
+//    // initialize GL function resolution for current context
+//    initializeGLFunctions();
+//    
+//    UniformMap uniforms;
+//    
+//    // init uniform hash table based on uniform variable names and location IDs
+//    uniforms["u_Brightness"] = BRIGHTNESS;
+//    uniforms["u_Contrast"  ] = U_CONTRAST;
+//    uniforms["u_Sampler"   ] = SAMPLER;
+//    
+//    QString v_name = ":/vshader_passthrough";
+//    QString f_name = ":/hw1/fshader_conlv";
+//    
+//#ifdef __APPLE__
+//    v_name += "_Mac";
+//    f_name += "_Mac";
+//#endif
+//    
+//    // compile shader, bind attribute vars, link shader, and initialize uniform var table
+//    g_mainWindowP->glw()->initShader(m_program[PASS1],
+//                                     v_name + ".glsl",
+//                                     f_name + ".glsl",
+//                                     uniforms,
+//                                     m_uniform[PASS1]);
+//    m_shaderFlag = true;
 }
 
 

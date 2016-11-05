@@ -28,12 +28,14 @@ protected slots:
 	void		changeFilterW	(int);
 	void		changeFilterH	(int);
 	void		setLock		(int);
+    void		setOnePass		(int);
 
 private:
 	// widgets
 	QSlider*	m_slider [2];	// Blur sliders
 	QSpinBox*	m_spinBox[2];	// Blur spin boxes
 	QCheckBox*	m_checkBox;	// Blur check box
+    QCheckBox*	m_checkBox_onePass;	// OnePass check box
 	QGroupBox*	m_ctrlGrp;	// groupbox for panel
 	int		m_width;	// input image width
 	int		m_height;	// input image height

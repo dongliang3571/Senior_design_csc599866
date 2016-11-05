@@ -11,21 +11,6 @@ Debug:OBJECTS_DIR   = debug/.obj
 Debug:MOC_DIR       = debug/.moc
 
 
-win32-msvc2013 {
-	Release:DESTDIR = release
-	Debug:DESTDIR = debug
-	INCLUDEPATH 	+= ./IP/win/header
-	LIBS 		+= -L./IP/win/lib
-	CONFIG(release, debug|release) {
-		LIBS += -lIP
-	} else {
-		LIBS += -lIP_d 
-	}
-	LIBS 		+= -lopengl32
-	QMAKE_CXXFLAGS  += /MP /Zi
-}
-
-
 win32-msvc2015 {
 	Release:DESTDIR = release
 	Debug:DESTDIR = debug
@@ -34,20 +19,25 @@ win32-msvc2015 {
 	CONFIG(release, debug|release) {
 		LIBS += -lIP
 	} else {
-		LIBS += -lIP_d 
+		LIBS += -lIP_d
 	}
 	LIBS 		+= -lopengl32
 	QMAKE_CXXFLAGS  += /MP /Zi
 }
 
 macx{
-	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 	INCLUDEPATH += ./IP/mac/header
 	LIBS        += -L./IP/mac/lib
-	LIBS        += -lIP_d
+	CONFIG(release, debug|release) {
+		LIBS += -lIP
+	} else {
+		LIBS += -lIP_d
+	}
 }
 
 unix:!macx {
+
 	CONFIG += C++11
 	INCLUDEPATH += ./IP/linux/header
 	LIBS        += -L./IP/linux/lib
@@ -72,10 +62,10 @@ HEADERS +=	MainWindow.h	\
 		Sharpen.h	\
 		Median.h	\
 		GLWidget.h	\
-		Convolve.h	
+		Convolve.h
 
-		
-SOURCES +=	main.cpp	\ 
+
+SOURCES +=	main.cpp	\
 		MainWindow.cpp 	\
 		ImageFilter.cpp	\
 		qcustomplot.cpp	\
@@ -92,4 +82,4 @@ SOURCES +=	main.cpp	\
 		Sharpen.cpp	\
 		Median.cpp	\
 		GLWidget.cpp	\
-		Convolve.cpp	
+		Convolve.cpp
