@@ -90,7 +90,7 @@ HW_objectMatch(ImagePtr I1, ImagePtr Ikernel, ImagePtr I2) {
                         sum += buffer[i][j+x] * (*kernelPtr++);
                     }
                 }
-                // qDebug() << sum;
+
                 // assign convoluted value to output
                 *p2++ = CLIP(sum, 0, MaxGray);
 
@@ -123,11 +123,14 @@ HW_objectMatch(ImagePtr I1, ImagePtr Ikernel, ImagePtr I2) {
             }
             cursor++;
 
-            if(y >= (h - paddingH - 1)) {
+            if(y >= (h - paddingH - 2)) {
                 cursor -= w;
             }
         }
 
     }
-
+    for (i = 0; i < kh; i++) {
+        delete[] buffer[i];
+    }
+    delete[] buffer;
 }
