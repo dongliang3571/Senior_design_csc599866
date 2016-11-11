@@ -35,7 +35,7 @@
 #define MAXFILTERS	50
 enum {
 	DUMMY, THRESHOLD, CLIP, QUANTIZE, GAMMA, CONTRAST, HISTOSTRETCH, HISTOMATCH,
-	ERRDIFFUSION, BLUR, SHARPEN, MEDIAN, CONVOLVE
+	ERRDIFFUSION, BLUR, SHARPEN, MEDIAN, CONVOLVE, OBJECTMATCH
 };
 using namespace IP;
 
@@ -53,22 +53,22 @@ public:
 			IP_castImage(I, BW_IMAGE, I);
 		m_imageDst = I;
 	}
-	QCustomPlot*	histogram	()      
+	QCustomPlot*	histogram	()
 		{return m_histogram;}
-	GLWidget*	glw		()      
+	GLWidget*	glw		()
 		{return m_glw;}
 	void		preview		();
-	bool		gpuFlag		()      
+	bool		gpuFlag		()
 		{ return m_checkboxGPU->checkState() ==  Qt::Checked; }
-	bool		timeFlag	()	
+	bool		timeFlag	()
 		{ return m_checkboxTime->checkState() ==  Qt::Checked; }
-	void		gpuProgram      (int pass) 
+	void		gpuProgram      (int pass)
 		{ m_imageFilter[m_code]->gpuProgram(pass); }
-	int		gpuPasses () 
+	int		gpuPasses ()
 		{ return m_imageFilter[m_code]->gpuPasses(); }
-	ImageFilter*	imageFilter(int i)	
+	ImageFilter*	imageFilter(int i)
 		{ return m_imageFilter[i]; }
-	bool		isInput		()	
+	bool		isInput		()
 		{ return m_radioDisplay[0]->isChecked();}
 	int	glFrameW() { return m_glwFrameW; }
 	int	glFrameH() { return m_glwFrameH; }
@@ -91,7 +91,7 @@ protected slots:
 	void		setTime		(int);
 	void		setGPU		(int);
 	void		resizeEvent	(QResizeEvent*);
-	
+
 
 protected:
 	void		createActions	();
@@ -132,6 +132,7 @@ private:
 	QAction*		m_actionSharpen	    ;
 	QAction*		m_actionMedian	    ;
 	QAction*		m_actionConvolve    ;
+    QAction*        m_actionObjectMatch;
 
 
 	// homework objects

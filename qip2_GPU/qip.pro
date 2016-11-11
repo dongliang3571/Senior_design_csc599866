@@ -62,7 +62,8 @@ HEADERS +=	MainWindow.h	\
 		Sharpen.h	\
 		Median.h	\
 		GLWidget.h	\
-		Convolve.h
+		Convolve.h  \
+        ObjectMatch.h \
 
 
 SOURCES +=	main.cpp	\
@@ -82,4 +83,5 @@ SOURCES +=	main.cpp	\
 		Sharpen.cpp	\
 		Median.cpp	\
 		GLWidget.cpp	\
-		Convolve.cpp
+		Convolve.cpp    \
+        ObjectMatch.cpp   \

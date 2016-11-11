@@ -9,6 +9,9 @@ moc*.cpp
 *.xcodeproj
 .DS_Store
 *.stash
+*.Debug
+*.Release
+release
 
 project.pbxproj
 project.xcworkspace/

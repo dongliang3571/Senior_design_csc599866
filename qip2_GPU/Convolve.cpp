@@ -178,7 +178,8 @@ Convolve::initShader()
     UniformMap uniforms;
     
     // init uniform hash table based on uniform variable names and location IDs
-    uniforms["u_Size"   ] = WSIZE;
+    uniforms["u_SizeW"   ] = WSIZE;
+    uniforms["u_SizeH"   ] = HSIZE;
     uniforms["u_StepX"  ] = STEPX;
     uniforms["u_StepY"  ] = STEPY;
     uniforms["u_Kernel" ] = KERNEL;
@@ -211,9 +212,9 @@ Convolve::initShader()
 void
 Convolve::gpuProgram(int pass) 
 {
-    int size   = m_kernel->width();
-    int kernelSize = size*size;
-    if(size % 2 == 0) ++size;
+    int w   = m_kernel->width();
+    int h   = m_kernel->height();
+    int kernelSize = w*h;
 
     int type;
     float* kernel = new float[kernelSize];
@@ -223,13 +224,10 @@ Convolve::gpuProgram(int pass)
     for(int i = 0; i < kernelSize; i++) {
         kernel[i] = *kernelPtr++;
     }
-    
-    for(int i = 0; i < kernelSize; i++) {
-        qDebug() << kernel[i];
-    }
-    
+
     glUseProgram(m_program[pass].programId());
-    glUniform1i (m_uniform[pass][WSIZE],  size);
+    glUniform1i (m_uniform[pass][WSIZE],  w);
+    glUniform1i (m_uniform[pass][HSIZE],  h);
     glUniform1f (m_uniform[pass][STEPX], (GLfloat) 1.0f / m_width);
     glUniform1f (m_uniform[pass][STEPY], (GLfloat) 1.0f / m_height);
     glUniform1fv(m_uniform[pass][KERNEL], kernelSize, kernel);

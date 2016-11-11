@@ -21,6 +21,7 @@
 #include "Sharpen.h"
 #include "Median.h"
 #include "Convolve.h"
+#include "ObjectMatch.h"
 
 
 using namespace IP;
@@ -58,17 +59,17 @@ MainWindow::MainWindow(QWidget *parent)
 	createActions();	// insert your actions here
 	createMenus  ();	// insert your menus here
 	createWidgets();
-	
+
 #ifdef __APPLE__
 	m_currentDir = qApp->applicationDirPath();
-        QDir dir(m_currentDir); 
+        QDir dir(m_currentDir);
         dir.cdUp();
         dir.cdUp();
         dir.cdUp();
         m_currentDir = dir.path();
         qDebug() << m_currentDir;
-#endif       
-	
+#endif
+
 }
 
 
@@ -154,6 +155,10 @@ MainWindow::createActions()
 	m_actionConvolve->setShortcut(tr("Ctrl+V"));
 	m_actionConvolve->setData(CONVOLVE);
 
+    m_actionObjectMatch = new QAction("Object Match", this);
+    m_actionObjectMatch->setShortcut(tr("Ctrl+O"));
+    m_actionObjectMatch->setData(OBJECTMATCH);
+
 
 	// one signal-slot connection for all actions;
 	// execute() will resolve which action was triggered
@@ -193,6 +198,7 @@ MainWindow::createMenus()
 	m_menuNbrOps->addAction(m_actionSharpen	   );
 	m_menuNbrOps->addAction(m_actionMedian	   );
 	m_menuNbrOps->addAction(m_actionConvolve   );
+    m_menuNbrOps->addAction(m_actionObjectMatch   );
 
 
 	// disable the following menus until input image is read
@@ -254,6 +260,7 @@ MainWindow::createGroupPanel()
 	m_imageFilter[SHARPEN	] = new Sharpen;
 	m_imageFilter[MEDIAN	] = new Median;
 	m_imageFilter[CONVOLVE	] = new Convolve;
+    m_imageFilter[OBJECTMATCH] = new ObjectMatch;
 
 
 	// create a stacked widget to hold multiple control panels
@@ -273,6 +280,7 @@ MainWindow::createGroupPanel()
 	m_stackWidgetPanels->addWidget(m_imageFilter[SHARPEN	 ]->controlPanel());
 	m_stackWidgetPanels->addWidget(m_imageFilter[MEDIAN	 ]->controlPanel());
 	m_stackWidgetPanels->addWidget(m_imageFilter[CONVOLVE	 ]->controlPanel());
+    m_stackWidgetPanels->addWidget(m_imageFilter[OBJECTMATCH]->controlPanel());
 
 
 	// display blank dummmy panel initially
@@ -708,7 +716,7 @@ void MainWindow::display(int flag)
 	IP_IPtoQImage(I, q);
 	if(flag == 0)
 		m_glw->setInTexture(q);
-	else 
+	else
 		m_glw->setOutTexture(q);
 
 	m_glw->update();
@@ -858,9 +866,9 @@ MainWindow::setHisto(int flag)
 // Slot to use GPU image filter checkbox.
 //
 void
-MainWindow::setGPU(int flag) 
+MainWindow::setGPU(int flag)
 {
-	
+
 	m_checkboxGPU->blockSignals(true);
 	// error checking (no filter selected).
 	if(m_code < 0) {
