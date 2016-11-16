@@ -156,7 +156,7 @@ MainWindow::createActions()
 	m_actionConvolve->setData(CONVOLVE);
 
     m_actionObjectMatch = new QAction("Object Match", this);
-    m_actionObjectMatch->setShortcut(tr("Ctrl+O"));
+    m_actionObjectMatch->setShortcut(tr("Ctrl+J"));
     m_actionObjectMatch->setData(OBJECTMATCH);
 
 

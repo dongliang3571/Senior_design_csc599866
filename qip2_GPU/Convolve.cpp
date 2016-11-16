@@ -118,7 +118,7 @@ Convolve::load()
 	// invoke native file browser to select file
 	m_file =  dialog.getOpenFileName(this,
 		"Open File", m_currentDir,
-		"Images (*.AF);;All files (*)");
+		"Images (*.AF *.png);;All files (*)");
 
 	// verify that file selection was made
 	if(m_file.isNull()) return 0;

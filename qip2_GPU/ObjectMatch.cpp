@@ -75,8 +75,7 @@ ObjectMatch::applyFilter(ImagePtr I1, bool gpuFlag, ImagePtr I2)
     m_width  = I1->width();
     m_height = I1->height();
     // ObjectMatch image
-    if(!(gpuFlag && m_shaderFlag))
-        objMatch(I1, m_kernel, I2);
+    if(!(gpuFlag && m_shaderFlag)) objMatch(I1, m_kernel, I2);
     else    g_mainWindowP->glw()->applyFilterGPU(m_nPasses);
     
     return 1;
@@ -116,10 +115,9 @@ ObjectMatch::load()
     dialog.setFileMode(QFileDialog::ExistingFile);
     
     // invoke native file browser to select file
-    m_file = dialog.getOpenFileName(this,
-                                    "Open File", m_currentDir,
-                                    "Images (*.jpg *.png *.ppm *.pgm *.bmp *.AF);;All files (*)");
-    
+    m_file =  dialog.getOpenFileName(this,
+                                     "Open File", m_currentDir,
+                                     "Images (*.AF *.png);;All files (*)");
     
     // verify that file selection was made
     if(m_file.isNull()) return 0;
@@ -131,6 +129,7 @@ ObjectMatch::load()
     // read kernel
     m_kernel = IP_readImage(qPrintable(m_file));
     
+//    IP_castImage(m_kernel,  BW_IMAGE, m_kernel);
     // init vars
     int w = m_kernel->width ();
     int h = m_kernel->height();
@@ -141,7 +140,7 @@ ObjectMatch::load()
     
     // declarations
     int type;
-    ChannelPtr<float> p;
+    ChannelPtr<uchar> p;
     QString s;
     
     // get pointer to kernel values
@@ -179,14 +178,15 @@ ObjectMatch::initShader()
     UniformMap uniforms;
     
     // init uniform hash table based on uniform variable names and location IDs
-    uniforms["u_Size"   ] = WSIZE;
+    uniforms["u_SizeW"   ] = WSIZE;
+    uniforms["u_SizeH"   ] = HSIZE;
     uniforms["u_StepX"  ] = STEPX;
     uniforms["u_StepY"  ] = STEPY;
     uniforms["u_Kernel" ] = KERNEL;
     uniforms["u_Sampler"] = SAMPLER;
     
     QString v_name = ":/vshader_passthrough";
-    QString f_name = ":/hw2/fshader_ObjectMatch";
+    QString f_name = ":/hw2/fshader_objectMatch";
     
 #ifdef __APPLE__
     v_name += "_Mac";
@@ -212,25 +212,23 @@ ObjectMatch::initShader()
 void
 ObjectMatch::gpuProgram(int pass)
 {
-    int size   = m_kernel->width();
-    int kernelSize = size*size;
-    if(size % 2 == 0) ++size;
+    int w   = m_kernel->width();
+    int h   = m_kernel->height();
+    int kernelSize = w*h;
     
     int type;
     float* kernel = new float[kernelSize];
-    ChannelPtr<float> kernelPtr;
+    ChannelPtr<uchar> kernelPtr;
     IP_getChannel(m_kernel, 0, kernelPtr, type);
     
     for(int i = 0; i < kernelSize; i++) {
-        kernel[i] = *kernelPtr++;
-    }
-    
-    for(int i = 0; i < kernelSize; i++) {
-        qDebug() << kernel[i];
+        kernel[i] = (*kernelPtr / 255.0);
+        kernelPtr++;
     }
     
     glUseProgram(m_program[pass].programId());
-    glUniform1i (m_uniform[pass][WSIZE],  size);
+    glUniform1i (m_uniform[pass][WSIZE],  w);
+    glUniform1i (m_uniform[pass][HSIZE],  h);
     glUniform1f (m_uniform[pass][STEPX], (GLfloat) 1.0f / m_width);
     glUniform1f (m_uniform[pass][STEPY], (GLfloat) 1.0f / m_height);
     glUniform1fv(m_uniform[pass][KERNEL], kernelSize, kernel);

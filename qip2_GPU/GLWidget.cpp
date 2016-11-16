@@ -310,6 +310,7 @@ GLWidget::initShaders()
 	g_mainWindowP->imageFilter(SHARPEN)->initShader();
 	g_mainWindowP->imageFilter(MEDIAN)->initShader();
 	g_mainWindowP->imageFilter(CONVOLVE)->initShader();
+    g_mainWindowP->imageFilter(OBJECTMATCH)->initShader();
 
 
 }
@@ -487,6 +488,11 @@ GLWidget::setDstImage(int pass)
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo[pass]);
 	glReadPixels(0, 0, m_imageW, m_imageH, GL_RGB, GL_UNSIGNED_BYTE, &p[0]);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
+//    for(int i = 0; i < 1000; i++) {
+//        qDebug() << *p++;
+//    }
+    
 	// uninterleave image
 	ImagePtr ipImage = IP_allocImage(m_imageW, m_imageH, RGB_TYPE);
 	IP_uninterleave(I, ipImage);
