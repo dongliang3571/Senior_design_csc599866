@@ -29,7 +29,9 @@ public:
 private:
     // widgets
     QPushButton*	m_button;	// ObjectMatch pushbutton
-    QTextEdit*	m_values;	// text field for kernel values
+    QLabel*         m_label;
+    QLabel*         m_label_template;
+//    QTextEdit*	m_values;	// text field for kernel values
     QGroupBox*	m_ctrlGrp;	// groupbox for panel
     
     // variables

@@ -116,7 +116,7 @@ float correlation(ImagePtr I1, ImagePtr I2, int &xx, int &yy) {
 }
 
 
-void HW_objectMatch(ImagePtr I1, ImagePtr Itemplate, ImagePtr I2) {
+float* HW_objectMatch(ImagePtr I1, ImagePtr Itemplate, ImagePtr I2) {
     ImagePtr tempImage;
     IP_copyImageHeader(I1, I2);
     IP_copyImageHeader(I1, tempImage);
@@ -130,10 +130,9 @@ void HW_objectMatch(ImagePtr I1, ImagePtr Itemplate, ImagePtr I2) {
 
     // get cross-correlation value
     float corr = correlation(I1, Itemplate, xx, yy);
-    qDebug() << "x: "<<xx << "y: "<< yy << "correlation: " << corr;
 
     int type;
-	ChannelPtr<uchar> p1, p2, p3, endd;
+    ChannelPtr<uchar> p1, p2, p3, endd;
 	for(int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {
         IP_getChannel(I2, ch, p2, type);
         IP_getChannel(Itemplate, ch, p3, type);
@@ -160,4 +159,9 @@ void HW_objectMatch(ImagePtr I1, ImagePtr Itemplate, ImagePtr I2) {
             }
         }
 	}
+    float *buf = new float[3];
+    buf[0] = xx;
+    buf[1] = yy;
+    buf[2] = corr;
+    return buf;
 }

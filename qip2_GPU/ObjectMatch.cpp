@@ -41,14 +41,13 @@ ObjectMatch::controlPanel()
     
     // create file pushbutton
     m_button = new QPushButton("File");
-    
-    // create text edit widget
-    m_values = new QTextEdit();
-    m_values->setReadOnly(1);
+    m_label = new QLabel("x: , y: , corr: ");
+    m_label_template = new QLabel;
     
     // assemble dialog
     vbox->addWidget(m_button);
-    vbox->addWidget(m_values);
+    vbox->addWidget(m_label);
+    vbox->addWidget(m_label_template);
     m_ctrlGrp->setLayout(vbox);
     
     // init signal/slot connections
@@ -92,7 +91,12 @@ ObjectMatch::applyFilter(ImagePtr I1, bool gpuFlag, ImagePtr I2)
 void
 ObjectMatch::objMatch(ImagePtr I1, ImagePtr kernel, ImagePtr I2)
 {
-    HW_objectMatch(I1, kernel, I2);
+    char buf[100];
+    float *corr;
+    corr = HW_objectMatch(I1, kernel, I2);
+    sprintf(buf, "x: %.2f, y: %.2f, corr: %.5f", corr[0], corr[1], corr[2]);
+    m_label->setText(QString(buf));
+    delete[] corr;
 }
 
 
@@ -138,22 +142,11 @@ ObjectMatch::load()
     m_button->setText(f.fileName());
     m_button->update();
     
-    // declarations
-    int type;
-    ChannelPtr<uchar> p;
-    QString s;
-    
-    // get pointer to kernel values
-    IP_getChannel(m_kernel, 0, p, type);
-    
-    // display kernel values
-    m_values->clear();			// clear text edit field (kernel values)
-    for(int y=0; y<h; y++) {		// process all kernel rows
-        s.clear();			// clear string
-        for(int x=0; x<w; x++)		// append kernel values to string
-            s.append(QString("%1   ").arg(*p++));
-        m_values->append(s);		// append string to text edit widget
-    }
+    QImage q;
+    IP_IPtoQImage(m_kernel, q);
+    QPixmap p;
+    p = QPixmap::fromImage(q);
+    m_label_template->setPixmap(p);
     
     // apply filter to source image and display result
     g_mainWindowP->preview();
