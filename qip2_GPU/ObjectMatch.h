@@ -25,19 +25,20 @@ public:
     
     protected slots:
     int		load		();
+    void    match       ();
     
 private:
     // widgets
     QPushButton*	m_button;	// ObjectMatch pushbutton
+    QPushButton*	m_button2;	// ObjectMatch pushbutton
     QLabel*         m_label;
     QLabel*         m_label_template;
-//    QTextEdit*	m_values;	// text field for kernel values
     QGroupBox*	m_ctrlGrp;	// groupbox for panel
     
     // variables
     QString		m_file;
     QString		m_currentDir;
-    ImagePtr	m_kernel;
+    ImagePtr	m_template;
     int		m_width;	// input image width
     int		m_height;	// input image height
 };

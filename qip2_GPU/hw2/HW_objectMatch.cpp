@@ -126,7 +126,7 @@ float* HW_objectMatch(ImagePtr I1, ImagePtr Itemplate, ImagePtr I2) {
 
     int width_k = Itemplate->width();
     int height_k = Itemplate->height();
-    int xx, yy;
+    int xx, yy; // coordinate of where template image sits in input image
 
     // get cross-correlation value
     float corr = correlation(I1, Itemplate, xx, yy);

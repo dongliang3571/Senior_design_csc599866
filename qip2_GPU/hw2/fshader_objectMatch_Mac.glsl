@@ -6,13 +6,19 @@ uniform int       u_SizeW;	// blur width value
 uniform int       u_SizeH;   // blur height value
 uniform float	  u_StepX;
 uniform float	  u_StepY;
-uniform float     u_Kernel[1000];
 uniform	sampler2D u_Sampler;	// uniform variable for the texture image
+
+uniform float	  u_StepX_T;
+uniform float	  u_StepY_T;
+uniform	sampler2D u_Sampler_T;
+
+uniform float     u_Sqrt_Sum_T;
 
 
 void main() {
 
-	vec4 avg = vec4(0.0);
+	vec4 convolve = vec4(0.0);
+    vec4 sum = vec4(0.0);
 	vec2 tc  = v_TexCoord;
     int  sizeW  = u_SizeW / 2;
     int  sizeH  = u_SizeH / 2;
@@ -20,8 +26,13 @@ void main() {
 
     for(int i=-sizeH; i<=sizeH; ++i) {
         for(int j=-sizeW; j<=sizeW; ++j) {
-            avg += (texture2D(u_Sampler, vec2(tc.x + j*u_StepX, tc.y + i*u_StepY)) * u_Kernel[count++]);
+            convolve += (texture2D(u_Sampler, vec2(tc.x + j*u_StepX, tc.y + i*u_StepY)) *
+                    texture2D(u_Sampler_T, vec2(0.5 + j*u_StepX_T, 0.5 + i*u_StepY_T)));
+
+            sum += (texture2D(u_Sampler, vec2(tc.x + j*u_StepX, tc.y + i*u_StepY)) *
+                    texture2D(u_Sampler, vec2(tc.x + j*u_StepX, tc.y + i*u_StepY)));
         }
     }
-	gl_FragColor = vec4(avg.rgb/300.0, 1.0);
+
+	gl_FragColor = vec4(convolve.rgb/sqrt(sum.rgb)/u_Sqrt_Sum_T, 1.0);
 }

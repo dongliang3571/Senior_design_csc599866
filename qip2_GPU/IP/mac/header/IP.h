@@ -89,6 +89,48 @@ extern int	JpgQuality;
 extern int	SwapBytes;
 
 
+
+// ----------------------------------------------------------------------
+// function externs
+//
+//		IParith.cpp	- arithmetic image operations
+extern int	IP_addImage	(ImagePtr, ImagePtr, ImagePtr);
+extern int	IP_addConst	(ImagePtr, double *, ImagePtr);
+extern int	IP_subtractImage(ImagePtr, ImagePtr, ImagePtr);
+extern int	IP_subtractConst(ImagePtr, double *, ImagePtr);
+extern int	IP_multiplyImage(ImagePtr, ImagePtr, ImagePtr);
+extern bool	IP_multiplyCmplx(ImagePtr, ImagePtr, ImagePtr);
+extern int	IP_multiplyConst(ImagePtr, double *, ImagePtr);
+extern int	IP_divideImage	(ImagePtr, ImagePtr, ImagePtr);
+extern int	IP_divideConst	(ImagePtr, double *, ImagePtr);
+extern void	IP_overlayImage	(ImagePtr, ImagePtr, ImagePtr);
+extern int	IP_absoluteValue(ImagePtr, ImagePtr);
+extern int	IP_magnitude	(ImagePtr, ImagePtr, ImagePtr);
+extern int	IP_magnitudeAbsVal(ImagePtr,ImagePtr,ImagePtr);
+extern ImagePtr operator+	(ImagePtr, ImagePtr);
+extern ImagePtr operator-	(ImagePtr, ImagePtr);
+extern ImagePtr operator*	(ImagePtr, ImagePtr);
+extern ImagePtr operator/	(ImagePtr, ImagePtr);
+
+//		IPbit.cpp	- bitwise image operations
+extern void	IP_andImage	(ImagePtr, ImagePtr, ImagePtr);
+extern void	IP_andConst	(ImagePtr, uchar  *, ImagePtr);
+extern void	IP_orImage	(ImagePtr, ImagePtr, ImagePtr);
+extern void	IP_orConst	(ImagePtr, uchar  *, ImagePtr);
+extern void	IP_xorImage	(ImagePtr, ImagePtr, ImagePtr);
+extern void	IP_xorConst	(ImagePtr, uchar  *, ImagePtr);
+extern void	IP_bicImage	(ImagePtr, ImagePtr, ImagePtr);
+extern void	IP_notImage	(ImagePtr, ImagePtr);
+
+//		IPblur.cpp	- blurring functions
+#include "IPblur.tpp"
+extern void	IP_blur		(ImagePtr, double, double, ImagePtr);
+
+//		IPcanny.cpp	- Canny edge operator
+extern void	IP_canny	(ImagePtr, double, int, int, ImagePtr);
+extern void	IP_cannyGradient(ImagePtr, double, int, int, ImagePtr,
+				 ImagePtr, ImagePtr);
+
 //		IPcastimg.cpp	- type casting routines for images
 extern void	IP_castImage	   (ImagePtr, int, ImagePtr);
 extern void	IP_initAlphaChannel(ImagePtr, int);
@@ -103,8 +145,75 @@ extern void	IP_RGBtoHSV1	(int, int, int, int&, int&, int&);
 extern void	IP_HSVtoRGB1	(int, int, int, int&, int&, int&);
 extern void	IP_clipRGB	(int&, int&, int&);
 
-//		IPhisto.cpp	- histogram evaluation
-extern void	IP_histogram	(ImagePtr, int, int*, int, double&, double&);
+//		IPconvolve.cpp	- convolution and correlation functions
+extern void	IP_convolve	(ImagePtr, ImagePtr, ImagePtr);
+extern float	IP_correlation	(ImagePtr, ImagePtr, int, int, int&, int&);
+
+//		IPdisplay.cpp	- display routines
+extern void	IP_displayImage	      (void);
+extern void	IP_displayImageInPlace(void);
+
+//		IPdither.cpp	- dithering algorithms
+extern void	IP_ditherOrdered  (ImagePtr, int, double,   ImagePtr);
+extern void	IP_halftone	  (ImagePtr, int,int,double,ImagePtr);
+extern void	IP_ditherDiffuse  (ImagePtr, int, double,   ImagePtr);
+extern void	IP_ditherED	  (ImagePtr,      double,   ImagePtr);
+
+//		IPfft.cpp	- 1D and 2D Fourier transforms
+extern void	IP_fft2D	(ImagePtr, int, ImagePtr);
+extern void	IP_fft1D	(ImagePtr, int, ImagePtr);
+extern int	IP_displayFFT	(ImagePtr, int, int, double, ImagePtr);
+extern void	IP_fftRecenter	(ImagePtr, ImagePtr);
+extern void	IP_complexConjugate(ImagePtr, ImagePtr);
+
+//		IPfiltnbr.cpp	- Neighborhood Ops
+extern void	IP_blurGaussian	(ImagePtr, double, ImagePtr);
+extern void	IP_blurEdgePreserve(ImagePtr, double, double, double, ImagePtr);
+extern void	IP_blurMask	(ImagePtr, ImagePtr, ImagePtr, double, ImagePtr);
+extern void	IP_blurMatte	(ImagePtr, double, double, ImagePtr);
+extern void	IP_sharpen	(ImagePtr, double, double, double, ImagePtr);
+extern void	IP_median	(ImagePtr, int, int, ImagePtr);
+extern void	IP_median2	(ImagePtr, int, ImagePtr);
+extern void	IP_gradient	(ImagePtr, ImagePtr, ImagePtr);
+extern void	IP_sobel	(ImagePtr, ImagePtr);
+extern void	IP_laplacian	(ImagePtr, ImagePtr);
+extern void	IP_laplacianThresh(ImagePtr, double*, ImagePtr);
+
+//		IPfiltpt.cpp	- Point Ops
+extern void	IP_threshold	(ImagePtr, double, double, double, double, double, ImagePtr);
+extern void	IP_thresholdOtsu(ImagePtr, int*, ImagePtr);
+extern void	IP_quantize	(ImagePtr, int ,     bool, ImagePtr);
+extern void	IP_clip		(ImagePtr, double, double, ImagePtr);
+extern void	IP_scaleRange	(ImagePtr, double, double, ImagePtr);
+extern void	IP_embedRange	(ImagePtr, double, double, ImagePtr);
+extern void	IP_gammaCorrect	(ImagePtr, double, ImagePtr);
+extern void	IP_contrast	(ImagePtr, double, double, double, ImagePtr);
+extern void	IP_medianOfChannels(ImagePtr, ImagePtr);
+
+//		IPgeo.cpp	- Geometric Ops
+extern void	IP_resize	(ImagePtr, int, int, int, ImagePtr);
+extern void	IP_resize1D	(ChannelPtr<uchar>, int, int, int, int,
+				 ChannelPtr<uchar>);
+extern void	IP_fresize1D	(ChannelPtr<float>, int, int, int, int,
+				 ChannelPtr<float>);
+extern void	IP_rotate	(ImagePtr, double, ImagePtr);
+extern void	IP_translate	(ImagePtr, double, double, ImagePtr);
+extern void	IP_reflect	(ImagePtr, int, ImagePtr);
+extern void	IP_tile		(ImagePtr, int, int, ImagePtr);
+extern void	IP_skew1D	(ChannelPtr<uchar>, int, int, double, int,
+			 	 ChannelPtr<uchar>);
+extern void	IP_fskew1D	(ChannelPtr<float>, int, int, double, int,
+				 ChannelPtr<float>);
+
+//		IPhisto.cpp	- histogram evaluation, manipulation, display
+extern void	IP_histogram	    (ImagePtr, int, int*, int, double&,double&);
+extern void	IP_histogramEqualize(ImagePtr, ImagePtr);
+extern void	IP_histogramMatch   (ImagePtr, ImagePtr, ImagePtr);
+
+//		IPhough.cpp	- Hough transform
+extern void	IP_houghLines	(ImagePtr, int, ImagePtr, ImagePtr);
+extern void	IP_houghCircles	(ImagePtr, ImagePtr, ImagePtr, int,
+				 int, int, ImagePtr);
 
 //		IPinit.cpp	- initialize global IP data structures
 extern void	IP_init		(void);
@@ -114,6 +223,29 @@ extern ImagePtr	IP_readImage	      (const char*);
 extern bool	IP_readImageIntoI     (const char*, ImagePtr);
 extern bool	IP_readImageDimensions(const char*, int&, int&);
 extern bool	IP_saveImage	      (ImagePtr, const char*, const char*);
+
+//		IPlut.cpp	- lookup tables
+extern void	IP_makeLut	(ImagePtr);
+extern void	IP_editLut	(ImagePtr, ImagePtr);
+extern void	IP_applyLut	(ImagePtr, ImagePtr, ImagePtr);
+extern void	IP_applyLutIntrp(ImagePtr, ImagePtr, ImagePtr);
+
+//		IPmatte.cpp	- matte operations
+extern void	IP_matteExtract	(ImagePtr, ImagePtr, ImagePtr);
+extern void	IP_matteOverlay	(ImagePtr, ImagePtr, ImagePtr);
+extern void	IP_matteOverlayAvg(ImagePtr,ImagePtr,ImagePtr);
+extern void	IP_matteCut	(ImagePtr, int,      ImagePtr);
+extern void	IP_matteOver	(ImagePtr, ImagePtr, int, ImagePtr);
+extern void	IP_matteIn	(ImagePtr, ImagePtr, ImagePtr);
+extern void	IP_matteOut	(ImagePtr, ImagePtr, ImagePtr);
+extern void	IP_matteAtop	(ImagePtr, ImagePtr, int, ImagePtr);
+extern void	IP_matteXor	(ImagePtr, ImagePtr, int, ImagePtr);
+extern void	IP_matteHicon	(ImagePtr, ImagePtr);
+extern void	IP_matteDarken	(ImagePtr, double, ImagePtr);
+extern void	IP_matteOpaque	(ImagePtr, double, ImagePtr);
+extern void	IP_matteDissolve(ImagePtr, double, ImagePtr);
+extern void	IP_matteMultiply(ImagePtr, ImagePtr, int, ImagePtr);
+extern void	IP_matteMaxAlpha(ImagePtr, ImagePtr, ImagePtr);
 
 //		IPmipmap.cpp	- mipmap routines
 extern int	IP_mipmap	(Image, Image&);
@@ -150,6 +282,18 @@ extern void	IP_copyHeader	(ImagePtr, int, ImagePtr);
 extern void	IP_copyHeader2	(ImagePtr, ImagePtr, int, ImagePtr);
 extern void	IP_copyImageBuffer(ImagePtr, ImagePtr);
 
+//	IPmorph.cpp
+extern void	IP_shrink	(ImagePtr, int, ImagePtr);
+extern void	IP_dilate	(ImagePtr, int, ImagePtr);
+
+//	IPpolar.cpp
+extern void	IP_polarToRect	 (ImagePtr, ImagePtr);
+extern void	IP_rectToPolar	 (ImagePtr, ImagePtr);
+extern void	IP_rectToLogPolar(ImagePtr, ImagePtr);
+
+//	IPthin.cpp
+extern void	IP_thin		(ImagePtr, int, int*, int*);
+extern void	IP_thinBridge	(ImagePtr, int, int, int, int, int*, int*);
 
 //	IPutil.cpp
 extern void	IP_interleave	(ImagePtr, ImagePtr);
@@ -170,9 +314,18 @@ extern void	IP_minmaxChannel(ImagePtr, int, double&, double&);
 extern void	IP_RGBdecouple	(ImagePtr, ImagePtr &, bool decouple=true);
 extern void	IP_RGBcouple	(ImagePtr, ImagePtr, ImagePtr);
 extern void	IP_bailout	(const char*, ...);
-extern void	IP_clip		(ImagePtr, double, double, ImagePtr);
-extern void	IP_embedRange	(ImagePtr I1, double t1, double t2, ImagePtr I2);
-extern void	IP_scaleRange   (ImagePtr I1, double t1, double t2, ImagePtr I2);
+
+//	IPwarp*.cpp
+extern void	IP_warpCoons	  (void);
+extern void	IP_warpSpatialLuts(ImagePtr,ImagePtr,ImagePtr,ImagePtr,ImagePtr);
+extern void	IP_warpMesh(ImagePtr,ImagePtr,ImagePtr,ImagePtr,ImagePtr,ImagePtr);
+
+//      IPdither.cpp
+extern void     IP_ditherUnordered(ImagePtr, int, double, ImagePtr);
+extern void     IP_ditherOrdered(ImagePtr, int, double, ImagePtr);
+extern void     IP_halftone(ImagePtr, int, int, double, ImagePtr);
+extern void     IP_ditherDiffuse(ImagePtr, int, double, ImagePtr);
+
 //      IPtoUI.cpp
 extern void     IP_printfErr(const char *fmt, ...);
 
