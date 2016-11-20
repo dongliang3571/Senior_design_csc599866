@@ -37,5 +37,14 @@ void main() {
 
     // first division is to get correlation
     // second division is to normalize correlation, that is range 0 - 1
+    // formula:
+    // 	           sum of {T(x,y) * I(x-u,y-v)}
+    //	 C(u,v) = --------------------------------
+    //			   sqrt{ sum of I(x-u,y-v)^2 }
+    //
+    //                               C(u,v)
+    //  Cnormalized(u,v) = ------------------------
+    //                      sqrt{ sum of T(X,Y)^2 }
+    //
 	gl_FragColor = vec4(convolve.rgb/sqrt(sum.rgb)/u_Sqrt_Sum_T, 1.0);
 }
