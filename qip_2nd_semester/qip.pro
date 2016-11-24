@@ -63,7 +63,7 @@ HEADERS +=	MainWindow.h	\
 		Median.h	\
 		GLWidget.h	\
 		Convolve.h  \
-        ObjectMatch.h \
+        Correlation.h \
 
 
 SOURCES +=	main.cpp	\
@@ -84,4 +84,4 @@ SOURCES +=	main.cpp	\
 		Median.cpp	\
 		GLWidget.cpp	\
 		Convolve.cpp    \
-        ObjectMatch.cpp   \
+        Correlation.cpp   \

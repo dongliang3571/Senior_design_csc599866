@@ -1,24 +1,15 @@
-// ======================================================================
-// IMPROC: Image Processing Software Package
-// Copyright (C) 2016 by George Wolberg
-//
-// ObjectMatch.cpp - ObjectMatch widget.
-//
-// Written by: George Wolberg, 2016
-// ======================================================================
-
 #include "MainWindow.h"
-#include "ObjectMatch.h"
-#include "hw2/HW_objectMatch.cpp"
+#include "Correlation.h"
+#include "hw2/HW_correlation.cpp"
 
 extern MainWindow *g_mainWindowP;
-enum { WSIZE, HSIZE, STEPX, STEPY, SAMPLER, STEPX_T, STEPY_T, SAMPLER_T, SQRT_SUM_T };
+enum { WSIZE_T, HSIZE_T, STEPX, STEPY, SAMPLER, STEPX_T, STEPY_T, SAMPLER_T, SQRT_SUM_T };
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// ObjectMatch::ObjectMatch:
+// Correlation::Correlation:
 //
 // Constructor.
 //
-ObjectMatch::ObjectMatch(QWidget *parent) : ImageFilter(parent)
+Correlation::Correlation(QWidget *parent) : ImageFilter(parent)
 {
     m_template = NULL;
 }
@@ -26,15 +17,15 @@ ObjectMatch::ObjectMatch(QWidget *parent) : ImageFilter(parent)
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// ObjectMatch::controlPanel:
+// Correlation::controlPanel:
 //
 // Create group box for control panel.
 //
 QGroupBox*
-ObjectMatch::controlPanel()
+Correlation::controlPanel()
 {
     // init group box
-    m_ctrlGrp = new QGroupBox("ObjectMatch");
+    m_ctrlGrp = new QGroupBox("Correlation");
     
     // layout for assembling filter widget
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -42,6 +33,7 @@ ObjectMatch::controlPanel()
     // create file pushbutton
     m_button = new QPushButton("File");
     m_button2 = new QPushButton("match");
+    m_button2->setDisabled(true);
     m_label = new QLabel("X: none, Y: none, Corr: none");
     m_label_template = new QLabel;
     
@@ -62,48 +54,50 @@ ObjectMatch::controlPanel()
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// ObjectMatch::applyFilter:
+// Correlation::applyFilter:
 //
 // Run filter on the image, transforming I1 to I2.
 // Overrides ImageFilter::applyFilter().
 // Return 1 for success, 0 for failure.
 //
 bool
-ObjectMatch::applyFilter(ImagePtr I1, bool gpuFlag, ImagePtr I2)
+Correlation::applyFilter(ImagePtr I1, bool gpuFlag, ImagePtr I2)
 {
     // error checking
     if(I1.isNull())		return 0;
     if(m_template.isNull())	return 0;
     m_width  = I1->width();
     m_height = I1->height();
-    // ObjectMatch image
-    if(!(gpuFlag && m_shaderFlag)) objMatch(I1, m_template, I2);
+    // Correlation image
+    if(!(gpuFlag && m_shaderFlag)) correlate(I1, m_template, I2);
     else    g_mainWindowP->glw()->applyFilterGPU(m_nPasses);
     
+    if(gpuFlag) m_button2->setDisabled(false);
+    else m_button2->setDisabled(true);
     return 1;
 }
 
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// ObjectMatch::ObjectMatch:
+// Correlation::Correlation:
 //
-// ObjectMatch image I1 with convolution filter in kernel.
+// Correlation image I1 with convolution filter in kernel.
 // Output is in I2.
 //
 void
-ObjectMatch::objMatch(ImagePtr I1, ImagePtr kernel, ImagePtr I2)
+Correlation::correlate(ImagePtr I1, ImagePtr kernel, ImagePtr I2)
 {
     char buf[100];
     float *corr;
-    corr = HW_objectMatch(I1, kernel, I2);
+    corr = HW_correlation(I1, kernel, I2);
     sprintf(buf, "X: %.2f, Y: %.2f, Corr: %.5f", corr[0], corr[1], corr[2]);
     m_label->setText(QString(buf));
     delete[] corr;
 }
 
 
-void ObjectMatch::match() {
+void Correlation::match() {
     
     // Read the output image from GPU
     ImagePtr out;
@@ -173,12 +167,12 @@ void ObjectMatch::match() {
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// ObjectMatch::load:
+// Correlation::load:
 //
 // Slot to load filter kernel from file.
 //
 int
-ObjectMatch::load()
+Correlation::load()
 {
     QFileDialog dialog(this);
     
@@ -230,12 +224,12 @@ ObjectMatch::load()
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// ObjectMatch::initShader:
+// Correlation::initShader:
 //
 // init shader program and parameters.
 //
 void
-ObjectMatch::initShader()
+Correlation::initShader()
 {
     m_nPasses = 1;
     
@@ -245,21 +239,20 @@ ObjectMatch::initShader()
     UniformMap uniforms;
     
     // init uniform hash table based on uniform variable names and location IDs
-    uniforms["u_SizeW"  ] = WSIZE;
-    uniforms["u_SizeH"  ] = HSIZE;
     uniforms["u_StepX"  ] = STEPX;
     uniforms["u_StepY"  ] = STEPY;
     uniforms["u_Sampler"] = SAMPLER;
     
-    
+    uniforms["u_SizeW_T"  ] = WSIZE_T;
+    uniforms["u_SizeH_T"  ] = HSIZE_T;
     uniforms["u_StepX_T"  ] = STEPX_T;
     uniforms["u_StepY_T"  ] = STEPY_T;
     uniforms["u_Sampler_T"] = SAMPLER_T;
     
     uniforms["u_Sqrt_Sum_T"] = SQRT_SUM_T;
     
-    QString v_name = ":/hw2/vshader_objectMatch";
-    QString f_name = ":/hw2/fshader_objectMatch";
+    QString v_name = ":/vshader_passthrough";
+    QString f_name = ":/hw2/fshader_correlation";
     
 #ifdef __APPLE__
     v_name += "_Mac";
@@ -278,19 +271,19 @@ ObjectMatch::initShader()
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// ObjectMatch::gpuProgram:
+// Correlation::gpuProgram:
 //
 // Active gpu program
 //
 void
-ObjectMatch::gpuProgram(int pass)
+Correlation::gpuProgram(int pass)
 {
     int w   = m_template->width();
     int h   = m_template->height();
     
     glUseProgram(m_program[pass].programId());
-    glUniform1i (m_uniform[pass][WSIZE],  w);
-    glUniform1i (m_uniform[pass][HSIZE],  h);
+    glUniform1i (m_uniform[pass][WSIZE_T],  w);
+    glUniform1i (m_uniform[pass][HSIZE_T],  h);
     glUniform1f (m_uniform[pass][STEPX], (GLfloat) 1.0f / m_width);
     glUniform1f (m_uniform[pass][STEPY], (GLfloat) 1.0f / m_height);
     glUniform1i (m_uniform[pass][SAMPLER], 0);

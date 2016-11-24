@@ -343,7 +343,7 @@ GLWidget::initShaders()
 	g_mainWindowP->imageFilter(SHARPEN)->initShader();
 	g_mainWindowP->imageFilter(MEDIAN)->initShader();
 	g_mainWindowP->imageFilter(CONVOLVE)->initShader();
-    g_mainWindowP->imageFilter(OBJECTMATCH)->initShader();
+    g_mainWindowP->imageFilter(CORRELATION)->initShader();
 
 
 }
@@ -438,7 +438,10 @@ GLWidget::paintGL()
 			glUniform1i(m_uniform[SAMPLER], 0);
 			break;
 		case 2: // display rendered texture by GPU filter
-            glUniform1i(m_uniform[SAMPLER], 3);
+            int n = g_mainWindowP->gpuPasses();
+            if(n == 1) glUniform1i(m_uniform[SAMPLER], 3);
+            else glUniform1i(m_uniform[SAMPLER], 4);
+            
 			break;
 	}
 	 
@@ -474,6 +477,7 @@ GLWidget::applyFilterGPU(int nPasses)
 		glBindBuffer(GL_ARRAY_BUFFER, m_texCoordBuffer);
 		glEnableVertexAttribArray(ATTRIB_TEXCOORD);
 		glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, false, 0, NULL);
+        
 		g_mainWindowP->gpuProgram(pass);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei) m_numPoints);
 
@@ -504,6 +508,7 @@ GLWidget::setDstImage(int pass)
 	ImagePtr ipImage = IP_allocImage(m_imageW, m_imageH, RGB_TYPE);
 	IP_uninterleave(I, ipImage);
     
+    // flip over the the image
     ImagePtr temp;
     IP_copyImageHeader(ipImage, temp);
     int type;

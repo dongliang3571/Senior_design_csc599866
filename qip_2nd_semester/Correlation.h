@@ -2,24 +2,24 @@
 // IMPROC: Image Processing Software Package
 // Copyright (C) 2016 by George Wolberg
 //
-// ObjectMatch.h - ObjectMatch widget
+// Correlation.h - Correlation widget
 //
 // Written by: George Wolberg, 2016
 // ======================================================================
 
-#ifndef ObjectMatch_H
-#define ObjectMatch_H
+#ifndef Correlation_H
+#define Correlation_H
 
 #include "ImageFilter.h"
 
-class ObjectMatch : public ImageFilter {
+class Correlation : public ImageFilter {
     Q_OBJECT
     
 public:
-    ObjectMatch			(QWidget *parent = 0);	// constructor
+    Correlation			(QWidget *parent = 0);	// constructor
     QGroupBox*	controlPanel	();			// create control panel
     bool		applyFilter	(ImagePtr, bool, ImagePtr);	// apply filter to input
-    void		objMatch	(ImagePtr, ImagePtr, ImagePtr);
+    void		correlate	(ImagePtr, ImagePtr, ImagePtr);
     void		initShader();
     void		gpuProgram(int pass);	// use GPU program to apply filter
     
@@ -29,8 +29,8 @@ public:
     
 private:
     // widgets
-    QPushButton*	m_button;	// ObjectMatch pushbutton
-    QPushButton*	m_button2;	// ObjectMatch pushbutton
+    QPushButton*	m_button;	// Correlation pushbutton
+    QPushButton*	m_button2;	// Correlation pushbutton
     QLabel*         m_label;
     QLabel*         m_label_template;
     QGroupBox*	m_ctrlGrp;	// groupbox for panel
@@ -43,4 +43,4 @@ private:
     int		m_height;	// input image height
 };
 
-#endif	// ObjectMatch_H
+#endif	// Correlation_H

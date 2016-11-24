@@ -116,7 +116,7 @@ float correlation(ImagePtr I1, ImagePtr I2, int &xx, int &yy) {
 }
 
 
-float* HW_objectMatch(ImagePtr I1, ImagePtr Itemplate, ImagePtr I2) {
+float* HW_correlation(ImagePtr I1, ImagePtr Itemplate, ImagePtr I2) {
     ImagePtr tempImage;
     IP_copyImageHeader(I1, I2);
     IP_copyImageHeader(I1, tempImage);
