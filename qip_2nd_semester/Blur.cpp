@@ -77,6 +77,7 @@ Blur::controlPanel()
     // Create onePass checkbox
     m_checkBox_onePass = new QCheckBox("One Pass GPU");
     m_checkBox_onePass->setCheckState(Qt::Unchecked);
+    m_checkBox_onePass->setDisabled(true);
 
 	// add checkbox to layout
 	layout->addWidget(m_checkBox, 2, 0, 1, 2);
@@ -121,6 +122,9 @@ Blur::applyFilter(ImagePtr I1, bool gpuFlag, ImagePtr I2)
 		blur(I1, w, h, I2);	// apply CPU based filter
 	else    g_mainWindowP->glw()->applyFilterGPU(m_nPasses);
 
+    if(gpuFlag) m_checkBox_onePass->setDisabled(false);
+    else m_checkBox_onePass->setDisabled(true);
+    
 	return 1;
 }
 
@@ -368,7 +372,7 @@ Blur::gpuProgram(int pass)
                 glUseProgram(m_program[PASS2].programId());
                 glUniform1i (m_uniform[PASS2][HSIZE], h_size);
                 glUniform1f (m_uniform[PASS2][STEPX],  (GLfloat) 1.0f / m_height);
-                glUniform1i (m_uniform[PASS2][SAMPLER], 0);
+                glUniform1i (m_uniform[PASS2][SAMPLER], 3);
                 break;
         }
     }

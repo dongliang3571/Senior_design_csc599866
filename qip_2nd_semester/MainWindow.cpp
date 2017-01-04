@@ -21,7 +21,7 @@
 #include "Sharpen.h"
 #include "Median.h"
 #include "Convolve.h"
-#include "ObjectMatch.h"
+#include "Correlation.h"
 
 
 using namespace IP;
@@ -155,9 +155,9 @@ MainWindow::createActions()
 	m_actionConvolve->setShortcut(tr("Ctrl+V"));
 	m_actionConvolve->setData(CONVOLVE);
 
-    m_actionObjectMatch = new QAction("Object Match", this);
-    m_actionObjectMatch->setShortcut(tr("Ctrl+J"));
-    m_actionObjectMatch->setData(OBJECTMATCH);
+    m_actionCorrelation = new QAction("Correlation", this);
+    m_actionCorrelation->setShortcut(tr("Ctrl+R"));
+    m_actionCorrelation->setData(CORRELATION);
 
 
 	// one signal-slot connection for all actions;
@@ -198,7 +198,7 @@ MainWindow::createMenus()
 	m_menuNbrOps->addAction(m_actionSharpen	   );
 	m_menuNbrOps->addAction(m_actionMedian	   );
 	m_menuNbrOps->addAction(m_actionConvolve   );
-    m_menuNbrOps->addAction(m_actionObjectMatch   );
+    m_menuNbrOps->addAction(m_actionCorrelation   );
 
 
 	// disable the following menus until input image is read
@@ -260,7 +260,7 @@ MainWindow::createGroupPanel()
 	m_imageFilter[SHARPEN	] = new Sharpen;
 	m_imageFilter[MEDIAN	] = new Median;
 	m_imageFilter[CONVOLVE	] = new Convolve;
-    m_imageFilter[OBJECTMATCH] = new ObjectMatch;
+    m_imageFilter[CORRELATION] = new Correlation;
 
 
 	// create a stacked widget to hold multiple control panels
@@ -280,7 +280,7 @@ MainWindow::createGroupPanel()
 	m_stackWidgetPanels->addWidget(m_imageFilter[SHARPEN	 ]->controlPanel());
 	m_stackWidgetPanels->addWidget(m_imageFilter[MEDIAN	 ]->controlPanel());
 	m_stackWidgetPanels->addWidget(m_imageFilter[CONVOLVE	 ]->controlPanel());
-    m_stackWidgetPanels->addWidget(m_imageFilter[OBJECTMATCH]->controlPanel());
+    m_stackWidgetPanels->addWidget(m_imageFilter[CORRELATION]->controlPanel());
 
 
 	// display blank dummmy panel initially
