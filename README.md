@@ -30,28 +30,28 @@ Step 1. Install [Qt](https://www.qt.io/download/)
 
 Step 2. Navigate to one of the folders (that's `my_opengl_version`, `qip_1st_semester`, and `qip_2nd_semester`. Each one is different project)
 
-Step 3. Running following commands one by one(assume we're in `qip_2nd_semester`)
+Step 3. Running following commands one by one(assume we're in `qip_2nd_semester`).
 
 
-	```
-	qmake qip.pro
-	```
+```bash
+qmake qip.pro
+```
 	
 This command will generate a `Makefile`, note that in folder 'my_opengl_version', we use hw.pro instead.
 
 Next
 
-	```
-	make
-	```
+```bash
+make
+```
 	
 This command will complie the program and produce excutable.
 	
 Lastly
 
-	```
-	./qip
-	```
+```bash
+./qip
+```
 	
 to run your excutable.
 
