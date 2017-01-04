@@ -23,6 +23,15 @@ Image filter is something that you can see often in the image processing softwar
 
 **Qt:** Qt is a cross-platform application framework that is widely used for developing application software that can be run on various software and hardware platforms with little or no change in the underlying codebase, while still being a native application with the capabilities and speed thereof
 
+Differences between three projects
+==================================
+
+As you might have noticed that we have three folders, `project1`, `project2`, and `project3`. The differences are that 
+- `project1` is normal implemented without using GPU.
+- `project2` has implementation of using shaders and shading language, which takes advantages of GPU, accelerate computing speed. Because GPU supports parallel computing, which basically can process multiple pixels at the same time.
+- `project3` is similar to `project2` but it's my own implementation without professor's help.
+
+
 Getting started
 ===============
 
@@ -68,6 +77,17 @@ ScreenShots
 
 - Contrast
 ![alt text](https://github.com/dongliang3571/Senior_design_csc599866/blob/master/screenshots/contrast.png?raw=true "Logo Title Text 1")
+
+- Blurring
+![alt text](https://github.com/dongliang3571/Senior_design_csc599866/blob/master/screenshots/blurring.png?raw=true "Logo Title Text 1")
+
+- Convolution
+![alt text](https://github.com/dongliang3571/Senior_design_csc599866/blob/master/screenshots/convolution.png?raw=true "Logo Title Text 1")
+
+- Correlation
+![alt text](https://github.com/dongliang3571/Senior_design_csc599866/blob/master/screenshots/correlation.png?raw=true "Logo Title Text 1")
+
+
 
 Important Notes
 ===============
