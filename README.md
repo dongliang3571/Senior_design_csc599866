@@ -8,18 +8,53 @@ Image filter is something that you can see often in the image processing softwar
   * [x] Contrast
   * [x] Quantization(Dithering isn't good)
   * [x] Histogram Stretching
-  * [ ] Histogram Matching
+  * [x] Histogram Matching (can't be impemented in shaders)
 
 - Neighborhood Operations
   * [x] Blur
-  * [ ] Sharpen
-  * [ ] Median Filter
+  * [x] Sharpen
+  * [x] Median Filter
+  * [x] Convolution
+  * [x] Correlation
 
 **Note:This is a Qt project, in order to run this you have to have Qt installed!**
 
 **OpenGL:** Open Graphics Library (OpenGL) is a cross-language, cross-platform application programming interface (API) for rendering 2D and 3D vector graphics. The API is typically used to interact with a graphics processing unit (GPU), to achieve hardware-accelerated rendering.
 
 **Qt:** Qt is a cross-platform application framework that is widely used for developing application software that can be run on various software and hardware platforms with little or no change in the underlying codebase, while still being a native application with the capabilities and speed thereof
+
+Getting started
+===============
+
+Step 1. Install [Qt](https://www.qt.io/download/)
+
+Step 2. Navigate to one of the folders (that's `my_opengl_version`, `qip_1st_semester`, and `qip_2nd_semester`. Each one is different project)
+
+Step 3. Running following commands one by one(assume we're in `qip_2nd_semester`)
+
+
+	```
+	qmake qip.pro
+	```
+	
+This command will generate a `Makefile`, note that in folder 'my_opengl_version', we use hw.pro instead.
+
+Next
+
+	```
+	make
+	```
+	
+This command will complie the program and produce excutable.
+	
+Lastly
+
+	```
+	./qip
+	```
+	
+to run your excutable.
+
 
 ScreenShots
 ===========
